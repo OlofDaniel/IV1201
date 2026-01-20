@@ -1,0 +1,13 @@
+__pycache__/
+.py[cod]
+.venv/
+.python-version
+
+node_modules/
+.next/
+out/
+build/
+.env.local
+
+.DS_Store
+.vscode/

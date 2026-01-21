@@ -1,3 +1,5 @@
+import { MessagePresenter } from "@/presenters/messagePresenter";
+
 export default function Home() {
-  return <div></div>;
+  return <MessagePresenter></MessagePresenter>;
 }

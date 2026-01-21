@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface messageState {
   message: string;
 }
-const initialState: messageState = { message: "initial string" };
+const initialState: messageState = { message: "from store string" };
 
 const messageSlice = createSlice({
   name: "message",
@@ -14,3 +14,6 @@ const messageSlice = createSlice({
     },
   },
 });
+
+export const { setMessage } = messageSlice.actions;
+export default messageSlice.reducer;

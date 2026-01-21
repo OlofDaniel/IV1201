@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
+import messageReducer from "../models/messageSlice";
 
 export const makeStore = () => {
   return configureStore({
-    reducer: {},
+    reducer: { message: messageReducer },
   });
 };
 export type AppStore = ReturnType<typeof makeStore>;

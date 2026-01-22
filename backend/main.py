@@ -1,3 +1,5 @@
+import time
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +17,7 @@ app.add_middleware(
 
 @app.get("/testing")
 def test():
+    time.sleep(2)
     return {"message": "message from the backend"}
 
 

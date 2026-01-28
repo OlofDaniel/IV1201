@@ -34,7 +34,7 @@ export function LoginDialog({
   onEyeClick,
   onLoginClick,
   onOpenChange,
-}: PopupDialogProps) {
+}: LoginDialogProps) {
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 

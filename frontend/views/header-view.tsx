@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   CustomDropdownMenu,
   dropdownItem,
-} from "@/components/ui/custom/Customdropdown-menu";
+} from "@/components/ui/custom/custom-dropdown-menu";
 
 interface headerViewProps {
   onLoginClick: () => void;

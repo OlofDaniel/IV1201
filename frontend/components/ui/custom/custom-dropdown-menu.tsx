@@ -25,7 +25,7 @@ export function CustomDropdownMenu({ trigger, items }: dropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="end" sideOffset={0}>
         {items.map((item, index) => (
           <div key={index}>
             <DropdownMenuItem onClick={item.onClick} className="cursor-pointer">

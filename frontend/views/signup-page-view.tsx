@@ -1,9 +1,14 @@
 import { SignupPageForm } from "@/components/ui/custom/signup-page-form";
 import Image from "next/image";
-import { House, ArrowLeft } from "lucide-react";
+import { House } from "lucide-react";
 import Link from "next/link";
 
-export function SignupPageView() {
+interface SignupPageProps {
+  passwordShown: boolean;
+  onEyeClick: () => void;
+}
+
+export function SignupPageView({ passwordShown, onEyeClick }: SignupPageProps) {
   return (
     <div className="grid h-full min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center items-center bg-slate-100 text-black">
@@ -12,7 +17,10 @@ export function SignupPageView() {
         </Link>
         <div>
           <h1 className="text-4xl font-bold ml-5 mb-5">Sign up</h1>
-          <SignupPageForm></SignupPageForm>
+          <SignupPageForm
+            onEyeClick={onEyeClick}
+            passwordShown={passwordShown}
+          ></SignupPageForm>
         </div>
       </div>
       <div className="relative hidden lg:block">

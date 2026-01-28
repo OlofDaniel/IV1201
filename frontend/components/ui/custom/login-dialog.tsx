@@ -64,6 +64,9 @@ export function LoginDialog({
                 className="peer user-invalid:border-red-500"
                 required
               />
+              <p className="text-sm text-red-500 hidden peer-user-invalid:block">
+                Required
+              </p>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>

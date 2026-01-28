@@ -19,7 +19,7 @@ export function HomePageView() {
           <p className=" text-white text-center mt-2 text-xl">
             Welcome to us at The Amusement Park
           </p>
-          <p className=" text-white text-center mt-10 text-xl max-w-200">
+          <p className=" text-white text-center mt-10 px-10 text-xl max-w-200">
             In order to make an application you first have to create an account,
             where you can make applications as well as review your applications.
           </p>

@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -75,6 +76,13 @@ export function LoginDialog({
                 </button>
               </div>
             </div>
+          </div>
+          <div className="text-sm leading-none font-medium mt-5 text-muted-foreground">
+            Don't have an account?
+            <Link href="/signup" className="text-blue-700">
+              {" "}
+              Sign up here
+            </Link>
           </div>
           <DialogFooter className="mt-5">
             <DialogClose asChild>

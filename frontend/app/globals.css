@@ -47,6 +47,7 @@
 
   /* Our own colors */
   --color-button-standard: var(--button-standard);
+  --color-input-standard: var(--input-standard);
 }
 
 :root {
@@ -85,6 +86,7 @@
 
   /* Our own colors */
   --button-standard: oklch(52.552% 0.10668 241.23);
+  --input-standard: oklch(72.516% 0.00008 271.152);
 }
 
 .dark {

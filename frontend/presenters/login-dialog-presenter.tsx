@@ -9,7 +9,7 @@ import {
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
 
-export function LoginPresenter() {
+export function LoginDialogPresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const { username, password, passwordShown, dialogIsOpen } = useSelector(
     (state: RootState) => state.login,

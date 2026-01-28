@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Field,
   FieldDescription,
@@ -8,11 +9,25 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
-export function SignupPageForm() {
+interface SignupPageFormProps {
+  passwordShown: boolean;
+  onEyeClick: () => void;
+}
+
+export function SignupPageForm({
+  passwordShown,
+  onEyeClick,
+}: SignupPageFormProps) {
+  // Placeholder to avoid error and site reload on button presses --------
+  const onClickPlaceholder = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("signup form submit");
+  };
+  // Placeholder to avoid error and site reload on button presses --------
   return (
-    <form className="w-110">
+    <form className="w-110" onSubmit={onClickPlaceholder}>
       {/* Personal information */}
-      <div className="p-5 rounded-xl border-[0.5px] border-black/10 bg-black/[0.02]">
+      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02]">
         <h2 className="mb-2 font-bold">Personal information</h2>
         <FieldGroup>
           <Field>
@@ -38,24 +53,62 @@ export function SignupPageForm() {
         </FieldGroup>
       </div>
 
-      <div className="p-5 rounded-xl border-[0.5px] border-black/10 bg-black/[0.02] my-5">
+      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02] my-5">
         <h2 className="mb-2 font-bold">Account information</h2>
         <FieldGroup>
           {/* Account information */}
           <Field className="">
-            <FieldLabel htmlFor="fieldgroup-name">Email</FieldLabel>
-            <Input id="fieldgroup-name" placeholder="Email" />
+            <FieldLabel htmlFor="fieldgroup-email">Email</FieldLabel>
+            <Input id="fieldgroup-email" placeholder="Email" type="Email" />
           </Field>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-email">Username</FieldLabel>
-            <Input id="fieldgroup-email" type="email" placeholder="Username" />
-            {/* <FieldDescription>
-            We&apos;ll send updates to this address.
-          </FieldDescription> */}
+            <FieldLabel htmlFor="fieldgroup-username">Username</FieldLabel>
+            <Input id="fieldgroup-usename" placeholder="Username" />
           </Field>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-email">Password</FieldLabel>
-            <Input id="fieldgroup-email" type="email" placeholder="Password" />
+            <FieldLabel htmlFor="fieldgroup-password">Password</FieldLabel>
+            <div className="relative">
+              <Input
+                id="fieldgroup-password"
+                type={passwordShown ? "text" : "password"}
+                placeholder="Password"
+              />
+              <button
+                className="absolute w-5 top-2 right-2"
+                onClick={onEyeClick}
+              >
+                {passwordShown ? (
+                  <EyeOff size={20} className="text-muted-foreground" />
+                ) : (
+                  <Eye size={20} className="text-muted-foreground" />
+                )}
+              </button>
+            </div>
+          </Field>
+          <FieldDescription>
+            Password must include letters and numbers
+          </FieldDescription>
+          <Field>
+            <FieldLabel htmlFor="fieldgroup-password">
+              Confirm password
+            </FieldLabel>
+            <div className="relative">
+              <Input
+                id="fieldgroup-password"
+                type={passwordShown ? "text" : "password"}
+                placeholder="Password"
+              />
+              <button
+                className="absolute w-5 top-2 right-2"
+                onClick={onEyeClick}
+              >
+                {passwordShown ? (
+                  <EyeOff size={20} className="text-muted-foreground" />
+                ) : (
+                  <Eye size={20} className="text-muted-foreground" />
+                )}
+              </button>
+            </div>
           </Field>
         </FieldGroup>
       </div>

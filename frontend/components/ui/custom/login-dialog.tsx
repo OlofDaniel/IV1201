@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface PopupDialogProps extends React.PropsWithChildren {
+interface LoginDialogProps extends React.PropsWithChildren {
   username: string | null;
   password: string | null;
   passwordShown: boolean;
@@ -34,7 +34,7 @@ export function LoginDialog({
   onEyeClick,
   onLoginClick,
   onOpenChange,
-}: PopupDialogProps) {
+}: LoginDialogProps) {
   return (
     <Dialog open={dialogIsOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">

@@ -31,23 +31,25 @@ export function SignupPageForm({
         <h2 className="mb-2 font-bold">Personal information</h2>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-email">First name</FieldLabel>
+            <FieldLabel htmlFor="first-name">First name</FieldLabel>
             <Input
-              id="fieldgroup-email"
-              type="email"
+              id="first-name"
+              type="text"
               placeholder="First name"
+              required
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-email">Surname</FieldLabel>
-            <Input id="fieldgroup-email" type="email" placeholder="Surname" />
+            <FieldLabel htmlFor="surname">Surname</FieldLabel>
+            <Input id="surname" type="text" placeholder="Surname" required />
           </Field>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-email">Person number</FieldLabel>
+            <FieldLabel htmlFor="person-number">Person number</FieldLabel>
             <Input
-              id="fieldgroup-email"
-              type="email"
+              id="person-number"
+              type="text"
               placeholder="Person number"
+              required
             />
           </Field>
         </FieldGroup>

@@ -57,16 +57,18 @@ export function LoginDialog({
           <div className="grid gap-4 mt-5">
             <div className="grid gap-3">
               <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                placeholder="Enter username..."
-                className="peer user-invalid:border-red-500"
-                required
-              />
-              <p className="text-sm text-red-500 hidden peer-user-invalid:block">
-                Required
-              </p>
+              <div className="relative">
+                <Input
+                  id="username"
+                  name="username"
+                  placeholder="Enter username..."
+                  className="peer user-invalid:border-red-500"
+                  required
+                />
+                <p className="text-sm text-red-500 hidden peer-user-invalid:block">
+                  Required
+                </p>
+              </div>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>
@@ -107,12 +109,7 @@ export function LoginDialog({
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button
-              type="submit"
-              className="group-[&:has(:invalid)]:pointer-events-none group-[&:has(:invalid)]:opacity-50"
-            >
-              Login
-            </Button>
+            <Button type="submit">Login</Button>
           </DialogFooter>
         </form>
       </DialogContent>

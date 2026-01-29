@@ -17,15 +17,9 @@ export function LoginDialogPresenter() {
   const onEyeClick = () => {
     dispatch(togglePasswordShown());
   };
-  const onLoginClick: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const { username, password } = Object.fromEntries(formData) as Record<
-      string,
-      string
-    >;
-    dispatch(setPassword(password));
+  const onLoginClick = (username: string, password: string) => {
     dispatch(setUsername(username));
+    dispatch(setPassword(password));
   };
   const onOpenChange = (value: boolean) => {
     dispatch(setDialogIsOpen(value));

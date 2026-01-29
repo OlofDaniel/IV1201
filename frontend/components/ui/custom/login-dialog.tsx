@@ -22,7 +22,6 @@ interface LoginDialogProps extends React.PropsWithChildren {
   dialogIsOpen: boolean;
   onEyeClick: () => void;
   onLoginClick: (username: string, password: string) => void;
-  onLoginClick: (username: string, password: string) => void;
   onOpenChange: (value: boolean) => void;
 }
 

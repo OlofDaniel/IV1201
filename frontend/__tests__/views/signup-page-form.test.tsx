@@ -1,33 +1,49 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, beforeEach, expect, test, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { SignupPageForm } from "@/components/ui/custom/signup-page-form";
 
 describe("SignupPageForm", () => {
-  test("ska uppdatera alla fält korrekt efter input", () => {
-    render(<SignupPageForm />);
+  let mockEyeClick: ReturnType<typeof vi.fn>;
 
+  beforeEach(() => {
+    mockEyeClick = vi.fn();
+    render(<SignupPageForm passwordShown={false} onEyeClick={mockEyeClick} />);
+  });
+
+  test("fields are updated with correct input values", () => {
     const inputFields = [
-      { label: /First name/i, value: "TestName" },
-      { label: /Surname/i, value: "TestSurname" },
-      { label: /Person number/i, value: "20000101-1234" },
-      { label: /Email/i, value: "TestEmail@test.com" },
-      { label: /Username/i, value: "TestUsername" },
-      { label: /Password/i, value: "TestPassword123!" },
+      { label: "First name", value: "TestName" },
+      { label: "Surname", value: "TestSurname" },
+      { label: "Person number", value: "20000101-1234" },
+      { label: "Email", value: "TestEmail@test.com" },
+      { label: "Username", value: "TestUsername" },
+      { label: "Password", value: "TestPassword123!" },
+      { label: "Confirm password", value: "TestPassword123!" },
     ];
 
     inputFields.forEach((field) => {
-      const input = screen.getByLabelText(field.label);
+      const input = screen.getByLabelText(field.label, { exact: true });
       fireEvent.change(input, { target: { value: field.value } });
       expect(input).toHaveValue(field.value);
     });
   });
+  test("sumbit button exists and can be pressed", () => {
+    const submitButton = screen.getByRole("button", { name: /sign up/i });
+    expect(submitButton).toBeInTheDocument();
+    expect(submitButton).toHaveAttribute("type", "submit");
+  });
+  test("calls onEyeClick when eye is clicked", () => {
+    const eyeButton = screen.getByRole("button", {
+      name: /show password/i,
+    });
+    fireEvent.click(eyeButton);
 
-  test("sumbit knapp ska finnas och fungera", () => {
-    render(<SignupPageForm />);
+    expect(mockEyeClick).toHaveBeenCalledTimes(1);
+  });
+  test("cancel link button points to /", () => {
+    const homepageLink = screen.getByRole("link", { name: /cancel signup/i });
 
-    const sumbitButton = screen.getByRole("button", { name: /sign up/i });
-    expect(sumbitButton).toBeInTheDocument();
-    expect(sumbitButton).toHaveAttribute("type", "submit");
+    expect(homepageLink).toHaveAttribute("href", "/");
   });
 });

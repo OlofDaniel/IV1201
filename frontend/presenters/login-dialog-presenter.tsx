@@ -8,29 +8,29 @@ import {
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
 
+// Having the creation of handler functions outside the actual presenter allows for useful testing, not needing to render the view and create a store to test.
+export function createLoginPresenterHandlers(dispatch: AppDispatch) {
+  return {
+    onEyeClick: () => dispatch(togglePasswordShown()),
+    onLoginClick: (username: string, password: string) =>
+      dispatch(postLoginThunk({ username: username, password: password })),
+    onOpenChange: (open: boolean) => dispatch(setDialogIsOpen(open)),
+  };
+}
+
 export function LoginDialogPresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const { loginLoading, passwordShown, dialogIsOpen, error } = useSelector(
     (state: RootState) => state.login,
   );
-  const onEyeClick = () => {
-    dispatch(togglePasswordShown());
-  };
-  const onLoginClick = (username: string, password: string) => {
-    dispatch(postLoginThunk({ username: username, password: password }));
-  };
-  const onOpenChange = (value: boolean) => {
-    dispatch(setDialogIsOpen(value));
-  };
+  const loginHandlers = createLoginPresenterHandlers(dispatch);
   return (
     <LoginDialog
       loginLoading={loginLoading}
       error={error}
       passwordShown={passwordShown}
       dialogIsOpen={dialogIsOpen}
-      onEyeClick={onEyeClick}
-      onLoginClick={onLoginClick}
-      onOpenChange={onOpenChange}
+      {...loginHandlers}
     ></LoginDialog>
   );
 }

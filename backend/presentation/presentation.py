@@ -1,3 +1,5 @@
+import time
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +32,7 @@ class SignupRequest(BaseModel):
 
 @app.post("/login")
 def login(data: LoginRequest):
+    time.sleep(2)
     return {"username": data.username, "password": data.password}
 
 

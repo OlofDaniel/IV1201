@@ -1,4 +1,5 @@
 import { PropsWithChildren } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
@@ -16,8 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface LoginDialogProps extends React.PropsWithChildren {
-  username: string | null;
-  password: string | null;
+  loginLoading: boolean;
+  error: boolean;
   passwordShown: boolean;
   dialogIsOpen: boolean;
   onEyeClick: () => void;
@@ -27,8 +28,8 @@ interface LoginDialogProps extends React.PropsWithChildren {
 
 export function LoginDialog({
   children,
-  username,
-  password,
+  loginLoading,
+  error,
   passwordShown,
   dialogIsOpen,
   onEyeClick,
@@ -82,6 +83,7 @@ export function LoginDialog({
                   required
                 />
                 <button
+                  type="button"
                   aria-label={passwordShown ? "hide password" : "show password"}
                   className="absolute w-5 top-2 right-2"
                   onClick={onEyeClick}
@@ -107,9 +109,13 @@ export function LoginDialog({
           </div>
           <DialogFooter className="mt-5">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" disabled={loginLoading}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button type="submit">Login</Button>
+            <Button type="submit" disabled={loginLoading}>
+              {loginLoading ? <Spinner className="size-4" /> : "Login"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

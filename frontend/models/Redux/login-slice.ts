@@ -1,17 +1,18 @@
+import { postLoginThunk } from "@/communication/login-communication";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface loginState {
-  username: string | null;
-  password: string | null;
   passwordShown: boolean;
   dialogIsOpen: boolean;
+  loginLoading: boolean;
+  error: boolean;
 }
 
 const initialState: loginState = {
-  username: null,
-  password: null,
   passwordShown: false,
   dialogIsOpen: false,
+  loginLoading: false,
+  error: false,
 };
 
 export const loginSlice = createSlice({
@@ -22,24 +23,25 @@ export const loginSlice = createSlice({
       state.passwordShown = !state.passwordShown;
       console.log(state.passwordShown);
     },
-    setPassword: (state, action: PayloadAction<string>) => {
-      state.password = action.payload;
-      console.log(state.password);
-    },
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
-      console.log(state.username);
-    },
     setDialogIsOpen: (state, action: PayloadAction<boolean>) => {
       state.dialogIsOpen = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(postLoginThunk.pending, (state) => {
+        state.loginLoading = true;
+      })
+      .addCase(postLoginThunk.fulfilled, (state) => {
+        state.loginLoading = false;
+        state.dialogIsOpen = false;
+      })
+      .addCase(postLoginThunk.rejected, (state) => {
+        state.loginLoading = false;
+        state.error = true;
+      });
+  },
 });
 
 export default loginSlice.reducer;
-export const {
-  togglePasswordShown,
-  setPassword,
-  setUsername,
-  setDialogIsOpen,
-} = loginSlice.actions;
+export const { togglePasswordShown, setDialogIsOpen } = loginSlice.actions;

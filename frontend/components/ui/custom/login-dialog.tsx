@@ -29,7 +29,7 @@ interface LoginDialogProps extends React.PropsWithChildren {
 export function LoginDialog({
   children,
   loginLoading,
-  error,
+  errorMessage,
   passwordShown,
   dialogIsOpen,
   onEyeClick,

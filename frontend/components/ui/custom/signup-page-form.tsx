@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
-export interface SignupPageFormProps {
+interface SignupPageFormProps {
   passwordShown: boolean;
   signupLoading: boolean;
   errorMessage: string | null;
@@ -21,15 +21,7 @@ export interface SignupPageFormProps {
     personNumber: string,
     email: string,
     username: string,
-    password: string,
-  ) => void;
-  onSignupClick: (
-    firstname: string,
-    surname: string,
-    personNumber: string,
-    email: string,
-    username: string,
-    password: string,
+    password: string
   ) => void;
 }
 
@@ -38,7 +30,6 @@ export function SignupPageForm({
   signupLoading,
   errorMessage,
   onEyeClick,
-  onSignupClick,
   onSignupClick,
 }: SignupPageFormProps) {
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -56,7 +47,6 @@ export function SignupPageForm({
 
   return (
     <form className="w-110" onSubmit={handleFormSubmit}>
-    <form className="w-110" onSubmit={handleFormSubmit}>
       {/* Personal information */}
       <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02]">
         <h2 className="mb-2 font-bold">Personal information</h2>
@@ -65,8 +55,6 @@ export function SignupPageForm({
             <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
             <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
             <Input
-              id="fieldgroup-firstname"
-              name="fieldgroup-firstname"
               id="fieldgroup-firstname"
               name="fieldgroup-firstname"
               type="text"
@@ -86,12 +74,9 @@ export function SignupPageForm({
           </Field>
           <Field>
             <FieldLabel htmlFor="fieldgroup-personNumber">
-            <FieldLabel htmlFor="fieldgroup-personNumber">
               Person number
             </FieldLabel>
             <Input
-              id="fieldgroup-personNumber"
-              name="fieldgroup-personNumber"
               id="fieldgroup-personNumber"
               name="fieldgroup-personNumber"
               type="text"
@@ -134,7 +119,7 @@ export function SignupPageForm({
                 name="fieldgroup-password"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" // limits password to meet requirements (must contain: capital, lowercase, number and be 8 characters min.)
                 required
               />
               <button
@@ -157,13 +142,10 @@ export function SignupPageForm({
           </FieldDescription>
           <Field>
             <FieldLabel htmlFor="fieldgroup-confirmPassword">
-            <FieldLabel htmlFor="fieldgroup-confirmPassword">
               Confirm password
             </FieldLabel>
             <div className="relative">
               <Input
-                id="fieldgroup-confirmPassword"
-                name="fieldgroup-confirmPassword"
                 id="fieldgroup-confirmPassword"
                 name="fieldgroup-confirmPassword"
                 type={passwordShown ? "text" : "password"}
@@ -194,7 +176,6 @@ export function SignupPageForm({
 
       <div className="flex justify-end">
         <Link href="/" aria-label="cancel signup">
-          <Button className="ml-5" variant="outline" disabled={signupLoading}>
           <Button className="ml-5" variant="outline" disabled={signupLoading}>
             Cancel
           </Button>

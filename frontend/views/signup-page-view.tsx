@@ -1,7 +1,4 @@
-import {
-  SignupPageForm,
-  SignupPageFormProps,
-} from "@/components/ui/custom/signup-page-form";
+import { SignupPageForm } from "@/components/ui/custom/signup-page-form";
 import Image from "next/image";
 import { House } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +14,7 @@ interface SignupPageViewProps {
     personNumber: string,
     email: string,
     username: string,
-    password: string,
+    password: string
   ) => void;
 }
 

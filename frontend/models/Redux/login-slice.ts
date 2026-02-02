@@ -5,14 +5,14 @@ interface loginState {
   passwordShown: boolean;
   dialogIsOpen: boolean;
   loginLoading: boolean;
-  error: boolean;
+  error: Error | null;
 }
 
 const initialState: loginState = {
   passwordShown: false,
   dialogIsOpen: false,
   loginLoading: false,
-  error: false,
+  error: null,
 };
 
 export const loginSlice = createSlice({

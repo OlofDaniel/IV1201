@@ -7,7 +7,7 @@ import { postSignupThunk } from "@/communication/signup-communication";
 
 export function SignupPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { passwordShown, signupLoading, error } = useSelector(
+  const { passwordShown, signupLoading, errorMessage } = useSelector(
     (state: RootState) => state.signup,
   );
   const onEyeClick = () => {
@@ -36,7 +36,7 @@ export function SignupPagePresenter() {
     <SignupPageView
       passwordShown={passwordShown}
       signupLoading={signupLoading}
-      error={error}
+      errorMessage={errorMessage}
       onEyeClick={onEyeClick}
       onSignupClick={onSignupClick}
     ></SignupPageView>

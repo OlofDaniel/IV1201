@@ -4,13 +4,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface signupState {
   passwordShown: boolean;
   signupLoading: boolean;
-  error: boolean;
+  errorMessage: string | null;
 }
 
 const initialState: signupState = {
   passwordShown: false,
   signupLoading: false,
-  error: false,
+  errorMessage: null,
 };
 
 export const signupSlice = createSlice({
@@ -30,9 +30,11 @@ export const signupSlice = createSlice({
       .addCase(postSignupThunk.fulfilled, (state) => {
         state.signupLoading = false;
       })
-      .addCase(postSignupThunk.rejected, (state) => {
+      .addCase(postSignupThunk.rejected, (state, action) => {
         state.signupLoading = false;
-        state.error = true;
+        state.errorMessage = action.payload
+          ? action.payload
+          : "Unknown error occured when attempting to signup";
       });
   },
 });

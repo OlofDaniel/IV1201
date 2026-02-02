@@ -1,12 +1,24 @@
-import {
-  SignupPageForm,
-  SignupPageFormProps,
-} from "@/components/ui/custom/signup-page-form";
+import { SignupPageForm } from "@/components/ui/custom/signup-page-form";
 import Image from "next/image";
 import { House } from "lucide-react";
 import Link from "next/link";
 
-export function SignupPageView(props: SignupPageFormProps) {
+interface SignupPageViewProps {
+  passwordShown: boolean;
+  signupLoading: boolean;
+  errorMessage: string | null;
+  onEyeClick: () => void;
+  onSignupClick: (
+    firstname: string,
+    surname: string,
+    personNumber: string,
+    email: string,
+    username: string,
+    password: string,
+  ) => void;
+}
+
+export function SignupPageView(SignupProps: SignupPageViewProps) {
   return (
     <div className="grid h-full min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center items-center bg-slate-100 text-black">
@@ -15,7 +27,7 @@ export function SignupPageView(props: SignupPageFormProps) {
         </Link>
         <div>
           <h1 className="text-4xl font-bold ml-5 mb-5">Sign up</h1>
-          <SignupPageForm {...props} />
+          <SignupPageForm {...SignupProps} />
         </div>
       </div>
       <div className="relative hidden lg:block">

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 import {
   Field,
@@ -9,10 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
-export interface SignupPageFormProps {
+interface SignupPageFormProps {
   passwordShown: boolean;
   signupLoading: boolean;
-  error: boolean;
+  errorMessage: string | null;
   onEyeClick: () => void;
   onSignupClick: (
     firstname: string,
@@ -27,13 +28,12 @@ export interface SignupPageFormProps {
 export function SignupPageForm({
   passwordShown,
   signupLoading,
-  error,
+  errorMessage,
   onEyeClick,
   onSignupClick,
 }: SignupPageFormProps) {
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
     const firstname = formData.get("fieldgroup-firstname") as string;
     const surname = formData.get("fieldgroup-surname") as string;
@@ -118,6 +118,7 @@ export function SignupPageForm({
                 name="fieldgroup-password"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                 required
               />
               <button
@@ -135,7 +136,8 @@ export function SignupPageForm({
             </div>
           </Field>
           <FieldDescription>
-            Password must include letters and numbers
+            Password must include at least one number and one uppercase and
+            lowercase letter and contain 8 or more characters
           </FieldDescription>
           <Field>
             <FieldLabel htmlFor="fieldgroup-confirmPassword">
@@ -147,6 +149,7 @@ export function SignupPageForm({
                 name="fieldgroup-confirmPassword"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                 required
               />
               <button
@@ -177,7 +180,7 @@ export function SignupPageForm({
           </Button>
         </Link>
         <Button className="ml-5" type="submit" disabled={signupLoading}>
-          Sign up
+          {signupLoading ? <Spinner className="size-4" /> : "Sign up"}
         </Button>
       </div>
     </form>

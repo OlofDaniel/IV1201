@@ -38,6 +38,7 @@ def login(data: LoginRequest):
 
 @app.post("/signup")
 def signup(data: SignupRequest):
+    time.sleep(2)
     return {
         "username": data.username,
         "password": data.password,

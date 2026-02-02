@@ -20,14 +20,13 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
 
 export function LoginDialogPresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loginLoading, passwordShown, dialogIsOpen, error } = useSelector(
-    (state: RootState) => state.login,
-  );
+  const { loginLoading, passwordShown, dialogIsOpen, errorMessage } =
+    useSelector((state: RootState) => state.login);
   const loginHandlers = createLoginPresenterHandlers(dispatch);
   return (
     <LoginDialog
       loginLoading={loginLoading}
-      error={error}
+      errorMessage={errorMessage}
       passwordShown={passwordShown}
       dialogIsOpen={dialogIsOpen}
       {...loginHandlers}

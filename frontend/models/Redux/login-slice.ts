@@ -5,14 +5,14 @@ interface loginState {
   passwordShown: boolean;
   dialogIsOpen: boolean;
   loginLoading: boolean;
-  error: Error | null;
+  errorMessage: string | null;
 }
 
 const initialState: loginState = {
   passwordShown: false,
   dialogIsOpen: false,
   loginLoading: false,
-  error: null,
+  errorMessage: null,
 };
 
 export const loginSlice = createSlice({
@@ -36,9 +36,11 @@ export const loginSlice = createSlice({
         state.loginLoading = false;
         state.dialogIsOpen = false;
       })
-      .addCase(postLoginThunk.rejected, (state) => {
+      .addCase(postLoginThunk.rejected, (state, action) => {
         state.loginLoading = false;
-        state.error = true;
+        state.errorMessage = action.payload
+          ? action.payload
+          : "Unknown error occurred when attempting to log in";
       });
   },
 });

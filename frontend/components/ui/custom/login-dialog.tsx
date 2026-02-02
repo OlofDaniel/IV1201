@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 
 interface LoginDialogProps extends React.PropsWithChildren {
   loginLoading: boolean;
-  error: boolean;
+  errorMessage: string | null;
   passwordShown: boolean;
   dialogIsOpen: boolean;
   onEyeClick: () => void;

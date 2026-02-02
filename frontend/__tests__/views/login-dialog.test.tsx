@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, beforeEach, test, vi, expect } from "vitest";
 import { LoginDialog } from "@/components/ui/custom/login-dialog";
 
-describe("LoginDialog", () => {
+describe("LoginDialog view test", () => {
   let mockLogin: ReturnType<typeof vi.fn>;
   let mockOnOpenChange: ReturnType<typeof vi.fn>;
   let mockEyeClick: ReturnType<typeof vi.fn>;

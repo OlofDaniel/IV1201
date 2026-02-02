@@ -1,4 +1,7 @@
-import { SignupPageForm } from "@/components/ui/custom/signup-page-form";
+import {
+  SignupPageForm,
+  SignupPageFormProps,
+} from "@/components/ui/custom/signup-page-form";
 import Image from "next/image";
 import { House } from "lucide-react";
 import Link from "next/link";

@@ -1,4 +1,5 @@
 import { postSignupThunk } from "@/communication/signup-communication";
+import { postSignupThunk } from "@/communication/signup-communication";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface signupState {
@@ -40,4 +41,5 @@ export const signupSlice = createSlice({
 });
 
 export default signupSlice.reducer;
+export const { togglePasswordShown } = signupSlice.actions;
 export const { togglePasswordShown } = signupSlice.actions;

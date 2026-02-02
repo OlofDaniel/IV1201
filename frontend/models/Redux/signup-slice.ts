@@ -1,23 +1,17 @@
+import { postSignupThunk } from "@/communication/signup-communication";
+import { postSignupThunk } from "@/communication/signup-communication";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface signupState {
-  firstname: string | null;
-  surname: string | null;
-  personNumber: string | null;
-  email: string | null;
-  username: string | null;
-  password: string | null;
   passwordShown: boolean;
+  signupLoading: boolean;
+  errorMessage: string | null;
 }
 
 const initialState: signupState = {
-  firstname: null,
-  surname: null,
-  personNumber: null,
-  email: null,
-  username: null,
-  password: null,
   passwordShown: false,
+  signupLoading: false,
+  errorMessage: null,
 };
 
 export const signupSlice = createSlice({
@@ -28,17 +22,24 @@ export const signupSlice = createSlice({
       state.passwordShown = !state.passwordShown;
       console.log(state.passwordShown);
     },
-    setPassword: (state, action: PayloadAction<string>) => {
-      state.password = action.payload;
-      console.log(state.password);
-    },
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
-      console.log(state.username);
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(postSignupThunk.pending, (state) => {
+        state.signupLoading = true;
+      })
+      .addCase(postSignupThunk.fulfilled, (state) => {
+        state.signupLoading = false;
+      })
+      .addCase(postSignupThunk.rejected, (state, action) => {
+        state.signupLoading = false;
+        state.errorMessage = action.payload
+          ? action.payload
+          : "Unknown error occured when attempting to signup";
+      });
   },
 });
 
 export default signupSlice.reducer;
-export const { togglePasswordShown, setPassword, setUsername } =
-  signupSlice.actions;
+export const { togglePasswordShown } = signupSlice.actions;
+export const { togglePasswordShown } = signupSlice.actions;

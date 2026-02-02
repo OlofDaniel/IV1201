@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 import {
   Field,
@@ -9,32 +10,65 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
-interface SignupPageFormProps {
+export interface SignupPageFormProps {
   passwordShown: boolean;
+  signupLoading: boolean;
+  errorMessage: string | null;
   onEyeClick: () => void;
+  onSignupClick: (
+    firstname: string,
+    surname: string,
+    personNumber: string,
+    email: string,
+    username: string,
+    password: string,
+  ) => void;
+  onSignupClick: (
+    firstname: string,
+    surname: string,
+    personNumber: string,
+    email: string,
+    username: string,
+    password: string,
+  ) => void;
 }
 
 export function SignupPageForm({
   passwordShown,
+  signupLoading,
+  errorMessage,
   onEyeClick,
+  onSignupClick,
+  onSignupClick,
 }: SignupPageFormProps) {
-  // Placeholder to avoid error and site reload on button presses --------
-  const onClickPlaceholder = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("signup form submit");
-  };
-  // Placeholder to avoid error and site reload on button presses --------
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const firstname = formData.get("fieldgroup-firstname") as string;
+    const surname = formData.get("fieldgroup-surname") as string;
+    const personNumber = formData.get("fieldgroup-personNumber") as string;
+    const email = formData.get("fieldgroup-email") as string;
+    const username = formData.get("fieldgroup-username") as string;
+    const password = formData.get("fieldgroup-password") as string;
+
+    onSignupClick(firstname, surname, personNumber, email, username, password);
+  }
+
   return (
-    <form className="w-110" onSubmit={onClickPlaceholder}>
+    <form className="w-110" onSubmit={handleFormSubmit}>
+    <form className="w-110" onSubmit={handleFormSubmit}>
       {/* Personal information */}
       <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02]">
         <h2 className="mb-2 font-bold">Personal information</h2>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-first-name">First name</FieldLabel>
+            <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
+            <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
             <Input
-              id="fieldgroup-first-name"
-              name="fieldgroup-first-name"
+              id="fieldgroup-firstname"
+              name="fieldgroup-firstname"
+              id="fieldgroup-firstname"
+              name="fieldgroup-firstname"
               type="text"
               placeholder="First name"
               required
@@ -51,12 +85,15 @@ export function SignupPageForm({
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-person-number">
+            <FieldLabel htmlFor="fieldgroup-personNumber">
+            <FieldLabel htmlFor="fieldgroup-personNumber">
               Person number
             </FieldLabel>
             <Input
-              id="fieldgroup-person-number"
-              name="fieldgroup-person-number"
+              id="fieldgroup-personNumber"
+              name="fieldgroup-personNumber"
+              id="fieldgroup-personNumber"
+              name="fieldgroup-personNumber"
               type="text"
               placeholder="Person number"
               required
@@ -97,6 +134,7 @@ export function SignupPageForm({
                 name="fieldgroup-password"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                 required
               />
               <button
@@ -114,18 +152,23 @@ export function SignupPageForm({
             </div>
           </Field>
           <FieldDescription>
-            Password must include letters and numbers
+            Password must include at least one number and one uppercase and
+            lowercase letter and contain 8 or more characters
           </FieldDescription>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-confirm-password">
+            <FieldLabel htmlFor="fieldgroup-confirmPassword">
+            <FieldLabel htmlFor="fieldgroup-confirmPassword">
               Confirm password
             </FieldLabel>
             <div className="relative">
               <Input
-                id="fieldgroup-confirm-password"
-                name="fieldgroup-confirm-password"
+                id="fieldgroup-confirmPassword"
+                name="fieldgroup-confirmPassword"
+                id="fieldgroup-confirmPassword"
+                name="fieldgroup-confirmPassword"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                 required
               />
               <button
@@ -151,12 +194,13 @@ export function SignupPageForm({
 
       <div className="flex justify-end">
         <Link href="/" aria-label="cancel signup">
-          <Button className="ml-5" variant="outline">
+          <Button className="ml-5" variant="outline" disabled={signupLoading}>
+          <Button className="ml-5" variant="outline" disabled={signupLoading}>
             Cancel
           </Button>
         </Link>
-        <Button className="ml-5" type="submit">
-          Sign up
+        <Button className="ml-5" type="submit" disabled={signupLoading}>
+          {signupLoading ? <Spinner className="size-4" /> : "Sign up"}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 import time
 
 import uvicorn
+from controllers.controller import signup_controller
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -39,15 +40,12 @@ def login(data: LoginRequest):
 @app.post("/signup")
 def signup(data: SignupRequest):
     time.sleep(2)
-    return {
-        "username": data.username,
-        "password": data.password,
-        "first_name": data.first_name,
-        "surname": data.surname,
-        "email": data.email,
-        "person_number": data.person_number,
-    }
+
+    data_dict = data.model_dump()
+    signup_controller(data_dict)
 
 
 if __name__ == "__main__":
-    uvicorn.run("presentation:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run(
+        "presentation.presentation:app", host="0.0.0.0", port=8000, reload=False
+    )

@@ -21,7 +21,7 @@ interface SignupPageFormProps {
     personNumber: string,
     email: string,
     username: string,
-    password: string
+    password: string,
   ) => void;
 }
 
@@ -52,7 +52,6 @@ export function SignupPageForm({
         <h2 className="mb-2 font-bold">Personal information</h2>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
             <FieldLabel htmlFor="fieldgroup-firstname">First name</FieldLabel>
             <Input
               id="fieldgroup-firstname"

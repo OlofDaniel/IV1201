@@ -38,7 +38,7 @@ class SignupRequest(BaseModel):
     @classmethod
     def password_complexity(cls, value: str) -> str:
         if len(value) < 8:
-            raise ValueError("Password should be more than 8 letters")
+            raise ValueError("Password should be at least 8 letters")
         if not re.search(r"[A-Z]", value):
             raise ValueError("Password has to include atleast 1 uppercase letter")
         if not re.search(r"[a-z]", value):

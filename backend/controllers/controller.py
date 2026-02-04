@@ -4,6 +4,7 @@ from models.signupModel import signup
 
 
 def signup_controller(person_information):
+    """Controller function for signing up, just calls model to sign up and catches possible errors, raising them to the caller"""
     try:
         return signup(person_information)
     except ValueError:
@@ -13,6 +14,7 @@ def signup_controller(person_information):
 
 
 def login_controller(user_credentials):
+    """Controller function for logging in, just calls model to attempt login and catches possible errors, raising them to the caller"""
     try:
         login(user_credentials)
     except ValueError:

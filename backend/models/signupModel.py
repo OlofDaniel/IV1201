@@ -12,6 +12,9 @@ def hash_password(password):
 
 
 def signup(person_information):
+    """Signup function that hashes a password, and then attempts to add that user to the database.
+    Catches Error if a field that is required to be unique in the database isn't and raises it with a specialized message
+    """
     try:
         person_information["password"] = hash_password(person_information["password"])
         add_person(person_information)

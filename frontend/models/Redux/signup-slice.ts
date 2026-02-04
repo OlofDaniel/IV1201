@@ -1,3 +1,10 @@
+/* 
+  State handeling for the sign up process:
+  passwordShown: whether or not the password in the signup form is visible or not, changes when user clicks 'eye-icon'
+  signupLoading: loading state of the signup process after cliking 'signup'
+  errorMessage: stores the error message if an error occursr
+*/
+
 import { postSignupThunk } from "@/communication/signup-communication";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -12,6 +19,15 @@ const initialState: signupState = {
   signupLoading: false,
   errorMessage: null,
 };
+
+/*
+Signup slice
+reducers:
+  togglePasswordShown: changes the state of passwordShown between true and false (toggle)
+extraReducers:
+  sets the loading state to true when pending, and false when not pending
+  sets error message if occured
+*/
 
 export const signupSlice = createSlice({
   name: "signup",

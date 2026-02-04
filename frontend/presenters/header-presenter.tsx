@@ -7,6 +7,9 @@ import { setDialogIsOpen } from "@/models/Redux/login-slice";
 export function HeaderPresenter() {
   const dispatch = useDispatch<AppDispatch>();
 
+  /*
+  onLoginClick: sets the state of dialogIsOpen to true when login button is clicked in HeaderView
+  */
   const onLoginClick = () => {
     dispatch(setDialogIsOpen(true));
   };

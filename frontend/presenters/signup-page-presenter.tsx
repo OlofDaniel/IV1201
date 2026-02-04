@@ -8,18 +8,24 @@ import { postSignupThunk } from "@/communication/signup-communication";
 export function SignupPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const { passwordShown, signupLoading, errorMessage } = useSelector(
-    (state: RootState) => state.signup
+    (state: RootState) => state.signup,
   );
+  /* 
+  onEyeClick: toggles the value in passwordShown, hides password if false
+  */
   const onEyeClick = () => {
     dispatch(togglePasswordShown());
   };
+  /* 
+  onSignupClick: sends the provided user information from signupView to the thunk which sends it to backend endpoint
+  */
   const onSignupClick = (
     firstname: string,
     surname: string,
     personNumber: string,
     email: string,
     username: string,
-    password: string
+    password: string,
   ) => {
     dispatch(
       postSignupThunk({
@@ -29,7 +35,7 @@ export function SignupPagePresenter() {
         email: email,
         username: username,
         password: password,
-      })
+      }),
     );
   };
   return (

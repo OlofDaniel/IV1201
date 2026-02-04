@@ -1,3 +1,11 @@
+/* 
+  State handeling for the login process:
+  passwordShown: whether or not the password in the login dialog is visible or not, changes when user clicks 'eye-icon'
+  dialogIsOpen: whether or not the login dialog is open or not
+  loginLoading: loading state of the login process after cliking 'login'
+  errorMessage: stores the error message if an error occursr
+*/
+
 import { postLoginThunk } from "@/communication/login-communication";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -14,6 +22,17 @@ const initialState: loginState = {
   loginLoading: false,
   errorMessage: null,
 };
+
+/*
+Signup slice
+reducers:
+  togglePasswordShown: changes the state of passwordShown between true and false (toggle)
+  setDialogIsOpen: sets the state of dialogIsOpen to the value in the payload (true or false), the dialog subscribes to this value in dialogIsOpen
+extraReducers:
+  sets the loading state to true when pending, and false when not pending
+  closes the dialog when login reques is fullfilled
+  sets error message if occured
+*/
 
 export const loginSlice = createSlice({
   name: "login",

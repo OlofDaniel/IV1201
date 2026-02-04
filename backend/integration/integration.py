@@ -37,6 +37,20 @@ def add_person(person_information):
             .execute()
         )
     except APIError as e:
+        raise ValueError(vars(e) if hasattr(e, "__dict__") else str(e))
+
+    return response
+
+
+def validate_user(user_credentials):
+    try:
+        response = (
+            supabase.table("person_duplicate-test")
+            .select("password")
+            .eq("username", user_credentials["username"])
+            .execute()
+        )
+    except APIError as e:
         raise ValueError(e.message)
 
     return response

@@ -13,7 +13,7 @@ interface headerViewProps {
 }
 
 /*
-  View layout for the header view on the home page:
+  View layout for the header view:
   CustomDropDownMenu: drop down menu that replaces the header links when used on smaller screens
   menuItems: each respective navigation link inside the drop down menu
   onLoginClick: triggers the call to the presenter to set the state of dialogIsOpen to true

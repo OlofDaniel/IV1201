@@ -2,6 +2,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+/*
+  View layout of the home page view:
+  Image: displays a blurred image in the background of the page
+  Link: provides the functionality to navigate to the signup page in the form of a button
+*/
 export function HomePageView() {
   return (
     <div>

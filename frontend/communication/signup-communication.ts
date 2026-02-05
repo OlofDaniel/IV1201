@@ -9,6 +9,12 @@ interface signupPayload {
   password: string;
 }
 
+/*
+  Communication logic for the signup process:
+  postSignup: handles the communication from the frontend to the backend for account registration
+  response: saves the response from the fetch call to the signup endpoint after the HTTP POST request
+  JSON.stringify: converts the frontend naming conventions to match the backends expected format
+*/
 const postSignup = async (payload: signupPayload) => {
   const response = await fetch("http://127.0.0.1:8000/signup", {
     method: "POST",
@@ -31,7 +37,12 @@ const postSignup = async (payload: signupPayload) => {
 
   return response.json();
 };
-
+/*
+  Asynchronous thunk for the signup process:
+  postSignupThunk: dispatches status updates (pending, fulfilled, rejected) of the signup state
+  await postSignup: executes the API call with the signup payload and waits for a response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
 export const postSignupThunk = createAsyncThunk<
   void,
   signupPayload,

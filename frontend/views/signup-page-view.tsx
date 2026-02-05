@@ -14,10 +14,16 @@ interface SignupPageViewProps {
     personNumber: string,
     email: string,
     username: string,
-    password: string
+    password: string,
   ) => void;
 }
 
+/*
+  View layout for the signup page view:
+  Link: provides the functionality to navigate back to the home page via a house icon
+  SignupPageForm: renders the registration form that contains the input fields needed for a user to create an account
+  Image: displays an image that covers the right side of the screen for larger screen sizes
+*/
 export function SignupPageView(SignupProps: SignupPageViewProps) {
   return (
     <div className="grid h-full min-h-screen grid-cols-1 lg:grid-cols-2">

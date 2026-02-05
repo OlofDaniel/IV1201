@@ -149,7 +149,7 @@ export function SignupPageForm({
                 name="fieldgroup-confirmPassword"
                 type={passwordShown ? "text" : "password"}
                 placeholder="Password"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" // limits password to meet requirements (must contain: capital, lowercase, number and be 8 characters min.)
                 required
               />
               <button

@@ -12,6 +12,14 @@ interface headerViewProps {
   loggedIn: boolean;
 }
 
+/*
+  View layout for the header view:
+  CustomDropDownMenu: drop down menu that replaces the header links when used on smaller screens
+  menuItems: each respective navigation link inside the drop down menu
+  onLoginClick: triggers the call to the presenter to set the state of dialogIsOpen to true
+  Link: links that provides the functionality to navigate to the signup, recruiter and account page, represented by a button and their respective icon
+  loggedIn: conditionally renders the correct links depending on if a users is logged in or not
+*/
 export function HeaderView({ onLoginClick, loggedIn }: headerViewProps) {
   const menuItems: dropdownItem[] = [
     { label: "Login", icon: User, separator: false, onClick: onLoginClick },

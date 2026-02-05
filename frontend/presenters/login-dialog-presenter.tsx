@@ -8,7 +8,9 @@ import {
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
 
-// Having the creation of handler functions outside the actual presenter allows for useful testing, not needing to render the view and create a store to test.
+/* 
+createLoginPresenterHandlers: Having the creation of handler functions outside the actual presenter allows for useful testing, not needing to render the view and create a store to test. 
+*/
 export function createLoginPresenterHandlers(dispatch: AppDispatch) {
   return {
     onEyeClick: () => dispatch(togglePasswordShown()),

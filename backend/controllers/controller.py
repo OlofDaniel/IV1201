@@ -1,8 +1,23 @@
+from models.customExceptions import DatabaseException
+from models.loginModel import login
 from models.signupModel import signup
 
 
 def signup_controller(person_information):
+    """Controller function for signing up, just calls model to sign up and catches possible errors, raising them to the caller"""
     try:
-        signup(person_information)
+        return signup(person_information)
     except ValueError:
+        raise
+    except DatabaseException:
+        raise
+
+
+def login_controller(user_credentials):
+    """Controller function for logging in, just calls model to attempt login and catches possible errors, raising them to the caller"""
+    try:
+        login(user_credentials)
+    except ValueError:
+        raise
+    except DatabaseException:
         raise

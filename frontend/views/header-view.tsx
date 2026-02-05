@@ -9,9 +9,10 @@ import {
 
 interface headerViewProps {
   onLoginClick: () => void;
+  loggedIn: boolean;
 }
 
-export function HeaderView({ onLoginClick }: headerViewProps) {
+export function HeaderView({ onLoginClick, loggedIn }: headerViewProps) {
   const menuItems: dropdownItem[] = [
     { label: "Login", icon: User, separator: false, onClick: onLoginClick },
     {
@@ -45,16 +46,27 @@ export function HeaderView({ onLoginClick }: headerViewProps) {
       </span>
       <div className="justify-self-end mr-5">
         <div className="hidden lg:flex">
-          <Button variant="link" className="w-25" onClick={onLoginClick}>
-            <User />
-            Login
-          </Button>
-          <Link href="/signup">
-            <Button className="w-25" variant="link">
-              <UserPlus />
-              Sign Up
-            </Button>
-          </Link>
+          {loggedIn ? (
+            <Link href="/account">
+              <Button className="w-25" variant="link">
+                <UserPlus />
+                Account
+              </Button>
+            </Link>
+          ) : (
+            <div>
+              <Button variant="link" className="w-25" onClick={onLoginClick}>
+                <User />
+                Login
+              </Button>
+              <Link href="/signup">
+                <Button className="w-25" variant="link">
+                  <UserPlus />
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
         <div className="lg:hidden">
           <CustomDropdownMenu

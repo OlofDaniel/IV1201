@@ -40,10 +40,10 @@ export function LoginDialog({
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const username = formData.get("username") as string;
+    const identifier = formData.get("identifier") as string;
     const password = formData.get("password") as string;
 
-    onLoginClick(username, password);
+    onLoginClick(identifier, password);
   }
   return (
     <Dialog open={dialogIsOpen} onOpenChange={onOpenChange}>
@@ -57,12 +57,16 @@ export function LoginDialog({
           </DialogHeader>
           <div className="grid gap-4 mt-5">
             <div className="grid gap-3">
-              <Label htmlFor="username">Username</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="identifier">Username or email address</Label>
+              </div>
+
               <div className="relative">
                 <Input
-                  id="username"
-                  name="username"
-                  placeholder="Enter username..."
+                  id="identifier"
+                  name="identifier"
+                  type={"text"}
+                  placeholder={"Enter username or email..."}
                   className="peer user-invalid:border-red-500"
                   required
                 />
@@ -101,6 +105,13 @@ export function LoginDialog({
             </div>
           </div>
           <div className="text-sm leading-none font-medium mt-5 text-muted-foreground">
+            Don't know your password?
+            <Link href="/passwordreset" className="text-blue-700">
+              {" "}
+              Click here
+            </Link>
+          </div>
+          <div className="text-sm leading-none font-medium mt-2 text-muted-foreground">
             Don't have an account?
             <Link href="/signup" className="text-blue-700">
               {" "}

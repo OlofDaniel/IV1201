@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 type loginPayload = {
-  username: string;
+  identifier: string;
   password: string;
 };
 /*

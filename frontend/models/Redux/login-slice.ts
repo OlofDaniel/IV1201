@@ -40,7 +40,6 @@ export const loginSlice = createSlice({
   reducers: {
     togglePasswordShown: (state) => {
       state.passwordShown = !state.passwordShown;
-      console.log(state.passwordShown);
     },
     setDialogIsOpen: (state, action: PayloadAction<boolean>) => {
       state.dialogIsOpen = action.payload;

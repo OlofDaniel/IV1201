@@ -20,7 +20,7 @@ app.add_middleware(
 class LoginRequest(BaseModel):
     """Specifies types expected in a log in request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
-    username: str
+    identifier: str
     password: str
 
 
@@ -54,11 +54,26 @@ class SignupRequest(BaseModel):
             raise ValueError("Email has to include @")
         return value
 
+class PasswordResetRequest(BaseModel):
+    """Specifies types and formats expected in a password reset request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
+
+    email: str
+
+
+    @field_validator("email")
+    @classmethod
+    def email_validity(cls, value: str) -> str:
+        if "@" not in value:
+            raise ValueError("Email has to include @")
+        return value
 
 @app.post("/login")
 def login(data: LoginRequest):
-    return {"username": data.username, "password": data.password}
+    return {"identifier": data.identifier, "password": data.password}
 
+@app.post("/reset")
+def reset(data: PasswordResetRequest):
+    return {"email": data.email}
 
 @app.post("/signup")
 def signup(data: SignupRequest):

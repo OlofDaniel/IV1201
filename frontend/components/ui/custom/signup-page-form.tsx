@@ -32,8 +32,31 @@ export function SignupPageForm({
   onEyeClick,
   onSignupClick,
 }: SignupPageFormProps) {
+  function handleConfirmPassword(): boolean {
+    const password = document.querySelector(
+      "input[name=fieldgroup-password]",
+    ) as HTMLInputElement;
+    const confirmPassword = document.querySelector(
+      "input[name=fieldgroup-confirmPassword]",
+    ) as HTMLInputElement;
+
+    if (confirmPassword.value != password.value) {
+      confirmPassword.setCustomValidity("Passwords do not match");
+      confirmPassword.reportValidity();
+      return false;
+    }
+
+    confirmPassword.setCustomValidity("");
+    return true;
+  }
+
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!handleConfirmPassword()) {
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
     const firstname = formData.get("fieldgroup-firstname") as string;
     const surname = formData.get("fieldgroup-surname") as string;
@@ -48,7 +71,7 @@ export function SignupPageForm({
   return (
     <form className="w-110" onSubmit={handleFormSubmit}>
       {/* Personal information */}
-      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02]">
+      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/2">
         <h2 className="mb-2 font-bold">Personal information</h2>
         <FieldGroup>
           <Field>
@@ -79,14 +102,15 @@ export function SignupPageForm({
               id="fieldgroup-personNumber"
               name="fieldgroup-personNumber"
               type="text"
-              placeholder="Person number"
+              placeholder="YYYYMMDD-XXXX"
+              pattern="\d{8}-\d{4}"
               required
             />
           </Field>
         </FieldGroup>
       </div>
 
-      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/[0.02] my-5">
+      <div className="p-5 rounded-md border-[0.5px] border-black/10 bg-black/2 my-5">
         <h2 className="mb-2 font-bold">Account information</h2>
         <FieldGroup>
           {/* Account information */}
@@ -96,7 +120,7 @@ export function SignupPageForm({
               id="fieldgroup-email"
               name="fieldgroup-email"
               placeholder="Email"
-              type="Email"
+              type="email"
               required
             />
           </Field>
@@ -148,9 +172,12 @@ export function SignupPageForm({
                 id="fieldgroup-confirmPassword"
                 name="fieldgroup-confirmPassword"
                 type={passwordShown ? "text" : "password"}
-                placeholder="Password"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" // limits password to meet requirements (must contain: capital, lowercase, number and be 8 characters min.)
+                placeholder="Confirm password"
                 required
+                onInput={
+                  (e) =>
+                    (e.currentTarget as HTMLInputElement).setCustomValidity("") // clears confirm password validation state on user input
+                }
               />
               <button
                 type="button"

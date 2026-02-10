@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "@/lib/Redux/store";
 import {
   togglePasswordShown,
   setDialogIsOpen,
+  toggleLoginType,
 } from "@/models/Redux/login-slice";
 
 /* 
@@ -14,19 +15,26 @@ createLoginPresenterHandlers: Having the creation of handler functions outside t
 export function createLoginPresenterHandlers(dispatch: AppDispatch) {
   return {
     onEyeClick: () => dispatch(togglePasswordShown()),
-    onLoginClick: (username: string, password: string) =>
-      dispatch(postLoginThunk({ username: username, password: password })),
+    onLoginClick: (identifier: string, password: string) =>
+      dispatch(postLoginThunk({ identifier: identifier, password: password })),
     onOpenChange: (open: boolean) => dispatch(setDialogIsOpen(open)),
+    onTypeChange: () => dispatch(toggleLoginType()),
   };
 }
 
 export function LoginDialogPresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loginLoading, passwordShown, dialogIsOpen, errorMessage } =
-    useSelector((state: RootState) => state.login);
+  const {
+    loginLoading,
+    passwordShown,
+    dialogIsOpen,
+    errorMessage,
+    loginWithUsername,
+  } = useSelector((state: RootState) => state.login);
   const loginHandlers = createLoginPresenterHandlers(dispatch);
   return (
     <LoginDialog
+      loginWithUsername={loginWithUsername}
       loginLoading={loginLoading}
       errorMessage={errorMessage}
       passwordShown={passwordShown}

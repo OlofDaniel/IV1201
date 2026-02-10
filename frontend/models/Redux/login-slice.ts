@@ -12,7 +12,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface loginState {
   passwordShown: boolean;
   dialogIsOpen: boolean;
-  loginWithUsername: boolean;
   loginLoading: boolean;
   errorMessage: string | null;
 }
@@ -20,7 +19,6 @@ interface loginState {
 const initialState: loginState = {
   passwordShown: false,
   dialogIsOpen: false,
-  loginWithUsername: false,
   loginLoading: false,
   errorMessage: null,
 };
@@ -46,9 +44,6 @@ export const loginSlice = createSlice({
     setDialogIsOpen: (state, action: PayloadAction<boolean>) => {
       state.dialogIsOpen = action.payload;
     },
-    toggleLoginType: (state) => {
-      state.loginWithUsername = !state.loginWithUsername;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -69,5 +64,4 @@ export const loginSlice = createSlice({
 });
 
 export default loginSlice.reducer;
-export const { togglePasswordShown, setDialogIsOpen, toggleLoginType } =
-  loginSlice.actions;
+export const { togglePasswordShown, setDialogIsOpen } = loginSlice.actions;

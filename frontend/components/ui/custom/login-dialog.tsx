@@ -18,27 +18,23 @@ import { Label } from "@/components/ui/label";
 
 interface LoginDialogProps extends React.PropsWithChildren {
   loginLoading: boolean;
-  loginWithUsername: boolean;
   errorMessage: string | null;
   passwordShown: boolean;
   dialogIsOpen: boolean;
   onEyeClick: () => void;
   onLoginClick: (username: string, password: string) => void;
   onOpenChange: (value: boolean) => void;
-  onTypeChange: () => void;
 }
 
 export function LoginDialog({
   children,
   loginLoading,
   errorMessage,
-  loginWithUsername,
   passwordShown,
   dialogIsOpen,
   onEyeClick,
   onLoginClick,
   onOpenChange,
-  onTypeChange,
 }: LoginDialogProps) {
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,28 +58,15 @@ export function LoginDialog({
           <div className="grid gap-4 mt-5">
             <div className="grid gap-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="identifier">
-                  {loginWithUsername ? "Username" : "Email"}
-                </Label>
-
-                <button
-                  type="button"
-                  onClick={onTypeChange}
-                  className="text-sm text-blue-700 hover:underline"
-                >
-                  Use {loginWithUsername ? "email" : "username"} instead
-                </button>
+                <Label htmlFor="identifier">Username or email address</Label>
               </div>
 
               <div className="relative">
                 <Input
                   id="identifier"
                   name="identifier"
-                  type={loginWithUsername ? "text" : "email"}
-                  placeholder={
-                    loginWithUsername ? "Enter username..." : "Enter email..."
-                  }
-                  autoComplete={loginWithUsername ? "username" : "email"}
+                  type={"text"}
+                  placeholder={"Enter username or email..."}
                   className="peer user-invalid:border-red-500"
                   required
                 />

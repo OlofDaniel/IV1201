@@ -16,7 +16,7 @@ def signup_controller(person_information):
 def login_controller(user_credentials):
     """Controller function for logging in, just calls model to attempt login and catches possible errors, raising them to the caller"""
     try:
-        login(user_credentials)
+        return login(user_credentials)
     except ValueError:
         raise
     except DatabaseException:

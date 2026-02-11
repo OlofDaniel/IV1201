@@ -1,9 +1,6 @@
-import bcrypt
-from integration.integration import validate_user
+from integration.integration import login_user
 
 from .customExceptions import DatabaseException
-
-failed_login_str = "Invalid username or password"
 
 
 def login(user_credentials):
@@ -12,16 +9,8 @@ def login(user_credentials):
     DataBaseException is raised if there was a problem when accessing the database but the cause is unknown or irrelevant to the user.
     """
     try:
-        password_data = validate_user(user_credentials)
-        password = password_data.data[0]["password"]
-        passwords_match = bcrypt.checkpw(
-            user_credentials["password"].encode("utf-8"), password.encode("utf-8")
-        )
-        if passwords_match:
-            return True
-        else:
-            raise ValueError(failed_login_str)
-    except IndexError:
-        raise ValueError(failed_login_str)
+        return login_user(user_credentials)
     except ValueError:
+        raise
+    except Exception:
         raise DatabaseException()

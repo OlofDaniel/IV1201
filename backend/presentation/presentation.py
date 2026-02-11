@@ -1,8 +1,8 @@
 import re
 
 import uvicorn
-from controllers.controller import signup_controller
-from fastapi import FastAPI, HTTPException
+from controllers.controller import signup_controller, login_controller
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
@@ -71,8 +71,25 @@ class PasswordResetRequest(BaseModel):
 
 
 @app.post("/login")
-def login(data: LoginRequest):
-    return {"identifier": data.identifier, "password": data.password}
+def login(data: LoginRequest, response: Response):
+    data_dict = data.model_dump()
+    try:
+        login_response = login_controller(data_dict)
+
+        access_token = login_response.session.access_token
+        refresh_token = login_response.session.refresh_token
+
+        set_cookies(response, access_token, refresh_token)
+
+        return {
+            "status": "success",
+            "user": {"metadata": login_response.user.user_metadata},
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/reset")
@@ -81,15 +98,45 @@ def reset(data: PasswordResetRequest):
 
 
 @app.post("/signup")
-def signup(data: SignupRequest):
+def signup(data: SignupRequest, response: Response):
     """Function that takes signup requests, calling controller function after converting the request to a dict"""
     data_dict = data.model_dump()
     try:
-        return signup_controller(data_dict)
+        signup_response = signup_controller(data_dict)
+
+        access_token = signup_response.session.access_token
+        refresh_token = signup_response.session.refresh_token
+
+        set_cookies(response, access_token, refresh_token)
+
+        return {
+            "status": "success",
+            "user": {"metadata": signup_response.user.user_metadata},
+        }
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def set_cookies(response: Response, access_token: str, refresh_token: str):
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        path="/",
+    )
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        path="/",
+    )
 
 
 if __name__ == "__main__":

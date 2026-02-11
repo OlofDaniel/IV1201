@@ -8,8 +8,7 @@ def signup(person_information):
     Catches Error if a field that is required to be unique in the database isn't and raises it with a specialized message
     """
     try:
-        add_person(person_information)
-        return "Account created successfully"
+        return add_person(person_information)
     except ValidationError as e:
         details = e.details
 

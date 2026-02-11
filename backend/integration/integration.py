@@ -14,6 +14,20 @@ key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
+def login_user(user_credentials):
+    try:
+        response = supabase.auth.sign_in_with_password(
+            {
+                "email": user_credentials["identifier"],
+                "password": user_credentials["password"],
+            }
+        )
+        return response
+
+    except AuthApiError as e:
+        raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
+
+
 def add_person(person_information):
     """
     Function that adds person to the person table in supabase.
@@ -47,6 +61,7 @@ def add_person(person_information):
                 },
             }
         )
+        print(response)
         return response
 
     except AuthApiError as e:

@@ -2,7 +2,9 @@ import os
 
 from dotenv import load_dotenv
 from postgrest.exceptions import APIError
+from models.customExceptions import ValidationError
 from supabase import Client, create_client
+from supabase_auth.errors import AuthApiError
 
 load_dotenv()
 
@@ -20,29 +22,39 @@ def add_person(person_information):
     Throws APIError when email,pnr or username is not unique
     """
     try:
-        response = (
-            supabase.table("person_duplicate-test")
-            .insert(
-                {
-                    "name": person_information["first_name"],
-                    "surname": person_information["surname"],
-                    "pnr": person_information["person_number"],
-                    "email": person_information["email"],
-                    "password": person_information["password"],
-                    "role_id": 2,
-                    "username": person_information["username"],
-                }
-            )
-            .execute()
+        unique_dict = validate_unique(
+            person_information["username"],
+            person_information["email"],
+            person_information["person_number"],
         )
-    except APIError as e:
-        raise ValueError(vars(e) if hasattr(e, "__dict__") else str(e))
 
-    return response
+        if False in unique_dict.values():
+            raise ValidationError("Some credentials was not unique: ", unique_dict)
+
+        response = supabase.auth.sign_up(
+            {
+                "email": person_information["email"],
+                "password": person_information["password"],
+                "options": {
+                    "data": {
+                        "name": person_information["first_name"],
+                        "surname": person_information["surname"],
+                        "pnr": person_information["person_number"],
+                        "username": person_information["username"],
+                        "role_id": 2,
+                        "needs_password_reset": False,
+                    }
+                },
+            }
+        )
+        return response
+
+    except AuthApiError as e:
+        raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
 
 
 def validate_user(user_credentials):
-    """Function that gets the hashed password in the dtabase for a given username if there is one, if there isn't on the function will just return no rows."""
+    """Function that gets the hashed password in th e dtabase for a given username if there is one, if there isn't on the function will just return no rows."""
     try:
         response = (
             supabase.table("person_duplicate-test")
@@ -54,3 +66,30 @@ def validate_user(user_credentials):
         raise ValueError(e.message)
 
     return response
+
+
+def validate_unique(username, email, pnr):
+    unique_status = {
+        "email": not bool(
+            supabase.table("person_add_to_auth")
+            .select("id")
+            .eq("email", email)
+            .execute()
+            .data
+        ),
+        "username": not bool(
+            supabase.table("person_add_to_auth")
+            .select("id")
+            .eq("username", username)
+            .execute()
+            .data
+        ),
+        "pnr": not bool(
+            supabase.table("person_add_to_auth")
+            .select("id")
+            .eq("pnr", pnr)
+            .execute()
+            .data
+        ),
+    }
+    return unique_status

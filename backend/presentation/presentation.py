@@ -6,6 +6,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
+from models.customExceptions import DatabaseException
+
 app = FastAPI()
 
 app.add_middleware(
@@ -54,11 +56,11 @@ class SignupRequest(BaseModel):
             raise ValueError("Email has to include @")
         return value
 
+
 class PasswordResetRequest(BaseModel):
     """Specifies types and formats expected in a password reset request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
     email: str
-
 
     @field_validator("email")
     @classmethod
@@ -67,13 +69,16 @@ class PasswordResetRequest(BaseModel):
             raise ValueError("Email has to include @")
         return value
 
+
 @app.post("/login")
 def login(data: LoginRequest):
     return {"identifier": data.identifier, "password": data.password}
 
+
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
     return {"email": data.email}
+
 
 @app.post("/signup")
 def signup(data: SignupRequest):
@@ -83,6 +88,8 @@ def signup(data: SignupRequest):
         return signup_controller(data_dict)
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -3,3 +3,9 @@ class DatabaseException(Exception):
 
     def init(self):
         self.msg = "Error occured when accessing the database"
+
+
+class ValidationError(ValueError):
+    def __init__(self, message, details: dict):
+        super().__init__(message)
+        self.details = details

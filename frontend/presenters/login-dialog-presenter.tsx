@@ -6,7 +6,6 @@ import { AppDispatch, RootState } from "@/lib/Redux/store";
 import {
   togglePasswordShown,
   setDialogIsOpen,
-  toggleLoginType,
 } from "@/models/Redux/login-slice";
 
 /* 

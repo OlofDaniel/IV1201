@@ -10,11 +10,7 @@ def signup(person_information):
     try:
         return add_person(person_information)
     except ValidationError as e:
-        details = e.details
+        raise
 
-        non_unique = [k for k, v in details.items() if v == False]
-
-        raise ValueError("The following credential were not unique:", non_unique)
-
-    except ValueError as e:
-        raise DatabaseException(e)
+    except DatabaseException as e:
+        raise

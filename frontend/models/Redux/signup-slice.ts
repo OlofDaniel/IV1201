@@ -12,12 +12,14 @@ interface signupState {
   passwordShown: boolean;
   signupLoading: boolean;
   errorMessage: string | null;
+  fieldErrors: Record<string, string>;
 }
 
 const initialState: signupState = {
   passwordShown: false,
   signupLoading: false,
   errorMessage: null,
+  fieldErrors: {},
 };
 
 /*
@@ -42,15 +44,22 @@ export const signupSlice = createSlice({
     builder
       .addCase(postSignupThunk.pending, (state) => {
         state.signupLoading = true;
+        state.errorMessage = null;
+        state.fieldErrors = {};
       })
       .addCase(postSignupThunk.fulfilled, (state) => {
         state.signupLoading = false;
       })
       .addCase(postSignupThunk.rejected, (state, action) => {
         state.signupLoading = false;
-        state.errorMessage = action.payload
-          ? action.payload
-          : "Unknown error occured when attempting to signup";
+
+        const payload = action.payload;
+
+        state.errorMessage =
+          payload?.message ??
+          "Unknown error occurred when attempting to signup";
+
+        state.fieldErrors = payload?.errors ?? {};
       });
   },
 });

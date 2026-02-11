@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from postgrest.exceptions import APIError
-from models.customExceptions import ValidationError
+from models.customExceptions import ValidationError, DatabaseException
 from supabase import Client, create_client
 from supabase_auth.errors import AuthApiError
 
@@ -64,8 +64,8 @@ def add_person(person_information):
         print(response)
         return response
 
-    except AuthApiError as e:
-        raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
+    except AuthApiError:
+        raise DatabaseException()
 
 
 def validate_user(user_credentials):

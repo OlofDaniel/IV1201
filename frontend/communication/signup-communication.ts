@@ -9,6 +9,10 @@ interface signupPayload {
   password: string;
 }
 
+interface SignupError {
+  message: string;
+  errors?: { [key: string]: string };
+}
 /*
   Communication logic for the signup process:
   postSignup: handles the communication from the frontend to the backend for account registration
@@ -30,12 +34,15 @@ const postSignup = async (payload: signupPayload) => {
       password: payload.password,
     }),
   });
-
+  const data = await response.json();
   if (!response.ok) {
-    throw new Error(`Failed POST to /signup with status: ${response.status}`);
+    throw {
+      status: response.status,
+      detail: data.detail,
+    };
   }
 
-  return response.json();
+  return data;
 };
 /*
   Asynchronous thunk for the signup process:
@@ -46,14 +53,16 @@ const postSignup = async (payload: signupPayload) => {
 export const postSignupThunk = createAsyncThunk<
   void,
   signupPayload,
-  { rejectValue: string }
+  { rejectValue: SignupError }
 >("signup/postSignupThunk", async (payload, thunkAPI) => {
   try {
     await postSignup(payload);
-  } catch (error) {
-    if (error instanceof Error) {
-      return thunkAPI.rejectWithValue(error.message);
+  } catch (error: any) {
+    if (error.status == "409") {
+      return thunkAPI.rejectWithValue(error.detail);
     }
-    return thunkAPI.rejectWithValue("Unknown error");
+    return thunkAPI.rejectWithValue({
+      message: "Something went wrong, try again later",
+    });
   }
 });

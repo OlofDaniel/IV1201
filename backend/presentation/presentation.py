@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
-from models.customExceptions import DatabaseException
+from models.customExceptions import DatabaseException, ValidationError
 
 app = FastAPI()
 
@@ -113,8 +113,25 @@ def signup(data: SignupRequest, response: Response):
             "status": "success",
             "user": {"metadata": signup_response.user.user_metadata},
         }
-    except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+    except ValidationError as e:
+        errors = {}
+
+        for field, is_unique in e.details.items():
+            if not is_unique:
+                if field == "email":
+                    errors["email"] = "Email is already registered"
+                elif field == "username":
+                    errors["username"] = "Username is already taken"
+                elif field == "pnr":
+                    errors["pnr"] = "Person number is already registered"
+
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "message": "Some credentials are already in use",
+                "errors": errors
+            }
+        )
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 

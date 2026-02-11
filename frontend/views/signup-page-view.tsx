@@ -6,7 +6,7 @@ import Link from "next/link";
 interface SignupPageViewProps {
   passwordShown: boolean;
   signupLoading: boolean;
-  errorMessage: string | null;
+  fieldErrors: { [key: string]: string };
   onEyeClick: () => void;
   onSignupClick: (
     firstname: string,

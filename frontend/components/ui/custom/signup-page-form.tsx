@@ -13,7 +13,7 @@ import Link from "next/link";
 interface SignupPageFormProps {
   passwordShown: boolean;
   signupLoading: boolean;
-  errorMessage: string | null;
+  fieldErrors: { [key: string]: string };
   onEyeClick: () => void;
   onSignupClick: (
     firstname: string,
@@ -28,7 +28,7 @@ interface SignupPageFormProps {
 export function SignupPageForm({
   passwordShown,
   signupLoading,
-  errorMessage,
+  fieldErrors,
   onEyeClick,
   onSignupClick,
 }: SignupPageFormProps) {
@@ -106,6 +106,9 @@ export function SignupPageForm({
               pattern="\d{8}-\d{4}"
               required
             />
+            {fieldErrors.pnr && (
+              <p className="text-red-500 text-sm">{fieldErrors.pnr}</p>
+            )}
           </Field>
         </FieldGroup>
       </div>
@@ -123,6 +126,9 @@ export function SignupPageForm({
               type="email"
               required
             />
+            {fieldErrors.email && (
+              <p className="text-red-500 text-sm">{fieldErrors.email}</p>
+            )}
           </Field>
           <Field>
             <FieldLabel htmlFor="fieldgroup-username">Username</FieldLabel>
@@ -133,6 +139,9 @@ export function SignupPageForm({
               type="text"
               required
             />
+            {fieldErrors.username && (
+              <p className="text-red-500 text-sm">{fieldErrors.username}</p>
+            )}
           </Field>
           <Field>
             <FieldLabel htmlFor="fieldgroup-password">Password</FieldLabel>

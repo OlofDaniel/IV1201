@@ -61,26 +61,11 @@ def add_person(person_information):
                 },
             }
         )
-        print(response)
         return response
 
     except AuthApiError:
         raise DatabaseException()
 
-
-def validate_user(user_credentials):
-    """Function that gets the hashed password in th e dtabase for a given username if there is one, if there isn't on the function will just return no rows."""
-    try:
-        response = (
-            supabase.table("person_duplicate-test")
-            .select("password")
-            .eq("username", user_credentials["username"])
-            .execute()
-        )
-    except APIError as e:
-        raise ValueError(e.message)
-
-    return response
 
 
 def validate_unique(username, email, pnr):

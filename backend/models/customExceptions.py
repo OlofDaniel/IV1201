@@ -6,6 +6,6 @@ class DatabaseException(Exception):
 
 
 class ValidationError(ValueError):
-    def init(self, message, details: dict):
-        super().init(message)
+    def __init__(self, message, details: dict):
+        super().__init__(message)
         self.details = details

@@ -13,12 +13,9 @@ def signup(person_information):
     except ValidationError as e:
         details = e.details
 
-        if details["email"] == False:
-            raise ValueError("Email is not unique")
-        elif details["pnr"] == False:
-            raise ValueError("Person number is not unique")
-        elif details["username"] == False:
-            raise ValueError("Username is not unique")
+        non_unique = [k for k, v in details.items() if v == False]
+
+        raise ValueError("The following credential were not unique:", non_unique)
 
     except ValueError as e:
         raise DatabaseException(e)

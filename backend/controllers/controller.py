@@ -4,7 +4,7 @@ from models.signupModel import signup
 
 
 def signup_controller(person_information):
-    """Controller function for signing up, just calls model to sign up and catches possible errors, raising them to the caller"""
+    """Controller function for signing up, just calls model to sign up and catches possible errors for example if user already exist, raising them to the caller"""
     try:
         return signup(person_information)
     except ValidationError:
@@ -14,7 +14,7 @@ def signup_controller(person_information):
 
 
 def login_controller(user_credentials):
-    """Controller function for logging in, just calls model to attempt login and catches possible errors, raising them to the caller"""
+    """Controller function for logging in, just calls model to attempt login and catches possible errors for example if account does not exist, raising them to the caller"""
     try:
         return login(user_credentials)
     except ValueError:

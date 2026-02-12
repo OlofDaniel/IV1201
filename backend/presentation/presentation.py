@@ -52,8 +52,9 @@ class SignupRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def email_validity(cls, value: str) -> str:
-        if "@" not in value:
-            raise ValueError("Email has to include @")
+        email_regex = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}"
+        if re.match(email_regex, value) is None:
+            raise ValueError("Invalid email format")
         return value
 
 
@@ -72,6 +73,10 @@ class PasswordResetRequest(BaseModel):
 
 @app.post("/login")
 def login(data: LoginRequest, response: Response):
+    """
+    Function that takes login requests, calling controller function after converting the request to a dict.
+    Gets access and refresh tokens returned from controller and creates cookies with these tokens which are returned to frontend.
+    """
     data_dict = data.model_dump()
     try:
         login_response = login_controller(data_dict)
@@ -99,7 +104,10 @@ def reset(data: PasswordResetRequest):
 
 @app.post("/signup")
 def signup(data: SignupRequest, response: Response):
-    """Function that takes signup requests, calling controller function after converting the request to a dict"""
+    """
+    Function that takes signup requests, calling controller function after converting the request to a dict
+    Gets access and refresh tokens returned from controller and creates cookies with these tokens which are returned to frontend.
+    """
     data_dict = data.model_dump()
     try:
         signup_response = signup_controller(data_dict)
@@ -127,16 +135,16 @@ def signup(data: SignupRequest, response: Response):
 
         raise HTTPException(
             status_code=409,
-            detail={
-                "message": "Some credentials are already in use",
-                "errors": errors
-            }
+            detail={"message": "Some credentials are already in use", "errors": errors},
         )
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 def set_cookies(response: Response, access_token: str, refresh_token: str):
+    """
+    Function that creates cookies with access and refresh tokens.
+    """
     response.set_cookie(
         key="access_token",
         value=access_token,

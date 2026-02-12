@@ -2,6 +2,7 @@ from models.customExceptions import DatabaseException, ValidationError
 from models.loginModel import login
 from models.signupModel import signup
 from models.userModel import get_user_information
+from models.passwordResetModel import request_password_email, change_password
 
 
 def signup_controller(person_information):
@@ -28,6 +29,22 @@ def get_user_information_controller(access_token, refresh_token):
     """Controller function for getting user information. Calls model function get_user_information with users tokens."""
     try:
         return get_user_information(access_token, refresh_token)
+    except ValueError:
+        raise
+    except DatabaseException:
+        raise
+
+def reset_password_controller(user_email):
+    """Controller function for resetting password, just calls model to attempt reset and catches possible errors, raising them to the caller"""
+    try:
+        return request_password_email(user_email)
+    except DatabaseException:
+        raise
+
+def update_password_controller(password, access_token, refresh_token):
+    """Controller function for updating password, just calls model to attempt update and catches possible errors, raising them to the caller"""
+    try:
+        return change_password(password, access_token, refresh_token)
     except ValueError:
         raise
     except DatabaseException:

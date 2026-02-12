@@ -1,13 +1,18 @@
 import Image from "next/image";
-import { House, MailCheck } from "lucide-react";
+import { House, BadgeCheck } from "lucide-react";
 import Link from "next/link";
-import { PasswordResetForm } from "@/components/ui/custom/password-reset-form";
+import { UpdatePasswordForm } from "@/components/ui/custom/update-password-form";
 
-interface PasswordResetViewProps {
-  passwordResetLoading: boolean;
-  errorMessage: string | null;
-  onSubmit: (email: string) => void;
-  emailSent: boolean;
+interface UpdatePasswordViewProps {
+  updatePasswordLoading: boolean;
+  passwordShown: boolean;
+  passwordUpdated: boolean;
+  onEyeClick: () => void;
+  onSubmit: (
+    password: string,
+    accessToken: string,
+    refreshToken: string,
+  ) => void;
 }
 
 /*
@@ -16,30 +21,28 @@ interface PasswordResetViewProps {
   PasswordResetForm: renders the form that takes the email the link should be sent to.
   Image: displays an image that covers the right side of the screen for larger screen sizes
 */
-export function PasswordResetView({
-  passwordResetLoading,
-  errorMessage,
+export function UpdatePasswordView({
+  updatePasswordLoading,
+  passwordShown,
+  onEyeClick,
   onSubmit,
-  emailSent,
-}: PasswordResetViewProps) {
+  passwordUpdated,
+}: UpdatePasswordViewProps) {
   return (
     <div className="grid h-full min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center items-center bg-slate-100 text-black">
-        <Link href="/">
-          <House size={30} className="flex absolute top-5 left-5" />
-        </Link>
         <div>
-          {emailSent ? (
+          {passwordUpdated ? (
             <span className="flex flex-col justify-center items-center bg-slate-100 text-xl">
-              <MailCheck size={60} />
-              If there is an account with the email provided, a link has been
-              sent!
+              <BadgeCheck size={60} />
+              Password changed successfully!
             </span>
           ) : (
-            <PasswordResetForm
-              loading={passwordResetLoading}
-              errorMessage={errorMessage}
+            <UpdatePasswordForm
+              loading={updatePasswordLoading}
+              passwordShown={passwordShown}
               onSubmit={onSubmit}
+              onEyeClick={onEyeClick}
             />
           )}
         </div>

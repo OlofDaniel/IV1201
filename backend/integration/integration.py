@@ -155,3 +155,29 @@ def refresh_session(refresh_token: str):
     Function that starta a new session with refresh token and returns it.
     """
     return supabase.auth.refresh_session(refresh_token)
+
+
+def password_reset_request(email):
+    """Function to request a password reset email to be sent to the user with the given email,
+    returns null regardless of success/failure to avoid leaking information about registered emails"""
+    try:
+        response = supabase.auth.reset_password_email(
+            email,
+        {"redirect_to": "http://localhost:3000/updatepassword"}, #TODO: Change redirect url when frontend is deployed
+        )
+        return response
+    except AuthApiError:
+        raise DatabaseException()
+
+def update_password(password, access_token, refresh_token):
+    try:
+        supabase.auth.set_session(access_token, refresh_token)
+
+        response = supabase.auth.update_user({
+            "password": password
+        })
+
+        return response
+
+    except AuthApiError as e:
+        raise e

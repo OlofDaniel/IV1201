@@ -37,7 +37,6 @@ export const signupSlice = createSlice({
   reducers: {
     togglePasswordShown: (state) => {
       state.passwordShown = !state.passwordShown;
-      console.log(state.passwordShown);
     },
   },
   extraReducers: (builder) => {

@@ -3,6 +3,7 @@ import loginReducer from "@/models/Redux/login-slice";
 import signupReducer from "@/models/Redux/signup-slice";
 import authReducer from "@/models/Redux/auth-slice";
 import passwordResetReducer from "@/models/Redux/password-reset-slice";
+import updatePasswordReducer from "@/models/Redux/update-password-slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -11,6 +12,7 @@ export const makeStore = () => {
       signup: signupReducer,
       auth: authReducer,
       passwordReset: passwordResetReducer,
+      updatePassword: updatePasswordReducer,
     },
   });
 };

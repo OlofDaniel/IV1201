@@ -1,7 +1,7 @@
 import re
 
 import uvicorn
-from controllers.controller import signup_controller, login_controller
+from controllers.controller import signup_controller, login_controller, reset_password_controller, update_password_controller
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
@@ -24,6 +24,13 @@ class LoginRequest(BaseModel):
 
     identifier: str
     password: str
+
+class PasswordUpdateRequest(BaseModel):
+    """Specifies types expected in a password update request"""
+
+    password: str
+    access_token: str
+    refresh_token: str 
 
 
 class SignupRequest(BaseModel):
@@ -94,8 +101,14 @@ def login(data: LoginRequest, response: Response):
 
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
-    return {"email": data.email}
+    try:
+        return reset_password_controller(data.email)
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/updatepassword")
+def updatepassword(data: PasswordUpdateRequest):
+    return update_password_controller(data.password, data.access_token, data.refresh_token)
 
 @app.post("/signup")
 def signup(data: SignupRequest, response: Response):

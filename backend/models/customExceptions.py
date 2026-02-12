@@ -6,6 +6,10 @@ class DatabaseException(Exception):
 
 
 class ValidationError(ValueError):
+    """
+    Custom exception used when something goes wrong when validation a user, for example if a user wants to signup with a username/email/person number that already exist.
+    """
+
     def __init__(self, message, details: dict):
         super().__init__(message)
         self.details = details

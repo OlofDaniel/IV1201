@@ -1,7 +1,6 @@
 import os
-
-from dotenv import load_dotenv
 from postgrest.exceptions import APIError
+from dotenv import load_dotenv
 from models.customExceptions import ValidationError, DatabaseException
 from supabase import Client, create_client
 from supabase_auth.errors import AuthApiError
@@ -15,6 +14,10 @@ supabase: Client = create_client(url, key)
 
 
 def login_user(user_credentials):
+    """
+    Function that loggs in user. If successful it returns account information to frontend.
+    Throws AuthAPIError if not successful, for example if user does not exist.
+    """
     try:
         response = supabase.auth.sign_in_with_password(
             {
@@ -33,7 +36,7 @@ def add_person(person_information):
     Function that adds person to the person table in supabase.
     Returns json from supabase
     If successful call to supabase the response from supabase is a json object with the added row data
-    Throws APIError when email,pnr or username is not unique
+    Throws AuthAPIError when email,pnr or username is not unique
     """
     try:
         unique_dict = validate_unique(
@@ -67,8 +70,10 @@ def add_person(person_information):
         raise DatabaseException()
 
 
-
 def validate_unique(username, email, pnr):
+    """
+    Function that checks if username, email and person number is unique. Returns a dict with a boolean value for each of these. True indicates unique, false is not unique.
+    """
     unique_status = {
         "email": not bool(
             supabase.table("person_add_to_auth")
@@ -93,3 +98,22 @@ def validate_unique(username, email, pnr):
         ),
     }
     return unique_status
+
+
+def get_email_from_username(identifier):
+    """
+    Function that retrieves email for username which is needed if the user wants to log in with username since supabase uses email to log in user.
+    Throws an APIError if the username does not exist in supabase.
+    """
+    try:
+        query = (
+            supabase.table("person_add_to_auth")
+            .select("email")
+            .eq("username", identifier)
+            .single()
+            .execute()
+        )
+        return query.data["email"]
+
+    except APIError:
+        raise ValueError("Invalid login credentials")

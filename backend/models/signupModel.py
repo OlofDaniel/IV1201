@@ -4,13 +4,14 @@ from .customExceptions import DatabaseException, ValidationError
 
 
 def signup(person_information):
-    """Signup function that hashes a password, and then attempts to add that user to the database.
+    """
+    Function that signs up user by adding it to supabase.
     Catches Error if a field that is required to be unique in the database isn't and raises it with a specialized message
     """
     try:
         return add_person(person_information)
-    except ValidationError as e:
+    except ValidationError:
         raise
 
-    except DatabaseException as e:
+    except DatabaseException:
         raise

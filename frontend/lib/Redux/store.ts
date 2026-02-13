@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import loginReducer from "@/models/Redux/login-slice";
 import signupReducer from "@/models/Redux/signup-slice";
-import authReducer from "@/models/Redux/auth-slice";
+import userReducer from "@/models/Redux/user-slice";
 import passwordResetReducer from "@/models/Redux/password-reset-slice";
 
 export const makeStore = () => {
@@ -9,7 +9,7 @@ export const makeStore = () => {
     reducer: {
       login: loginReducer,
       signup: signupReducer,
-      auth: authReducer,
+      user: userReducer,
       passwordReset: passwordResetReducer,
     },
   });

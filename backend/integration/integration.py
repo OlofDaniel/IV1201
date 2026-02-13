@@ -115,5 +115,33 @@ def get_email_from_username(identifier):
         )
         return query.data["email"]
 
-    except APIError:
+    except APIError as e:
+        print(e)
         raise ValueError("Invalid login credentials")
+
+
+def get_user_data(access_token: str):
+    try:
+        user_client = get_user_client(access_token)
+        response = (
+            user_client.table("person_add_to_auth")
+            .select("username, name, surname, email, pnr")
+            .single()
+            .execute()
+        )
+        if response.data is None:
+            raise ValueError("No data found")
+        return response.data
+    except APIError:
+        raise
+
+
+def get_user_client(access_token: str):
+    user_client = create_client(url, key)
+    user_client.postgrest.auth(access_token)
+
+    return user_client
+
+
+def refresh_session(refresh_token: str):
+    return supabase.auth.refresh_session(refresh_token)

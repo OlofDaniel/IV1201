@@ -1,8 +1,12 @@
 import re
 
 import uvicorn
-from controllers.controller import signup_controller, login_controller
-from fastapi import FastAPI, HTTPException, Response
+from controllers.controller import (
+    signup_controller,
+    login_controller,
+    get_user_information_controller,
+)
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
@@ -10,9 +14,15 @@ from models.customExceptions import DatabaseException, ValidationError
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -162,6 +172,31 @@ def set_cookies(response: Response, access_token: str, refresh_token: str):
         secure=False,
         path="/",
     )
+
+
+@app.get("/getinfo")
+def get_user_info(response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+    try:
+        user_info, new_tokens = get_user_information_controller(
+            access_token, refresh_token
+        )
+
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return user_info
+
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except DatabaseException as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

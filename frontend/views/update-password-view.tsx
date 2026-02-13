@@ -1,12 +1,13 @@
 import Image from "next/image";
-import { House, BadgeCheck } from "lucide-react";
+import { House, BadgeCheck, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { UpdatePasswordForm } from "@/components/ui/custom/update-password-form";
-
+import { Spinner } from "@/components/ui/spinner";
 interface UpdatePasswordViewProps {
   updatePasswordLoading: boolean;
+  linkParsed: boolean;
+  linkExpired: boolean;
   passwordShown: boolean;
-  passwordUpdated: boolean;
   onEyeClick: () => void;
   onSubmit: (
     password: string,
@@ -15,27 +16,27 @@ interface UpdatePasswordViewProps {
   ) => void;
 }
 
-/*
-  View layout for the password reset page view:
-  Link: provides the functionality to navigate back to the home page via a house icon
-  PasswordResetForm: renders the form that takes the email the link should be sent to.
-  Image: displays an image that covers the right side of the screen for larger screen sizes
-*/
 export function UpdatePasswordView({
   updatePasswordLoading,
   passwordShown,
   onEyeClick,
   onSubmit,
-  passwordUpdated,
+  linkExpired,
+  linkParsed,
 }: UpdatePasswordViewProps) {
   return (
     <div className="grid h-full min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center items-center bg-slate-100 text-black">
         <div>
-          {passwordUpdated ? (
+          {!linkParsed ? (
+            <div className="flex justify-center items-center h-64">
+              <Spinner className="size-12" />
+            </div>
+          ) : linkExpired ? (
             <span className="flex flex-col justify-center items-center bg-slate-100 text-xl">
-              <BadgeCheck size={60} />
-              Password changed successfully!
+              <CircleAlert size={60} />
+              This reset link has already been used or expired. Please request a
+              new one.
             </span>
           ) : (
             <UpdatePasswordForm

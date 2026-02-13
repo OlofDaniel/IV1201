@@ -1,14 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { postPasswordUpdateThunk } from "@/communication/password-reset-communication";
 
 interface updatePasswordState {
   passwordShown: boolean;
+  linkParsed: boolean;
   passwordUpdated: boolean;
   loading: boolean;
   errorMessage: null | string;
+  linkExpired: boolean;
 }
 
 const initialState: updatePasswordState = {
+  linkExpired: false,
+  linkParsed: false,
   passwordShown: false,
   passwordUpdated: false,
   loading: false,
@@ -22,6 +26,12 @@ export const updatePasswordSlice = createSlice({
     updatePasswordState: () => initialState,
     togglePasswordShown: (state) => {
       state.passwordShown = !state.passwordShown;
+    },
+    setLinkExpired: (state) => {
+      state.linkExpired = true;
+    },
+    setLinkParsed: (state, action: PayloadAction<boolean>) => {
+      state.linkParsed = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -44,7 +54,11 @@ export const updatePasswordSlice = createSlice({
   },
 });
 
-export const { updatePasswordState, togglePasswordShown } =
-  updatePasswordSlice.actions;
+export const {
+  updatePasswordState,
+  togglePasswordShown,
+  setLinkExpired,
+  setLinkParsed,
+} = updatePasswordSlice.actions;
 
 export default updatePasswordSlice.reducer;

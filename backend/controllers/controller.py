@@ -1,4 +1,4 @@
-from models.customExceptions import DatabaseException, ValidationError
+from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
 from models.loginModel import login
 from models.signupModel import signup
 from models.passwordResetModel import request_password_email, change_password
@@ -34,7 +34,9 @@ def update_password_controller(password, access_token, refresh_token):
     """Controller function for updating password, just calls model to attempt update and catches possible errors, raising them to the caller"""
     try:
         return change_password(password, access_token, refresh_token)
-    except ValueError:
+    except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValueError:
         raise

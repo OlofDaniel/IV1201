@@ -10,21 +10,7 @@ class ValidationError(ValueError):
         super().__init__(message)
         self.details = details
 
-
-class DomainException(Exception):
-    def __init__(self, code: str, message: str):
-        self.code = code
-        self.message = message
+class InvalidTokenError(Exception):
+    def __init__(self, message):
         super().__init__(message)
 
-
-class LinkExpiredError(DomainException):
-    pass
-
-
-class WeakPasswordError(DomainException):
-    pass
-
-
-class RateLimitError(DomainException):
-    pass

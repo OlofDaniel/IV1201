@@ -2,13 +2,19 @@ import re
 
 import uvicorn
 from controllers.controller import signup_controller, login_controller, reset_password_controller, update_password_controller
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Depends, Header
+from typing import Annotated
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
-from models.customExceptions import DatabaseException, ValidationError
+from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
+
 
 app = FastAPI()
+
+security = HTTPBearer()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,8 +35,6 @@ class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 
     password: str
-    access_token: str
-    refresh_token: str 
 
 
 class SignupRequest(BaseModel):
@@ -107,8 +111,17 @@ def reset(data: PasswordResetRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/updatepassword")
-def updatepassword(data: PasswordUpdateRequest):
-    return update_password_controller(data.password, data.access_token, data.refresh_token)
+def updatepassword(data: PasswordUpdateRequest, credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], 
+                   refresh_token : str = Header("refresh_token")):
+    try:
+        return update_password_controller(data.password, credentials.credentials, refresh_token)
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 
 @app.post("/signup")
 def signup(data: SignupRequest, response: Response):

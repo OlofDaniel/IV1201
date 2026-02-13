@@ -79,11 +79,11 @@ const postPasswordUpdate = async (payload: passwordupdatePayload) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${payload.accessToken}`,
+      refresh_token: payload.refreshToken,
     },
     body: JSON.stringify({
       password: payload.password,
-      access_token: payload.accessToken,
-      refresh_token: payload.refreshToken,
     }),
   });
 
@@ -113,11 +113,18 @@ export const postPasswordUpdateThunk = createAsyncThunk<
   try {
     await postPasswordUpdate(payload);
   } catch (error: any) {
-    if (error.status === 422) {
+    if (error.status === 401) {
       return thunkAPI.rejectWithValue({
         message:
-          error.detail?.message ??
+          error.detail ??
           "Link har already been used or is invalid. Please request a new password reset.",
+      });
+    }
+    if (error.status === 400) {
+      return thunkAPI.rejectWithValue({
+        message:
+          error.detail ??
+          "New password should be different from the old password.",
       });
     }
 

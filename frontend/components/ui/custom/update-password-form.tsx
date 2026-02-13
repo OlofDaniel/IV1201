@@ -10,8 +10,8 @@ interface UpdatePasswordFormProps {
   passwordShown: boolean;
   onSubmit: (
     password: string,
-    accessToken: string,
-    refreshToken: string,
+    accessToken: string | null,
+    refreshToken: string | null,
   ) => void;
   onEyeClick: () => void;
 }

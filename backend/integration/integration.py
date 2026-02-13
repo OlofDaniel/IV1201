@@ -2,6 +2,8 @@ import os
 from postgrest.exceptions import APIError
 from dotenv import load_dotenv
 from models.customExceptions import ValidationError, DatabaseException
+from pydantic import ValidationError as PydanticValidationError 
+from models.customExceptions import ValidationError, DatabaseException, InvalidTokenError
 from supabase import Client, create_client
 from supabase_auth.errors import AuthApiError
 
@@ -180,4 +182,11 @@ def update_password(password, access_token, refresh_token):
         return response
 
     except AuthApiError as e:
-        raise e
+        if str(e) == "New password should be different from the old password.":
+            raise ValueError(str(e))
+        else:
+            raise InvalidTokenError("Invalid or expired token")
+    
+    except PydanticValidationError as e:
+        print(e)
+        raise InvalidTokenError("Invalid or expired token")

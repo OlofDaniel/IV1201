@@ -9,7 +9,7 @@ import {
 
 interface headerViewProps {
   onLoginClick: () => void;
-  loggedIn: boolean;
+  isAuthenticated: boolean;
 }
 
 /*
@@ -18,9 +18,9 @@ interface headerViewProps {
   menuItems: each respective navigation link inside the drop down menu
   onLoginClick: triggers the call to the presenter to set the state of dialogIsOpen to true
   Link: links that provides the functionality to navigate to the signup, recruiter and account page, represented by a button and their respective icon
-  loggedIn: conditionally renders the correct links depending on if a users is logged in or not
+  isAuthenticated: conditionally renders the correct links depending on if a users is logged in or not
 */
-export function HeaderView({ onLoginClick, loggedIn }: headerViewProps) {
+export function HeaderView({ onLoginClick, isAuthenticated }: headerViewProps) {
   const menuItems: dropdownItem[] = [
     { label: "Login", icon: User, separator: false, onClick: onLoginClick },
     {
@@ -54,7 +54,7 @@ export function HeaderView({ onLoginClick, loggedIn }: headerViewProps) {
       </span>
       <div className="justify-self-end mr-5">
         <div className="hidden lg:flex">
-          {loggedIn ? (
+          {isAuthenticated ? (
             <Link href="/account">
               <Button className="w-25" variant="link">
                 <UserPlus />

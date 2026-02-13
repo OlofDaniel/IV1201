@@ -4,6 +4,13 @@ type loginPayload = {
   identifier: string;
   password: string;
 };
+interface LoginResponse {
+  username: string;
+  firstname: string;
+  surname: string;
+  email: string;
+  personNumber: string;
+}
 /*
   Communication logic for the login process:
   postLogin: handles the asynchronous communication from the frontend to the backend with the users credentials
@@ -11,12 +18,13 @@ type loginPayload = {
   JSON.stringify: formats the users credentials as a JSON payload for authentication
 */
 const postLogin = async (payload: loginPayload) => {
-  const response = await fetch("http://127.0.0.1:8000/login", {
+  const response = await fetch("http://localhost:8000/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -33,12 +41,22 @@ const postLogin = async (payload: loginPayload) => {
   rejectWithValue: returns the correct error message if an error occurs
 */
 export const postLoginThunk = createAsyncThunk<
-  void,
+  LoginResponse,
   loginPayload,
   { rejectValue: string }
 >("login/postLoginThunk", async (payload, thunkAPI) => {
   try {
-    await postLogin(payload);
+    const data = await postLogin(payload);
+
+    const userInfo = data.user.metadata;
+
+    return {
+      username: userInfo.username,
+      firstname: userInfo.name,
+      surname: userInfo.surname,
+      email: userInfo.email,
+      personNumber: userInfo.pnr,
+    };
   } catch (error) {
     if (error instanceof Error) {
       return thunkAPI.rejectWithValue(error.message);

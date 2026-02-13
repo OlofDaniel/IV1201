@@ -6,7 +6,7 @@
 */
 
 import { postSignupThunk } from "@/communication/signup-communication";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface signupState {
   passwordShown: boolean;

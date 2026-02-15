@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/lib/Redux/StoreProvider";
+import UserSync from "@/utils/UserSync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <UserSync />
+          {children}
+        </StoreProvider>
         <Toaster />
       </body>
     </html>

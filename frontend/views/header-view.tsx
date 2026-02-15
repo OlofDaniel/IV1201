@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { User, UserPlus, ShieldUser, Menu, Ghost } from "lucide-react";
+import { User, UserPlus, ShieldUser, Menu } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -55,7 +55,7 @@ export function HeaderView({ onLoginClick, isAuthenticated }: headerViewProps) {
       <div className="justify-self-end mr-5">
         <div className="hidden lg:flex">
           {isAuthenticated ? (
-            <Link href="/account">
+            <Link href="/profile">
               <Button className="w-25" variant="link">
                 <UserPlus />
                 Account

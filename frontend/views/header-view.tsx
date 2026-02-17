@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { User, UserPlus, ShieldUser, Menu } from "lucide-react";
+import { User, UserPlus, ShieldUser, Menu, LogOut } from "lucide-react";
 import Link from "next/link";
+import { RoundSpinner } from "@/components/ui/custom/round-spinner";
 
 import {
   CustomDropdownMenu,
@@ -10,6 +11,7 @@ import {
 interface headerViewProps {
   onLoginClick: () => void;
   isAuthenticated: boolean;
+  userLoading: boolean;
 }
 
 /*
@@ -20,7 +22,11 @@ interface headerViewProps {
   Link: links that provides the functionality to navigate to the signup, recruiter and account page, represented by a button and their respective icon
   isAuthenticated: conditionally renders the correct links depending on if a users is logged in or not
 */
-export function HeaderView({ onLoginClick, isAuthenticated }: headerViewProps) {
+export function HeaderView({
+  onLoginClick,
+  isAuthenticated,
+  userLoading,
+}: headerViewProps) {
   const menuItems: dropdownItem[] = [
     { label: "Login", icon: User, separator: false, onClick: onLoginClick },
     {
@@ -54,13 +60,21 @@ export function HeaderView({ onLoginClick, isAuthenticated }: headerViewProps) {
       </span>
       <div className="justify-self-end mr-5">
         <div className="hidden lg:flex">
-          {isAuthenticated ? (
-            <Link href="/profile">
+          {userLoading ? (
+            <RoundSpinner />
+          ) : isAuthenticated ? (
+            <div>
+              <Link href="/profile">
+                <Button className="w-25" variant="link">
+                  <User />
+                  Profile
+                </Button>
+              </Link>
               <Button className="w-25" variant="link">
-                <UserPlus />
-                Account
+                <LogOut />
+                Logout
               </Button>
-            </Link>
+            </div>
           ) : (
             <div>
               <Button variant="link" className="w-25" onClick={onLoginClick}>

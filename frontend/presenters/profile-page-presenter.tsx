@@ -17,7 +17,7 @@ export function ProfileViewPresenter() {
       person_number={user?.person_number ?? ""}
       errorMessage={errorMessage}
       isAuthenticated={isAuthenticated}
-      loading={loading}
+      userLoading={loading}
     ></ProfilePageView>
   );
 }

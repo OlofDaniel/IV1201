@@ -8,23 +8,36 @@ import {
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
 
-/* 
-createLoginPresenterHandlers: Having the creation of handler functions outside the actual presenter allows for useful testing, not needing to render the view and create a store to test. 
+/* Genom att skicka in router hit kan vi styra navigeringen, 
+samtidigt som det är enkelt att mocka routern i framtida tester. 
 */
 export function createLoginPresenterHandlers(dispatch: AppDispatch) {
   return {
     onEyeClick: () => dispatch(togglePasswordShown()),
-    onLoginClick: (identifier: string, password: string) =>
-      dispatch(postLoginThunk({ identifier: identifier, password: password })),
+
+    // 3. Gör funktionen async
+    onLoginClick: async (identifier: string, password: string) => {
+      try {
+        await dispatch(postLoginThunk({ identifier, password })).unwrap();
+        dispatch(setDialogIsOpen(false));
+        window.location.href = "/profile";
+      } catch (error) {
+        console.error("Login failed", error);
+      }
+    },
+
     onOpenChange: (open: boolean) => dispatch(setDialogIsOpen(open)),
   };
 }
 
 export function LoginDialogPresenter() {
   const dispatch = useDispatch<AppDispatch>();
+
   const { loginLoading, passwordShown, dialogIsOpen, errorMessage } =
     useSelector((state: RootState) => state.login);
+
   const loginHandlers = createLoginPresenterHandlers(dispatch);
+
   return (
     <LoginDialog
       loginLoading={loginLoading}
@@ -32,6 +45,6 @@ export function LoginDialogPresenter() {
       passwordShown={passwordShown}
       dialogIsOpen={dialogIsOpen}
       {...loginHandlers}
-    ></LoginDialog>
+    />
   );
 }

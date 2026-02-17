@@ -6,7 +6,10 @@ import { setDialogIsOpen } from "@/models/Redux/login-slice";
 
 export function HeaderPresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated } = useSelector((state: RootState) => state.user);
+
+  const { loading, isAuthenticated } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   /*
   onLoginClick: sets the state of dialogIsOpen to true when login button is clicked in HeaderView
@@ -15,6 +18,10 @@ export function HeaderPresenter() {
     dispatch(setDialogIsOpen(true));
   };
   return (
-    <HeaderView onLoginClick={onLoginClick} isAuthenticated={isAuthenticated} />
+    <HeaderView
+      onLoginClick={onLoginClick}
+      isAuthenticated={isAuthenticated}
+      userLoading={loading}
+    />
   );
 }

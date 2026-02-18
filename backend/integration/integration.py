@@ -121,6 +121,10 @@ def get_email_from_username(identifier):
 
 
 def get_user_data(access_token: str):
+    """
+    Function that fetches user information from supabase and returns it to frontend.
+    Throws an ValueError if no user data is found.
+    """
     try:
         user_client = get_user_client(access_token)
         response = (
@@ -137,6 +141,9 @@ def get_user_data(access_token: str):
 
 
 def get_user_client(access_token: str):
+    """
+    Function that creates a new user client with the users access token.
+    """
     user_client = create_client(url, key)
     user_client.postgrest.auth(access_token)
 
@@ -144,4 +151,7 @@ def get_user_client(access_token: str):
 
 
 def refresh_session(refresh_token: str):
+    """
+    Function that starta a new session with refresh token and returns it.
+    """
     return supabase.auth.refresh_session(refresh_token)

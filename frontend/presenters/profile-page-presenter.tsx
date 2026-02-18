@@ -1,7 +1,7 @@
 "use client";
 import { ProfilePageView } from "@/views/profile-page-view";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/lib/Redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/Redux/store";
 
 export function ProfileViewPresenter() {
   const { user, loading, isAuthenticated, errorMessage } = useSelector(

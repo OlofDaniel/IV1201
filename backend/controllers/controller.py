@@ -25,6 +25,7 @@ def login_controller(user_credentials):
 
 
 def get_user_information_controller(access_token, refresh_token):
+    """Controller function for getting user information. Calls model function get_user_information with users tokens."""
     try:
         return get_user_information(access_token, refresh_token)
     except ValueError:

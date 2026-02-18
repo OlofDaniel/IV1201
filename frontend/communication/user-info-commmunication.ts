@@ -12,6 +12,12 @@ interface GetInfoError {
   message: string;
   errors?: { [key: string]: string };
 }
+
+/*
+  Communication logic for the user informatio:
+  getUserInfo: Retrieves the user info from supabase. Such as username and person number and more.
+  response: saves the response from the fetch call to the getUserInfo endpoint after the HTTP POST request
+*/
 const getUserInfo = async () => {
   const response = await fetch("http://localhost:8000/getinfo", {
     method: "GET",
@@ -27,6 +33,12 @@ const getUserInfo = async () => {
 
   return data;
 };
+/*
+  Asynchronous thunk for the get user info process:
+  getUserInfoThunk: dispatches status updates (pending, fulfilled, rejected) of the signup state
+  await getUserInfow: executes the API call and waits for a response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
 export const getUserInfoThunk = createAsyncThunk<
   UserInfoResponse,
   void,

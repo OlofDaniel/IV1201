@@ -13,3 +13,8 @@ class ValidationError(ValueError):
     def __init__(self, message, details: dict):
         super().__init__(message)
         self.details = details
+
+class InvalidTokenError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { PasswordResetView } from "@/views/password-reset-view";
 import { postResetThunk } from "@/communication/password-reset-communication";
-import { resetPasswordResetState } from "@/models/Redux/password-reset-slice";
 
 export function PasswordResetPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();

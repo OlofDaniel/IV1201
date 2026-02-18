@@ -5,12 +5,16 @@ from controllers.controller import (
     signup_controller,
     login_controller,
     get_user_information_controller,
+    reset_password_controller,
+    update_password_controller,
 )
 from fastapi import FastAPI, HTTPException, Response, Request
+from typing import Annotated
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
-from models.customExceptions import DatabaseException, ValidationError
+from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
 
 app = FastAPI()
 
@@ -18,6 +22,9 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+
+security = HTTPBearer()
 
 
 app.add_middleware(
@@ -33,6 +40,16 @@ class LoginRequest(BaseModel):
     """Specifies types expected in a log in request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
     identifier: str
+    password: str
+
+class PasswordUpdateRequest(BaseModel):
+    """Specifies types expected in a password update request"""
+
+    password: str
+
+class PasswordUpdateRequest(BaseModel):
+    """Specifies types expected in a password update request"""
+
     password: str
 
 
@@ -109,8 +126,31 @@ def login(data: LoginRequest, response: Response):
 
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
-    return {"email": data.email}
+    """ Reset password endpoint, takes email from the request, 
+    then calls the reset password controller function.
+    Error is only raised if there is a problem with connection to the database,
+    Response is otherwise 200 OK regardless of email valididity, to avoid information leakage.
+    """
+    try:
+        return reset_password_controller(data.email)
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/updatepassword")
+def updatepassword(data: PasswordUpdateRequest, credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], 
+                   refresh_token : str = Header("refresh_token")):
+    """Update password endpoint, takes the new password,
+    the access and refresh tokens from the request, 
+    then calls the update password controller function"""
+    try:
+        return update_password_controller(data.password, credentials.credentials, refresh_token)
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 
 @app.post("/signup")
 def signup(data: SignupRequest, response: Response):

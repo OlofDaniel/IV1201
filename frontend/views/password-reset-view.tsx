@@ -32,7 +32,8 @@ export function PasswordResetView({
           {emailSent ? (
             <span className="flex flex-col justify-center items-center bg-slate-100 text-xl">
               <MailCheck size={60} />
-              Email has been sent!
+              If there is an account with the email provided, a link has been
+              sent!
             </span>
           ) : (
             <PasswordResetForm

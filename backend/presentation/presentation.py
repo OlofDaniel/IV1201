@@ -1,25 +1,23 @@
 import re
+from typing import Annotated
 
 import uvicorn
 from controllers.controller import (
-    signup_controller,
-    login_controller,
     get_user_information_controller,
+    login_controller,
     reset_password_controller,
+    signup_controller,
     update_password_controller,
 )
-from fastapi import FastAPI, HTTPException, Response, Request
-from typing import Annotated
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-<<<<<<< HEAD
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
 from pydantic import BaseModel, field_validator
-
-from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
-=======
-from models.customExceptions import DatabaseException
-from pydantic import BaseModel, field_validator
->>>>>>> e41397c (feat: added recruiter applications ui and management functionality, a DataTable component that shows user details with pagination and expandable rows, an application table that makes the columns for the DataTable with status management via select component, and a slice/thunk for fetching the user applications)
 
 app = FastAPI()
 
@@ -47,10 +45,12 @@ class LoginRequest(BaseModel):
     identifier: str
     password: str
 
+
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 
     password: str
+
 
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
@@ -131,7 +131,7 @@ def login(data: LoginRequest, response: Response):
 
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
-    """ Reset password endpoint, takes email from the request, 
+    """Reset password endpoint, takes email from the request,
     then calls the reset password controller function.
     Error is only raised if there is a problem with connection to the database,
     Response is otherwise 200 OK regardless of email valididity, to avoid information leakage.
@@ -141,21 +141,27 @@ def reset(data: PasswordResetRequest):
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/updatepassword")
-def updatepassword(data: PasswordUpdateRequest, credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], 
-                   refresh_token : str = Header("refresh_token")):
+def updatepassword(
+    data: PasswordUpdateRequest,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    refresh_token: str = Header("refresh_token"),
+):
     """Update password endpoint, takes the new password,
-    the access and refresh tokens from the request, 
+    the access and refresh tokens from the request,
     then calls the update password controller function"""
     try:
-        return update_password_controller(data.password, credentials.credentials, refresh_token)
+        return update_password_controller(
+            data.password, credentials.credentials, refresh_token
+        )
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
 
 @app.post("/signup")
 def signup(data: SignupRequest, response: Response):

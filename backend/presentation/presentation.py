@@ -16,7 +16,6 @@ from pydantic import BaseModel, field_validator
 
 from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
 
-
 app = FastAPI()
 
 origins = [
@@ -41,6 +40,11 @@ class LoginRequest(BaseModel):
     """Specifies types expected in a log in request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
     identifier: str
+    password: str
+
+class PasswordUpdateRequest(BaseModel):
+    """Specifies types expected in a password update request"""
+
     password: str
 
 class PasswordUpdateRequest(BaseModel):

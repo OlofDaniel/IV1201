@@ -40,6 +40,8 @@ export function UpdatePasswordForm({
     return true;
   }
 
+  /*Workaround since supabase expects the call to be made from this URL, not the backend. 
+  Reads the URL of the form page when submitted to get the relevant tokens.*/
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!handleConfirmPassword()) {

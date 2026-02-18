@@ -25,12 +25,15 @@ export function UpdatePasswordPagePresenter() {
     linkParsed,
   } = useSelector((state: RootState) => state.updatePassword);
 
+  /*UseEffect to show error message as a "toast" notification*/
   useEffect(() => {
     if (errorMessage) {
       toast.error(errorMessage, { position: "top-center" });
     }
   }, [errorMessage]);
 
+  /*UseEffect to indicate successful password update as a "toast" notification, 
+  aswell as re-route the user to the homepage*/
   useEffect(() => {
     if (passwordUpdated) {
       toast.success("Password changed successfully!", {
@@ -40,6 +43,7 @@ export function UpdatePasswordPagePresenter() {
     }
   }, [passwordUpdated, router]);
 
+  /*Used to sanity-check the link, ie. if it conatins an access token at all, a used link says 'access denied'*/
   useEffect(() => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const error = hashParams.get("error");
@@ -54,6 +58,7 @@ export function UpdatePasswordPagePresenter() {
     dispatch(togglePasswordShown());
   };
 
+  /* When the update password form is submitted the password and tokens are used when to posting the update*/
   const onSubmit = (
     password: string,
     accessToken: string,

@@ -172,6 +172,11 @@ def password_reset_request(email):
         raise DatabaseException()
 
 def update_password(password, access_token, refresh_token):
+    """Function to update a user's password, given the new password and valid
+    access and refresh tokens. Returns the response from supabase if successful, 
+    raises invalid token error if the access token is invalid, database exception 
+    if there is a problem with the connection and value error if the new password 
+    is the same as the previous password"""
     try:
         supabase.auth.set_session(access_token, refresh_token)
 

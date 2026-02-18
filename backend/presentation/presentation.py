@@ -122,6 +122,11 @@ def login(data: LoginRequest, response: Response):
 
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
+    """ Reset password endpoint, takes email from the request, 
+    then calls the reset password controller function.
+    Error is only raised if there is a problem with connection to the database,
+    Response is otherwise 200 OK regardless of email valididity, to avoid information leakage.
+    """
     try:
         return reset_password_controller(data.email)
     except DatabaseException as e:
@@ -130,6 +135,9 @@ def reset(data: PasswordResetRequest):
 @app.post("/updatepassword")
 def updatepassword(data: PasswordUpdateRequest, credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], 
                    refresh_token : str = Header("refresh_token")):
+    """Update password endpoint, takes the new password,
+    the access and refresh tokens from the request, 
+    then calls the update password controller function"""
     try:
         return update_password_controller(data.password, credentials.credentials, refresh_token)
     except InvalidTokenError as e:

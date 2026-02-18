@@ -1,3 +1,7 @@
+/* 
+  State handeling for the user profile: 
+  Holds the state of the user information such as username, first_name and more. 
+*/
 import { getUserInfoThunk } from "@/communication/user-info-commmunication";
 import { createSlice } from "@reduxjs/toolkit";
 import { postLoginThunk } from "@/communication/login-communication";

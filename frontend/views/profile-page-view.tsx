@@ -22,6 +22,11 @@ interface ProfilePageViewProps {
   userLoading: boolean;
 }
 
+/*
+  View layout of the user profile view:
+  Image: displays a blurred image in the background of the page
+  SkeletonCard: A placeholder when the user information is getting fetched from supabase
+*/
 export function ProfilePageView({
   username,
   first_name,

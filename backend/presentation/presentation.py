@@ -176,6 +176,11 @@ def set_cookies(response: Response, access_token: str, refresh_token: str):
 
 @app.get("/getinfo")
 def get_user_info(response: Response, request: Request):
+    """
+    Function that gets user information from supabase with the users access token. It retrieves the user access and refresh token from cookies.
+    Sets new cookies if new tokens are returned from lower layers, which indicate that the old tokens expired.
+    Raises HTTPException if no access_token were sent.
+    """
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
     if not access_token:

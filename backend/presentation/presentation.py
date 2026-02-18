@@ -86,6 +86,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
+
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 

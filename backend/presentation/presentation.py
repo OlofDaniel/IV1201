@@ -293,6 +293,75 @@ def get_user_info(response: Response, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/applications")
+def applications():
+    return [
+        {
+            "person_id": "1",
+            "name": "Kalle",
+            "surname": "Karlsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "2",
+            "name": "Martin",
+            "surname": "Matsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "3",
+            "name": "Lisa",
+            "surname": "Larsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "4",
+            "name": "Johan",
+            "surname": "Johansson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "5",
+            "name": "Fredrik",
+            "surname": "Fredriksson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "6",
+            "name": "Anders",
+            "surname": "Andersson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "7",
+            "name": "Filip",
+            "surname": "Filipsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+    ]
+
+
 if __name__ == "__main__":
     uvicorn.run(
         "presentation.presentation:app", host="0.0.0.0", port=8000, reload=False

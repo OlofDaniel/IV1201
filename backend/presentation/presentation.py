@@ -12,9 +12,14 @@ from fastapi import FastAPI, HTTPException, Response, Request
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
+<<<<<<< HEAD
 from pydantic import BaseModel, field_validator
 
 from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
+=======
+from models.customExceptions import DatabaseException
+from pydantic import BaseModel, field_validator
+>>>>>>> e41397c (feat: added recruiter applications ui and management functionality, a DataTable component that shows user details with pagination and expandable rows, an application table that makes the columns for the DataTable with status management via select component, and a slice/thunk for fetching the user applications)
 
 app = FastAPI()
 
@@ -242,6 +247,75 @@ def get_user_info(response: Response, request: Request):
     except DatabaseException as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/applications")
+def applications():
+    return [
+        {
+            "person_id": "1",
+            "name": "Kalle",
+            "surname": "Karlsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "2",
+            "name": "Martin",
+            "surname": "Matsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "3",
+            "name": "Lisa",
+            "surname": "Larsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "4",
+            "name": "Johan",
+            "surname": "Johansson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "5",
+            "name": "Fredrik",
+            "surname": "Fredriksson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "6",
+            "name": "Anders",
+            "surname": "Andersson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+        {
+            "person_id": "7",
+            "name": "Filip",
+            "surname": "Filipsson",
+            "email": "",
+            "username": "",
+            "pnr": "",
+            "status": "Unhandled",
+        },
+    ]
 
 
 if __name__ == "__main__":

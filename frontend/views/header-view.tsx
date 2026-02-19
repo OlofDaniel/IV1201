@@ -10,6 +10,7 @@ import {
 
 interface headerViewProps {
   onLoginClick: () => void;
+  onLogoutClick: () => void;
   isAuthenticated: boolean;
   userLoading: boolean;
 }
@@ -23,6 +24,7 @@ interface headerViewProps {
   isAuthenticated: conditionally renders the correct links depending on if a users is logged in or not
 */
 export function HeaderView({
+  onLogoutClick,
   onLoginClick,
   isAuthenticated,
   userLoading,
@@ -70,7 +72,7 @@ export function HeaderView({
                   Profile
                 </Button>
               </Link>
-              <Button className="w-25" variant="link">
+              <Button className="w-25" variant="link" onClick={onLogoutClick}>
                 <LogOut />
                 Logout
               </Button>

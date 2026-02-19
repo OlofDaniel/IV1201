@@ -7,8 +7,9 @@ from controllers.controller import (
     get_user_information_controller,
     reset_password_controller,
     update_password_controller,
+    logout_controller,
 )
-from fastapi import FastAPI, HTTPException, Response, Request
+from fastapi import FastAPI, HTTPException, Response, Request, Header, Depends
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
@@ -123,6 +124,29 @@ def login(data: LoginRequest, response: Response):
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/logout")
+def logout(request: Request, response: Response):
+    """
+    Function that takes logout requests, calling controller function after retrieving the users access and refresh tokens from cookies.
+    if successful, it clears the cookies in the response and returns 200 OK.
+    Raises HTTPException if no access_token/refresh_token was sent, or if the tokens are invalid/expired. 
+    Raises HTTPException with status code 500 if there is a problem with the database connection.
+    """
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token or not refresh_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+    try:
+        logout_controller(
+            access_token, refresh_token
+        )
+        clear_auth_cookies(response)
+        return {"status": "success"}    
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/reset")
 def reset(data: PasswordResetRequest):
@@ -211,6 +235,22 @@ def set_cookies(response: Response, access_token: str, refresh_token: str):
         samesite="lax",
         secure=False,
         path="/",
+    )
+
+def clear_auth_cookies(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        samesite="lax",
+        secure=True,
+        path="/"
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        samesite="lax",
+        secure=True,
+        path="/"
     )
 
 

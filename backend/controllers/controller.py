@@ -3,6 +3,7 @@ from models.loginModel import login
 from models.signupModel import signup
 from models.userModel import get_user_information
 from models.passwordResetModel import request_password_email, change_password
+from models.logoutModel import logout
 
 
 def signup_controller(person_information):
@@ -50,4 +51,13 @@ def update_password_controller(password, access_token, refresh_token):
     except DatabaseException:
         raise
     except ValueError:
+        raise
+
+def logout_controller(access_token, refresh_token):
+    """Controller function for logging out, just calls model to attempt logout and catches possible errors, raising them to the caller"""
+    try:
+        return logout(access_token, refresh_token)
+    except InvalidTokenError:
+        raise
+    except DatabaseException:
         raise

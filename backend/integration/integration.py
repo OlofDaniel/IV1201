@@ -31,7 +31,22 @@ def login_user(user_credentials):
     except AuthApiError as e:
         raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
 
+def logout_user(access_token, refresh_token):
+    """Function that logs out user, given the users access and refresh tokens. 
+    Returns response from supabase if successful, raises invalid token error if the access 
+    token is invalid and database exception if there is a problem with the connection"""
+    try:
+        supabase.auth.set_session(access_token, refresh_token)
+        response = supabase.auth.sign_out()
+        return response
 
+    except AuthApiError:
+        raise InvalidTokenError("Invalid or expired token")
+    except PydanticValidationError:
+        raise InvalidTokenError("Invalid or expired token")
+    except Exception:
+        raise DatabaseException()
+    
 def add_person(person_information):
     """
     Function that adds person to the person table in supabase.

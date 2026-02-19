@@ -49,10 +49,12 @@ export const loginSlice = createSlice({
     builder
       .addCase(postLoginThunk.pending, (state) => {
         state.loginLoading = true;
+        state.errorMessage = null;
       })
       .addCase(postLoginThunk.fulfilled, (state) => {
         state.loginLoading = false;
         state.dialogIsOpen = false;
+        state.errorMessage = null;
       })
       .addCase(postLoginThunk.rejected, (state, action) => {
         state.loginLoading = false;

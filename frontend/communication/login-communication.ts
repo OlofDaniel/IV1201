@@ -27,11 +27,15 @@ const postLogin = async (payload: loginPayload) => {
     credentials: "include",
   });
 
+  const data = await response.json();
   if (!response.ok) {
-    throw new Error(`Failed to POST to /login with status: ${response.status}`);
+    throw {
+      status: response.status,
+      detail: data.detail,
+    };
   }
 
-  return response.json();
+  return data;
 };
 
 /*
@@ -57,9 +61,14 @@ export const postLoginThunk = createAsyncThunk<
       email: userInfo.email,
       personNumber: userInfo.pnr,
     };
-  } catch (error) {
-    if (error instanceof Error) {
-      return thunkAPI.rejectWithValue(error.message);
+  } catch (error: any) {
+    if (error.status === 401) {
+      return thunkAPI.rejectWithValue("Incorrect identifier or password");
+    }
+    if (error.status === 500) {
+      return thunkAPI.rejectWithValue(
+        "Something went wrong when connecting to the server, try again later",
+      );
     }
     return thunkAPI.rejectWithValue("Unknown error");
   }

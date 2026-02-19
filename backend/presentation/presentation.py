@@ -120,7 +120,7 @@ def login(data: LoginRequest, response: Response):
         }
 
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 

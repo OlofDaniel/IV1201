@@ -19,7 +19,11 @@ const COMPETENCIES = [
 ];
 
 export function CompetensSelection() {
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [selected, setSelected] = useState<Record<string, boolean>>({
+    "ticket-sales": false,
+    lotteries: false,
+    "roller-coaster": false,
+  });
 
   const handleToggle = (id: string, checked: boolean) => {
     setSelected((prev) => ({ ...prev, [id]: checked }));
@@ -41,7 +45,7 @@ export function CompetensSelection() {
           return (
             <div
               key={comp.id}
-              className="my-10 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between w-full max-w-md"
+              className="flex gap-2 flex-row items-center justify-center w-full max-w-md h-8"
             >
               <Field orientation="horizontal" className="flex-1">
                 <Checkbox
@@ -51,6 +55,7 @@ export function CompetensSelection() {
                   onCheckedChange={(checked) =>
                     handleToggle(comp.id, checked as boolean)
                   }
+                  className="border border-black"
                 />
                 <FieldLabel
                   htmlFor={comp.id}
@@ -61,11 +66,14 @@ export function CompetensSelection() {
               </Field>
 
               {isChecked && (
-                <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Experience
+                  </span>
                   <Input
                     type="number"
                     name={`${comp.id}-years`}
-                    step="0.1"
+                    step="0.25"
                     min="0"
                     placeholder="0.0"
                     className="w-20 h-8"

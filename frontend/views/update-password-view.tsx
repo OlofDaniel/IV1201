@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { House, BadgeCheck, CircleAlert } from "lucide-react";
-import Link from "next/link";
+import { CircleAlert } from "lucide-react";
 import { UpdatePasswordForm } from "@/components/ui/custom/update-password-form";
 import { Spinner } from "@/components/ui/spinner";
 interface UpdatePasswordViewProps {
@@ -11,8 +10,8 @@ interface UpdatePasswordViewProps {
   onEyeClick: () => void;
   onSubmit: (
     password: string,
-    accessToken: string,
-    refreshToken: string,
+    accessToken: string | null,
+    refreshToken: string | null,
   ) => void;
 }
 

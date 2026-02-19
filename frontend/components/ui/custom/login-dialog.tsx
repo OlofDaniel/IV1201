@@ -104,6 +104,11 @@ export function LoginDialog({
               </div>
             </div>
           </div>
+          {errorMessage && (
+            <div className="mt-3 text-sm text-red-600 font-medium">
+              {errorMessage}
+            </div>
+          )}
           <div className="text-sm leading-none font-medium mt-5 text-muted-foreground">
             Don't know your password?
             <Link href="/passwordreset" className="text-blue-700">

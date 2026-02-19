@@ -15,14 +15,13 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
   return {
     onEyeClick: () => dispatch(togglePasswordShown()),
 
-    // 3. Gör funktionen async
     onLoginClick: async (identifier: string, password: string) => {
       try {
         await dispatch(postLoginThunk({ identifier, password })).unwrap();
         dispatch(setDialogIsOpen(false));
         window.location.href = "/profile";
       } catch (error) {
-        console.error("Login failed", error);
+        // Error message is handled in the slice, so we don't need to do anything hereS
       }
     },
 

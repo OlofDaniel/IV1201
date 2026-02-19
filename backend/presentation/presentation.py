@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Response, Request, Header, Depends
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, AfterValidator
 
 from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
 
@@ -36,37 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class LoginRequest(BaseModel):
-    """Specifies types expected in a log in request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
-
-    identifier: str
-    password: str
-
-class PasswordUpdateRequest(BaseModel):
-    """Specifies types expected in a password update request"""
-
-    password: str
-
-class PasswordUpdateRequest(BaseModel):
-    """Specifies types expected in a password update request"""
-
-    password: str
-
-
-class SignupRequest(BaseModel):
-    """Specifies types and formats expected in a sign up request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
-
-    username: str
-    password: str
-    first_name: str
-    surname: str
-    email: str
-    person_number: str
-
-    @field_validator("password")
-    @classmethod
-    def password_complexity(cls, value: str) -> str:
+def validate_password(value: str) -> str:
         if len(value) < 8:
             raise ValueError("Password should be at least 8 letters")
         if not re.search(r"[A-Z]", value):
@@ -77,26 +47,55 @@ class SignupRequest(BaseModel):
             raise ValueError("Password has to include atleast 1 number")
         return value
 
-    @field_validator("email")
-    @classmethod
-    def email_validity(cls, value: str) -> str:
+password_str = Annotated[str, AfterValidator(validate_password)]
+
+def validate_email(value: str) -> str:
         email_regex = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}"
         if re.match(email_regex, value) is None:
             raise ValueError("Invalid email format")
         return value
 
+email_str = Annotated[str, AfterValidator(validate_email)]
+
+def validate_person_number(value: str) -> str:
+        if len(value) != 13:
+            raise ValueError("Person number must be 13 digits")
+        if "-" not in value:
+            raise ValueError("Person number must include a hyphen")
+        if not re.search(r"^\d{8}-\d{4}$", value):
+            raise ValueError("Person number must be in format YYYYMMDD-XXXX")
+
+        return value
+
+person_number_str = Annotated[str, AfterValidator(validate_person_number)]
+
+class LoginRequest(BaseModel):
+    """Specifies types expected in a log in request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
+
+    identifier: str
+    password: str
+
+class PasswordUpdateRequest(BaseModel):
+    """Specifies types expected in a password update request"""
+
+    password: password_str
+
+class SignupRequest(BaseModel):
+    """Specifies types and formats expected in a sign up request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
+
+    username: str
+    password: password_str
+    first_name: str
+    surname: str
+    email: email_str
+    person_number: person_number_str
+
+
 
 class PasswordResetRequest(BaseModel):
     """Specifies types and formats expected in a password reset request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
-    email: str
-
-    @field_validator("email")
-    @classmethod
-    def email_validity(cls, value: str) -> str:
-        if "@" not in value:
-            raise ValueError("Email has to include @")
-        return value
+    email: email_str
 
 
 @app.post("/login")

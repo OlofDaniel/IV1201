@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { RecruiterPageView } from "@/views/recruiter-page-view";
-import { getApplicationsThunk } from "@/communication/applications-communication";
+import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
 import {
   setNewStatus,
   setSelectedApplication,

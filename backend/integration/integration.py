@@ -1,8 +1,13 @@
 import os
-from postgrest.exceptions import APIError
+
 from dotenv import load_dotenv
-from pydantic import ValidationError as PydanticValidationError 
-from models.customExceptions import ValidationError, DatabaseException, InvalidTokenError
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
+from postgrest.exceptions import APIError
+from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, create_client
 from supabase_auth.errors import AuthApiError
 
@@ -164,24 +169,25 @@ def password_reset_request(email):
     try:
         response = supabase.auth.reset_password_email(
             email,
-        {"redirect_to": "http://localhost:3000/updatepassword"}, #TODO: Change redirect url when frontend is deployed
+            {
+                "redirect_to": "http://localhost:3000/updatepassword"
+            },  # TODO: Change redirect url when frontend is deployed
         )
         return response
     except AuthApiError:
         raise DatabaseException()
 
+
 def update_password(password, access_token, refresh_token):
     """Function to update a user's password, given the new password and valid
-    access and refresh tokens. Returns the response from supabase if successful, 
-    raises invalid token error if the access token is invalid, database exception 
-    if there is a problem with the connection and value error if the new password 
+    access and refresh tokens. Returns the response from supabase if successful,
+    raises invalid token error if the access token is invalid, database exception
+    if there is a problem with the connection and value error if the new password
     is the same as the previous password"""
     try:
         supabase.auth.set_session(access_token, refresh_token)
 
-        response = supabase.auth.update_user({
-            "password": password
-        })
+        response = supabase.auth.update_user({"password": password})
 
         return response
 
@@ -190,7 +196,29 @@ def update_password(password, access_token, refresh_token):
             raise ValueError(str(e))
         else:
             raise InvalidTokenError("Invalid or expired token")
-    
+
     except PydanticValidationError as e:
         print(e)
         raise InvalidTokenError("Invalid or expired token")
+
+
+def get_applicants_data(access_token: str):
+    """
+    Function that fetches all applicants information from supabase and returns it to frontend.
+    Throws an ValueError if no user data is found.
+    """
+    try:
+        user_client = get_user_client(access_token)
+        response = (
+            user_client.table("person_add_to_auth")
+            .select(
+                "person_id, username, name, surname, email, pnr, application_status"
+            )
+            .neq("role_id", "1")
+            .execute()
+        )
+        if not response.data:
+            raise ValueError("No data found")
+        return response.data
+    except APIError:
+        raise DatabaseException()

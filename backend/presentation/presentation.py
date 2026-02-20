@@ -9,7 +9,7 @@ from controllers.controller import (
     signup_controller,
     update_password_controller,
 )
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from models.customExceptions import (
@@ -256,73 +256,71 @@ def get_user_info(response: Response, request: Request):
 
 
 @app.get("/applications")
-def applications():
+def get_all_applicants_info():
     return [
         {
-            "person_id": "1",
+            "person_id": 1,
+            "username": "kalle123",
             "name": "Kalle",
             "surname": "Karlsson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
+            "email": "kalle.karlsson@finnsinte.se",
+            "pnr": "20000101-1234",
+            "application_status": "Unhandled",
         },
         {
-            "person_id": "2",
-            "name": "Martin",
-            "surname": "Matsson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
+            "person_id": 2,
+            "username": "anna456",
+            "name": "Anna",
+            "surname": "Andersson",
+            "email": "anna.andersson@finnsinte.se",
+            "pnr": "20001201-4567",
+            "application_status": "Unhandled",
         },
         {
-            "person_id": "3",
+            "person_id": 3,
+            "username": "erik789",
+            "name": "Erik",
+            "surname": "Eriksson",
+            "email": "erik.eriksson@finnsinte.se",
+            "pnr": "20000812-8910",
+            "application_status": "Unhandled",
+        },
+        {
+            "person_id": 4,
+            "username": "lisa321",
             "name": "Lisa",
             "surname": "Larsson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
-        },
-        {
-            "person_id": "4",
-            "name": "Johan",
-            "surname": "Johansson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
-        },
-        {
-            "person_id": "5",
-            "name": "Fredrik",
-            "surname": "Fredriksson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
-        },
-        {
-            "person_id": "6",
-            "name": "Anders",
-            "surname": "Andersson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
-        },
-        {
-            "person_id": "7",
-            "name": "Filip",
-            "surname": "Filipsson",
-            "email": "",
-            "username": "",
-            "pnr": "",
-            "status": "Unhandled",
+            "email": "lisa.larsson@finnsinte.se",
+            "pnr": "20000202-1089",
+            "application_status": "Unhandled",
         },
     ]
 
+
+"""
+def get_all_applicants_info(response: Response, request: Request):
+
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        all_applicants_info, new_tokens = get_all_applicants_information_controller(
+            access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return all_applicants_info
+
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+"""
 
 if __name__ == "__main__":
     uvicorn.run(

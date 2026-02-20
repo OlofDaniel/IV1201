@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getApplicationsThunk } from "@/communication/applications-communication";
+import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
 
 export interface Application {
   id: string; // Person_id

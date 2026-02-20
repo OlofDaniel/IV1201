@@ -225,3 +225,25 @@ def update_password(password, access_token, refresh_token):
     except PydanticValidationError as e:
         print(e)
         raise InvalidTokenError("Invalid or expired token")
+
+
+def get_applicants_data(access_token: str):
+    """
+    Function that fetches all applicants information from supabase and returns it to frontend.
+    Throws an ValueError if no user data is found.
+    """
+    try:
+        user_client = get_user_client(access_token)
+        response = (
+            user_client.table("person_add_to_auth")
+            .select(
+                "person_id, username, name, surname, email, pnr, application_status"
+            )
+            .neq("role_id", "1")
+            .execute()
+        )
+        if not response.data:
+            raise ValueError("No data found")
+        return response.data
+    except APIError:
+        raise DatabaseException()

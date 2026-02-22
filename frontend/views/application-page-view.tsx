@@ -3,6 +3,8 @@ import { CalendarPicker } from "@/components/ui/custom/calendar-picker";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonCard } from "@/components/ui/custom/card-skeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DateRange } from "react-day-picker";
 
 interface ApplicationPageViewProps {
   username: string | null;
@@ -13,6 +15,13 @@ interface ApplicationPageViewProps {
   errorMessage: string | null;
   isAuthenticated: boolean;
   userLoading: boolean;
+  selected: Record<string, boolean>;
+  yearsOfExperience: Record<string, number>;
+  onToggle: (id: string, checked: boolean) => void;
+  onYearsChange: (id: string, years: number) => void;
+  onSubmit: () => void;
+  dateRange: DateRange | undefined;
+  onDateChange: (range: DateRange | undefined) => void;
 }
 
 export function ApplicationPageView({
@@ -24,6 +33,13 @@ export function ApplicationPageView({
   errorMessage,
   isAuthenticated,
   userLoading,
+  selected,
+  yearsOfExperience,
+  onToggle,
+  onYearsChange,
+  onSubmit,
+  dateRange,
+  onDateChange,
 }: ApplicationPageViewProps) {
   return userLoading ? (
     <div className="flex justify-center mt-20">
@@ -57,13 +73,24 @@ export function ApplicationPageView({
         </div>
         <div className="flex flex-col items-center w-full mt-8">
           <div>
-            <CompetensSelection />
+            <CompetensSelection
+              selected={selected}
+              yearsOfExperience={yearsOfExperience}
+              onToggle={onToggle}
+              onYearsChange={onYearsChange}
+            />
           </div>
           <div className="mt-10 w-full flex justify-center">
-            <CalendarPicker />
+            <CalendarPicker dateRange={dateRange} onDateChange={onDateChange} />
           </div>
           <div className="mt-10 w-75">
-            <Button className="w-full">Send application</Button>
+            <Button
+              className="w-full"
+              onClick={onSubmit}
+              disabled={!dateRange?.from || !dateRange.to}
+            >
+              Send application
+            </Button>
           </div>
         </div>
       </div>

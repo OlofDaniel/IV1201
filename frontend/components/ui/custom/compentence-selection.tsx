@@ -1,6 +1,4 @@
 "use client";
-
-import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,17 +16,19 @@ const COMPETENCIES = [
   { id: "roller-coaster", label: "Roller coaster operation" },
 ];
 
-export function CompetensSelection() {
-  const [selected, setSelected] = useState<Record<string, boolean>>({
-    "ticket-sales": false,
-    lotteries: false,
-    "roller-coaster": false,
-  });
+interface CompetensSelectionProps {
+  selected: Record<string, boolean>;
+  onToggle: (id: string, checked: boolean) => void;
+  onYearsChange: (id: string, years: number) => void;
+  yearsOfExperience: Record<string, number>;
+}
 
-  const handleToggle = (id: string, checked: boolean) => {
-    setSelected((prev) => ({ ...prev, [id]: checked }));
-  };
-
+export function CompetensSelection({
+  selected,
+  yearsOfExperience,
+  onToggle,
+  onYearsChange,
+}: CompetensSelectionProps) {
   return (
     <FieldSet>
       <FieldLegend variant="label">
@@ -40,7 +40,8 @@ export function CompetensSelection() {
 
       <FieldGroup className="gap-4 mt-4">
         {COMPETENCIES.map((comp) => {
-          const isChecked = selected[comp.id] || false;
+          const isChecked = selected[comp.id];
+          const yearsOfExperienceValue = yearsOfExperience[comp.id];
 
           return (
             <div
@@ -53,7 +54,7 @@ export function CompetensSelection() {
                   name={comp.id}
                   checked={isChecked}
                   onCheckedChange={(checked) =>
-                    handleToggle(comp.id, checked as boolean)
+                    onToggle(comp.id, checked as boolean)
                   }
                   className="border border-black"
                 />
@@ -71,6 +72,10 @@ export function CompetensSelection() {
                     Experience
                   </span>
                   <Input
+                    onChange={(e) =>
+                      onYearsChange(comp.id, Number(e.target.value))
+                    }
+                    value={yearsOfExperienceValue}
                     type="number"
                     name={`${comp.id}-years`}
                     step="0.25"

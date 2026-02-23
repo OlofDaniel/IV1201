@@ -26,7 +26,7 @@ export function SignupPagePresenter() {
   /* 
   onSignupClick: sends the provided user information from signupView to the thunk which sends it to backend endpoint
   */
-  const onSignupClick = (
+  const onSignupClick = async (
     firstname: string,
     surname: string,
     personNumber: string,
@@ -34,16 +34,21 @@ export function SignupPagePresenter() {
     username: string,
     password: string,
   ) => {
-    dispatch(
-      postSignupThunk({
-        firstname: firstname,
-        surname: surname,
-        personNumber: personNumber,
-        email: email,
-        username: username,
-        password: password,
-      }),
-    );
+    try {
+      await dispatch(
+        postSignupThunk({
+          firstname: firstname,
+          surname: surname,
+          personNumber: personNumber,
+          email: email,
+          username: username,
+          password: password,
+        }),
+      ).unwrap();
+      window.location.href = "/profile";
+    } catch (error) {
+      // Error message is handled in the slice, so we don't need to do anything here
+    }
   };
   return (
     <SignupPageView

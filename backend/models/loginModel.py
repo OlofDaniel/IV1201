@@ -17,7 +17,14 @@ def login(user_credentials):
                 user_credentials["identifier"]
             )
 
-        return login_user(user_credentials)
+        login_response = login_user(user_credentials)
+        formatted_response = {
+            "access_token": login_response.session.access_token,
+            "refresh_token": login_response.session.refresh_token,
+            "user": login_response.user.user_metadata,
+        }
+        return formatted_response
+
     except ValueError:
         raise
     except Exception:

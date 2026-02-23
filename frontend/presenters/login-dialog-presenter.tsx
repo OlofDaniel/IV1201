@@ -21,7 +21,7 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
         dispatch(setDialogIsOpen(false));
         window.location.href = "/profile";
       } catch (error) {
-        // Error message is handled in the slice, so we don't need to do anything hereS
+        // Error message is handled in the slice, so we don't need to do anything here
       }
     },
 

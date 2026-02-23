@@ -13,6 +13,13 @@ interface SignupError {
   message: string;
   errors?: { [key: string]: string };
 }
+interface SignupResponse {
+  username: string;
+  firstname: string;
+  surname: string;
+  email: string;
+  personNumber: string;
+}
 /*
   Communication logic for the signup process:
   postSignup: handles the communication from the frontend to the backend for account registration
@@ -20,7 +27,7 @@ interface SignupError {
   JSON.stringify: converts the frontend naming conventions to match the backends expected format
 */
 const postSignup = async (payload: signupPayload) => {
-  const response = await fetch("http://127.0.0.1:8000/signup", {
+  const response = await fetch("http://localhost:8000/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,6 +40,7 @@ const postSignup = async (payload: signupPayload) => {
       username: payload.username,
       password: payload.password,
     }),
+    credentials: "include",
   });
   const data = await response.json();
   if (!response.ok) {
@@ -51,12 +59,21 @@ const postSignup = async (payload: signupPayload) => {
   rejectWithValue: returns the correct error message if an error occurs
 */
 export const postSignupThunk = createAsyncThunk<
-  void,
+  SignupResponse,
   signupPayload,
   { rejectValue: SignupError }
 >("signup/postSignupThunk", async (payload, thunkAPI) => {
   try {
-    await postSignup(payload);
+    const data = await postSignup(payload);
+    const userInfo = data.user.metadata;
+
+    return {
+      username: userInfo.username,
+      firstname: userInfo.name,
+      surname: userInfo.surname,
+      email: userInfo.email,
+      personNumber: userInfo.pnr,
+    };
   } catch (error: any) {
     if (error.status == "409") {
       return thunkAPI.rejectWithValue(error.detail);

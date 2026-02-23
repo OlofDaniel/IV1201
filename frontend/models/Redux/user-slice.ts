@@ -5,6 +5,7 @@
 import { getUserInfoThunk } from "@/communication/user-info-commmunication";
 import { createSlice } from "@reduxjs/toolkit";
 import { postLoginThunk } from "@/communication/login-communication";
+import { postSignupThunk } from "@/communication/signup-communication";
 
 interface UserProfile {
   username: string | null;
@@ -62,6 +63,17 @@ export const userSlice = createSlice({
         };
       })
       .addCase(postLoginThunk.fulfilled, (state, action) => {
+        const data = action.payload;
+
+        state.user = {
+          username: data.username,
+          first_name: data.firstname,
+          surname: data.surname,
+          email: data.email,
+          person_number: data.personNumber,
+        };
+      })
+      .addCase(postSignupThunk.fulfilled, (state, action) => {
         const data = action.payload;
 
         state.user = {

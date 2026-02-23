@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Response, Request, Header, Depends
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, field_validator, AfterValidator
+from pydantic import BaseModel, AfterValidator
 
 from models.customExceptions import DatabaseException, ValidationError, InvalidTokenError
 
@@ -108,14 +108,11 @@ def login(data: LoginRequest, response: Response):
     try:
         login_response = login_controller(data_dict)
 
-        access_token = login_response.session.access_token
-        refresh_token = login_response.session.refresh_token
-
-        set_cookies(response, access_token, refresh_token)
+        set_cookies(response, login_response["access_token"], login_response["refresh_token"])
 
         return {
             "status": "success",
-            "user": {"metadata": login_response.user.user_metadata},
+            "user": {"metadata": login_response["user"]},
         }
 
     except ValueError as e:
@@ -185,14 +182,11 @@ def signup(data: SignupRequest, response: Response):
     try:
         signup_response = signup_controller(data_dict)
 
-        access_token = signup_response.session.access_token
-        refresh_token = signup_response.session.refresh_token
-
-        set_cookies(response, access_token, refresh_token)
+        set_cookies(response, signup_response["access_token"], signup_response["refresh_token"])
 
         return {
             "status": "success",
-            "user": {"metadata": signup_response.user.user_metadata},
+            "user": {"metadata": signup_response["user"]},
         }
     except ValidationError as e:
         errors = {}
@@ -260,6 +254,7 @@ def get_user_info(response: Response, request: Request):
     Sets new cookies if new tokens are returned from lower layers, which indicate that the old tokens expired.
     Raises HTTPException if no access_token were sent.
     """
+    print(request.cookies)
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
     if not access_token:

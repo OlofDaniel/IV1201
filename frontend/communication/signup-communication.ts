@@ -20,7 +20,7 @@ interface SignupError {
   JSON.stringify: converts the frontend naming conventions to match the backends expected format
 */
 const postSignup = async (payload: signupPayload) => {
-  const response = await fetch("http://127.0.0.1:8000/signup", {
+  const response = await fetch("http://localhost:8000/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -238,8 +238,8 @@ def set_cookies(response: Response, access_token: str, refresh_token: str):
         key="access_token",
         value=access_token,
         httponly=True,
-        samesite="lax",
-        secure=False,
+        samesite="none",
+        secure=True,
         path="/",
     )
 
@@ -247,18 +247,18 @@ def set_cookies(response: Response, access_token: str, refresh_token: str):
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        samesite="lax",
-        secure=False,
+        samesite="none",
+        secure=True,
         path="/",
     )
 
 
 def clear_auth_cookies(response: Response):
     response.delete_cookie(
-        key="access_token", httponly=True, samesite="lax", secure=True, path="/"
+        key="access_token", httponly=True, samesite="none", secure=True, path="/"
     )
     response.delete_cookie(
-        key="refresh_token", httponly=True, samesite="lax", secure=True, path="/"
+        key="refresh_token", httponly=True, samesite="none", secure=True, path="/"
     )
 
 

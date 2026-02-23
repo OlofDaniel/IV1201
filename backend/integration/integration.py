@@ -1,17 +1,26 @@
 import os
-from postgrest.exceptions import APIError
+
 from dotenv import load_dotenv
-from pydantic import ValidationError as PydanticValidationError 
-from models.customExceptions import ValidationError, DatabaseException, InvalidTokenError
-from supabase import Client, create_client
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
+from postgrest.exceptions import APIError
+from pydantic import ValidationError as PydanticValidationError
+from supabase import Client, ClientOptions, create_client
 from supabase_auth.errors import AuthApiError
 
+# from supabase_auth.errors import AuthApiError
+
 load_dotenv()
+
+options = ClientOptions(auto_refresh_token=False)
 
 # Initilaze the client with the url and key from supabase
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(url, key, options=options)
 
 
 def login_user(user_credentials):
@@ -31,9 +40,10 @@ def login_user(user_credentials):
     except AuthApiError as e:
         raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
 
+
 def logout_user(access_token, refresh_token):
-    """Function that logs out user, given the users access and refresh tokens. 
-    Returns response from supabase if successful, raises invalid token error if the access 
+    """Function that logs out user, given the users access and refresh tokens.
+    Returns response from supabase if successful, raises invalid token error if the access
     token is invalid and database exception if there is a problem with the connection"""
     try:
         supabase.auth.set_session(access_token, refresh_token)
@@ -46,7 +56,8 @@ def logout_user(access_token, refresh_token):
         raise InvalidTokenError("Invalid or expired token")
     except Exception:
         raise DatabaseException()
-    
+
+
 def add_person(person_information):
     """
     Function that adds person to the person table in supabase.
@@ -154,13 +165,18 @@ def get_user_data(access_token: str):
         return response.data
     except APIError:
         raise
+    except Exception as e:
+        print(e)
+        raise ValueError("An error occurred while fetching user data")
 
 
 def get_user_client(access_token: str):
     """
     Function that creates a new user client with the users access token.
     """
-    user_client = create_client(url, key)
+
+    options = ClientOptions(auto_refresh_token=False)
+    user_client = create_client(url, key, options=options)
     user_client.postgrest.auth(access_token)
 
     return user_client
@@ -170,7 +186,10 @@ def refresh_session(refresh_token: str):
     """
     Function that starta a new session with refresh token and returns it.
     """
-    return supabase.auth.refresh_session(refresh_token)
+    try:
+        return supabase.auth.refresh_session(refresh_token)
+    except AuthApiError:
+        raise
 
 
 def password_reset_request(email):
@@ -179,24 +198,25 @@ def password_reset_request(email):
     try:
         response = supabase.auth.reset_password_email(
             email,
-        {"redirect_to": "http://localhost:3000/updatepassword"}, #TODO: Change redirect url when frontend is deployed
+            {
+                "redirect_to": "http://localhost:3000/updatepassword"
+            },  # TODO: Change redirect url when frontend is deployed
         )
         return response
     except AuthApiError:
         raise DatabaseException()
 
+
 def update_password(password, access_token, refresh_token):
     """Function to update a user's password, given the new password and valid
-    access and refresh tokens. Returns the response from supabase if successful, 
-    raises invalid token error if the access token is invalid, database exception 
-    if there is a problem with the connection and value error if the new password 
+    access and refresh tokens. Returns the response from supabase if successful,
+    raises invalid token error if the access token is invalid, database exception
+    if there is a problem with the connection and value error if the new password
     is the same as the previous password"""
     try:
         supabase.auth.set_session(access_token, refresh_token)
 
-        response = supabase.auth.update_user({
-            "password": password
-        })
+        response = supabase.auth.update_user({"password": password})
 
         return response
 
@@ -205,7 +225,7 @@ def update_password(password, access_token, refresh_token):
             raise ValueError(str(e))
         else:
             raise InvalidTokenError("Invalid or expired token")
-    
+
     except PydanticValidationError as e:
         print(e)
         raise InvalidTokenError("Invalid or expired token")

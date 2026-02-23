@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/field";
 
 const COMPETENCIES = [
-  { id: "ticket-sales", label: "Ticket sales" },
   { id: "lotteries", label: "Lotteries" },
-  { id: "roller-coaster", label: "Roller coaster operation" },
+  { id: "roller-coaster", label: "Roller Coaster Operations" },
+  { id: "ticket-sales", label: "Ticket Sales" },
 ];
 
 interface CompetensSelectionProps {

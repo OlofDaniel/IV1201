@@ -52,6 +52,18 @@ export function ApplicationPagePresenter() {
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
+  const application = {
+    selected,
+    yearsOfExperience,
+    actions: {
+      onToggle: toggleCompetency,
+      onYearsChange: setYearsFor,
+      onSubmit: submit,
+      onDateChange: setDateRange,
+    },
+    dateRange,
+  };
+
   return (
     <ApplicationPageView
       first_name={user?.first_name ?? ""}
@@ -62,14 +74,7 @@ export function ApplicationPagePresenter() {
       errorMessage={errorMessage}
       isAuthenticated={isAuthenticated}
       userLoading={loading}
-      selected={selected}
-      yearsOfExperience={yearsOfExperience}
-      onToggle={toggleCompetency}
-      onYearsChange={setYearsFor}
-      onSubmit={submit}
-      dateRange={dateRange}
-      onDateChange={setDateRange}
-    ></ApplicationPageView>
+      application={application}
+    />
   );
 }
-

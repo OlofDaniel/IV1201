@@ -3,8 +3,8 @@ import { CalendarPicker } from "@/components/ui/custom/calendar-picker";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { SkeletonCard } from "@/components/ui/custom/card-skeleton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DateRange } from "react-day-picker";
+import { ApplicationDialog } from "@/components/ui/custom/application-dialog";
 
 interface ApplicationPageViewProps {
   username: string | null;
@@ -15,13 +15,17 @@ interface ApplicationPageViewProps {
   errorMessage: string | null;
   isAuthenticated: boolean;
   userLoading: boolean;
-  selected: Record<string, boolean>;
-  yearsOfExperience: Record<string, number>;
-  onToggle: (id: string, checked: boolean) => void;
-  onYearsChange: (id: string, years: number) => void;
-  onSubmit: () => void;
-  dateRange: DateRange | undefined;
-  onDateChange: (range: DateRange | undefined) => void;
+  application: {
+    selected: Record<string, boolean>;
+    yearsOfExperience: Record<string, number>;
+    dateRange: DateRange | undefined;
+    actions: {
+      onToggle: (id: string, checked: boolean) => void;
+      onYearsChange: (id: string, years: number) => void;
+      onSubmit: () => void;
+      onDateChange: (range: DateRange | undefined) => void;
+    };
+  };
 }
 
 export function ApplicationPageView({
@@ -33,14 +37,10 @@ export function ApplicationPageView({
   errorMessage,
   isAuthenticated,
   userLoading,
-  selected,
-  yearsOfExperience,
-  onToggle,
-  onYearsChange,
-  onSubmit,
-  dateRange,
-  onDateChange,
+  application,
 }: ApplicationPageViewProps) {
+  const { selected, yearsOfExperience, dateRange, actions } = application;
+  const { onToggle, onYearsChange, onSubmit, onDateChange } = actions;
   return userLoading ? (
     <div className="flex justify-center mt-20">
       <SkeletonCard />
@@ -84,13 +84,12 @@ export function ApplicationPageView({
             <CalendarPicker dateRange={dateRange} onDateChange={onDateChange} />
           </div>
           <div className="mt-10 w-75">
-            <Button
-              className="w-full"
-              onClick={onSubmit}
-              disabled={!dateRange?.from || !dateRange.to}
-            >
-              Send application
-            </Button>
+            <ApplicationDialog
+              selected={selected}
+              yearsOfExperience={yearsOfExperience}
+              dateRange={dateRange}
+              onSubmit={onSubmit}
+            />
           </div>
         </div>
       </div>

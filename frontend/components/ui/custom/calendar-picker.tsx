@@ -9,9 +9,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { isDateRange, type DateRange } from "react-day-picker";
+import { type DateRange } from "react-day-picker";
 
 interface CalendarPickerProps {
   dateRange: DateRange | undefined;
@@ -22,11 +22,6 @@ export function CalendarPicker({
   dateRange,
   onDateChange,
 }: CalendarPickerProps) {
-  // const [date, setDate] = React.useState<DateRange | undefined>({
-  //   from: new Date(new Date().getFullYear(), 0, 20),
-  //   to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
-  // });
-
   return (
     <Field className="mx-auto w-60">
       <FieldLabel htmlFor="date-picker-range">
@@ -54,7 +49,7 @@ export function CalendarPicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0" align="center">
           <Calendar
             mode="range"
             defaultMonth={dateRange?.from}

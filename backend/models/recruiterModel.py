@@ -1,5 +1,6 @@
 from integration.integration import get_applicants_data, refresh_session
 from postgrest import APIError
+from supabase_auth.errors import AuthApiError
 
 from .customExceptions import DatabaseException
 
@@ -14,14 +15,17 @@ def get_all_applicants_information(access_token, refresh_token):
         return data, None
     except ValueError:
         raise
-    except APIError as e:
+    except (APIError, AuthApiError) as e:
         if "JWT" in str(e) or "expired" in str(e):
-            new_session = refresh_session(refresh_token)
-            new_tokens = {
-                "access_token": new_session.session.access_token,
-                "refresh_token": new_session.session.refresh_token,
-            }
-            data = get_applicants_data(new_tokens["access_token"])
-            return data, new_tokens
+            try:
+                new_session = refresh_session(refresh_token)
+                new_tokens = {
+                    "access_token": new_session.session.access_token,
+                    "refresh_token": new_session.session.refresh_token,
+                }
+                data = get_applicants_data(new_tokens["access_token"])
+                return data, new_tokens
+            except AuthApiError:
+                raise ValueError("Bad refresh token")
         else:
             raise DatabaseException()

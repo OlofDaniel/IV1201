@@ -171,7 +171,10 @@ def get_user_data(access_token: str):
         return response.data
     except APIError:
         raise
-    except Exception:
+    except AuthApiError:
+        raise
+    except Exception as e:
+        print (type(e))
         raise ValueError("An error occurred while fetching user data")
 
 

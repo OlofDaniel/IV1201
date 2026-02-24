@@ -22,7 +22,7 @@ interface GetApplicationsError {
 */
 
 const getApplications = async () => {
-  const response = await fetch("http://localhost:8000/applications", {
+  const response = await fetch("http://localhost:8000/recruiter", {
     method: "GET",
     credentials: "include",
     headers: {

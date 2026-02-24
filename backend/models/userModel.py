@@ -12,7 +12,7 @@ def get_user_information(access_token, refresh_token):
     try:
         data = get_user_data(access_token)
         return data, None
-    except APIError as e:
+    except (APIError, AuthApiError) as e:
         msg = str(e)
 
         if "JWT" in msg or "expired" in msg:

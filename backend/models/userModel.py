@@ -1,7 +1,6 @@
 from integration.integration import get_user_data, refresh_session
 from postgrest.exceptions import APIError
 from supabase_auth.errors import AuthApiError
-
 from .customExceptions import DatabaseException
 
 

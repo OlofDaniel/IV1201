@@ -7,6 +7,7 @@ import {
   CustomDropdownMenu,
   dropdownItem,
 } from "@/components/ui/custom/custom-dropdown-menu";
+import { is } from "date-fns/locale";
 
 interface headerViewProps {
   onLoginClick: () => void;
@@ -29,21 +30,31 @@ export function HeaderView({
   isAuthenticated,
   userLoading,
 }: headerViewProps) {
-  const menuItems: dropdownItem[] = [
-    { label: "Login", icon: User, separator: false, onClick: onLoginClick },
-    {
-      label: "Sign up",
-      icon: UserPlus,
-      separator: true,
-      href: "/signup",
-    },
-    {
-      label: "Recruiter",
-      icon: ShieldUser,
-      separator: false,
-      href: "/recruiter",
-    },
-  ];
+  const menuItems: dropdownItem[] = isAuthenticated
+    ? [
+        { label: "Profile", icon: User, separator: false, href: "/profile" },
+        {
+          label: "Logout",
+          icon: LogOut,
+          separator: false,
+          onClick: onLogoutClick,
+        },
+      ]
+    : [
+        { label: "Login", icon: User, separator: false, onClick: onLoginClick },
+        {
+          label: "Sign up",
+          icon: UserPlus,
+          separator: true,
+          href: "/signup",
+        },
+        {
+          label: "Recruiter",
+          icon: ShieldUser,
+          separator: false,
+          href: "/recruiter",
+        },
+      ];
 
   return (
     <div className="grid grid-cols-3 items-center bg-neutral-200 py-5">

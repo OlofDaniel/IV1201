@@ -15,6 +15,12 @@ interface GetApplicationsError {
   errors?: { [key: string]: string };
 }
 
+/*
+  Communication logic for fetching applications for the recruiter page:
+  getApplications: handles the communication from the frontend to the backend for fetching applications
+  response: saves the response from the fetch call to the applications endpoint after the HTTP GET request
+*/
+
 const getApplications = async () => {
   const response = await fetch("http://localhost:8000/applications", {
     method: "GET",
@@ -33,6 +39,13 @@ const getApplications = async () => {
 
   return data;
 };
+
+/*
+  Asynchronous thunk for fetching applications:
+  getApplicationsThunk: dispatches status updates (pending, fulfilled, rejected) of the applications fetching state
+  await getApplications: executes the API call to fetch applications and waits for a response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
 
 export const getApplicationsThunk = createAsyncThunk<
   ApplicationsResponse[],

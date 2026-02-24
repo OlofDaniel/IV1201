@@ -161,7 +161,7 @@ def get_user_data(access_token: str):
         user_client = get_user_client(access_token)
         response = (
             user_client.table("person_add_to_auth")
-            .select("username, name, surname, email, pnr, role_id")
+            .select("person_id, username, name, surname, email, pnr, role_id")
             .eq("id", user_client.auth.get_user(access_token).user.id)
             .single()
             .execute()
@@ -264,3 +264,23 @@ def get_applicants_data(access_token: str):
         if "Unauthorized" in str(e):
             raise ValueError(str(e))
         raise DatabaseException()
+
+
+def send_application(access_token: str):
+    try:
+        user_client = get_user_client(access_token)
+        person_id = (
+            user_client.table("person_add_to_auth")
+            .select("person_id")
+            .single()
+            .execute()
+        )
+        if person_id.data is None:
+            raise ValueError("No data found")
+
+        response = user_client.table("competence_profile").insert("").single().execute()
+
+    except APIError:
+        raise
+    except Exception:
+        raise ValueError("An error occurred while fetching user data")

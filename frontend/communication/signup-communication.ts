@@ -20,6 +20,7 @@ interface SignupResponse {
   email: string;
   personNumber: string;
   role_id: number;
+  person_id: number;
 }
 /*
   Communication logic for the signup process:

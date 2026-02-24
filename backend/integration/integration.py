@@ -229,21 +229,29 @@ def update_password(password, access_token, refresh_token):
 
 def get_applicants_data(access_token: str):
     """
-    Function that fetches all applicants information from supabase and returns it to frontend.
-    Throws an ValueError if no user data is found.
+    Function that fetches information about all applicants and returns it to frontend.
+    Throws an ValueError if no user data is found or if the user is not a recruiter, or a
+    DatabaseException if there is an error in the database.
     """
     try:
         user_client = get_user_client(access_token)
+
         response = (
             user_client.table("person_add_to_auth")
             .select(
                 "person_id, username, name, surname, email, pnr, application_status"
             )
-            .neq("role_id", "1")
+            .eq("role_id", 2)
             .execute()
         )
-        if not response.data:
-            raise ValueError("No data found")
+        print(response)
+
+        if response.data is None:
+            return []
         return response.data
     except APIError:
+        raise DatabaseException()
+    except Exception as e:
+        if "Unauthorized" in str(e):
+            raise ValueError(str(e))
         raise DatabaseException()

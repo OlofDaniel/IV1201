@@ -136,6 +136,7 @@ def get_user_data(access_token: str):
         response = (
             user_client.table("person_add_to_auth")
             .select("username, name, surname, email, pnr")
+            .eq("id", user_client.auth.get_user(access_token).user.id)
             .single()
             .execute()
         )
@@ -204,9 +205,8 @@ def update_password(password, access_token, refresh_token):
 
 def get_applicants_data(access_token: str):
     """
-    Function that fetches information about all applicants and returns it to frontend.
-    Throws an ValueError if no user data is found or if the user is not a recruiter, or a
-    DatabaseException if there is an error in the database.
+    Function that fetches information about all applicants (role_id = 2) and returns data as a list to the frontend.
+    Throws an ValueError if no user data is found or if the user is unauthorized, or a DatabaseException if there is an error in the database.
     """
     try:
         user_client = get_user_client(access_token)
@@ -219,7 +219,6 @@ def get_applicants_data(access_token: str):
             .eq("role_id", 2)
             .execute()
         )
-        print(response)
 
         if response.data is None:
             return []

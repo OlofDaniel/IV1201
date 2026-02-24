@@ -1,6 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
 
+/*
+  State handling for the recruiter page:
+  applications: list of all applications fetched from the backend
+  updatedApplications: list of applications that have been updated by the user but not yet sent to the backend
+  selectedApplication: the application that is currently selected by the user, null if no application is selected
+  applicationsLoading: loading state of the applications fetching process
+  errorMessage: stores the error message if an error occurs when fetching applications
+*/
+
 export interface Application {
   id: string; // Person_id
   firstname: string;
@@ -26,6 +35,17 @@ const initialState: recruiterState = {
   applicationsLoading: false,
   errorMessage: null,
 };
+
+/*
+recruiter slice
+reducers:
+  setNewStatus: updates the status of an application in the applications list and adds it to the updatedApplications list if it's not already there
+  setSelectedApplication: sets the selected application to the one passed in the action payload
+extraReducers:
+  sets the loading state to true when pending, and false when not pending
+  maps database response to the application model and stores it in the state upon success
+  sets error message if an error occured when fetching applications
+*/
 
 export const recruiterSlice = createSlice({
   name: "recruiter",

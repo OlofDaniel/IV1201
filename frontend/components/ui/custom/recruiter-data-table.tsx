@@ -37,6 +37,7 @@ export function DataTable<TData extends { id: string }, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: false,
     initialState: {
       pagination: {
         pageSize: 15,

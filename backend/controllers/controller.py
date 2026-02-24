@@ -3,6 +3,11 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
 from models.loginModel import login
 from models.passwordResetModel import change_password, request_password_email
 from models.recruiterModel import get_all_applicants_information
@@ -41,6 +46,8 @@ def get_user_information_controller(access_token, refresh_token):
         raise
     except Exception:
         raise
+
+
 
 def reset_password_controller(user_email):
     """Controller function for resetting password, just calls model to attempt reset and catches possible errors, raising them to the caller"""

@@ -6,6 +6,13 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
+
+from dotenv import load_dotenv
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
 from postgrest.exceptions import APIError
 from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, ClientOptions, create_client

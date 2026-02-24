@@ -3,6 +3,7 @@ from typing import Annotated
 
 import uvicorn
 from controllers.controller import (
+    get_all_applicants_information_controller,
     get_user_information_controller,
     login_controller,
     reset_password_controller,
@@ -256,50 +257,12 @@ def get_user_info(response: Response, request: Request):
 
 
 @app.get("/applications")
-def get_all_applicants_info():
-    return [
-        {
-            "person_id": 1,
-            "username": "kalle123",
-            "name": "Kalle",
-            "surname": "Karlsson",
-            "email": "kalle.karlsson@finnsinte.se",
-            "pnr": "20000101-1234",
-            "application_status": "Unhandled",
-        },
-        {
-            "person_id": 2,
-            "username": "anna456",
-            "name": "Anna",
-            "surname": "Andersson",
-            "email": "anna.andersson@finnsinte.se",
-            "pnr": "20001201-4567",
-            "application_status": "Unhandled",
-        },
-        {
-            "person_id": 3,
-            "username": "erik789",
-            "name": "Erik",
-            "surname": "Eriksson",
-            "email": "erik.eriksson@finnsinte.se",
-            "pnr": "20000812-8910",
-            "application_status": "Unhandled",
-        },
-        {
-            "person_id": 4,
-            "username": "lisa321",
-            "name": "Lisa",
-            "surname": "Larsson",
-            "email": "lisa.larsson@finnsinte.se",
-            "pnr": "20000202-1089",
-            "application_status": "Unhandled",
-        },
-    ]
-
-
-"""
 def get_all_applicants_info(response: Response, request: Request):
-
+    """
+    Function that gets all applicants information from supabase with the users access token. It retrieves the user access and refresh token from cookies.
+    Sets new cookies if new tokens are returned from lower layers, which indicate that the old tokens expired.
+    Raises HTTPException if no access_token were sent.
+    """
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
     if not access_token:
@@ -320,7 +283,7 @@ def get_all_applicants_info(response: Response, request: Request):
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
-"""
+
 
 if __name__ == "__main__":
     uvicorn.run(

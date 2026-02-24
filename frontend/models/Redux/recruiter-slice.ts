@@ -78,7 +78,7 @@ export const recruiterSlice = createSlice({
           email: app.email,
           personNumber: app.pnr,
           username: app.username,
-          status: app.status,
+          status: app.application_status,
         }));
       })
       .addCase(getApplicationsThunk.rejected, (state, action) => {

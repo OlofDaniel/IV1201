@@ -7,7 +7,7 @@ interface ApplicationsResponse {
   email: string;
   username: string;
   pnr: string;
-  status: "Accepted" | "Rejected" | "Unhandled";
+  application_status: "Accepted" | "Rejected" | "Unhandled";
 }
 
 interface GetApplicationsError {
@@ -16,7 +16,7 @@ interface GetApplicationsError {
 }
 
 const getApplications = async () => {
-  const response = await fetch("http://127.0.0.1:8000/applications", {
+  const response = await fetch("http://localhost:8000/applications", {
     method: "GET",
     credentials: "include",
     headers: {

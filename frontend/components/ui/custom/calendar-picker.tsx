@@ -24,9 +24,6 @@ export function CalendarPicker({
 }: CalendarPickerProps) {
   return (
     <Field className="mx-auto w-60">
-      <FieldLabel htmlFor="date-picker-range">
-        Select your availability period
-      </FieldLabel>
       <Popover>
         <PopoverTrigger asChild>
           <Button

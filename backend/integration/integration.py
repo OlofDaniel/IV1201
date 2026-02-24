@@ -154,7 +154,7 @@ def get_user_data(access_token: str):
         user_client = get_user_client(access_token)
         response = (
             user_client.table("person_add_to_auth")
-            .select("username, name, surname, email, pnr")
+            .select("person_id, username, name, surname, email, pnr")
             .single()
             .execute()
         )
@@ -225,3 +225,23 @@ def update_password(password, access_token, refresh_token):
     except PydanticValidationError as e:
         print(e)
         raise InvalidTokenError("Invalid or expired token")
+
+
+def send_application(access_token: str):
+    try:
+        user_client = get_user_client(access_token)
+        person_id = (
+            user_client.table("person_add_to_auth")
+            .select("person_id")
+            .single()
+            .execute()
+        )
+        if person_id.data is None:
+            raise ValueError("No data found")
+
+        response = user_client.table("competence_profile").insert("").single().execute()
+
+    except APIError:
+        raise
+    except Exception:
+        raise ValueError("An error occurred while fetching user data")

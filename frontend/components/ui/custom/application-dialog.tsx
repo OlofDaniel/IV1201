@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/dialog";
 
 interface ApplicationDialogProps {
-  dateRange: DateRange | undefined;
+  dateRanges: DateRange[];
   selected: Record<string, boolean>;
   yearsOfExperience: Record<string, number>;
   onSubmit: () => void;
 }
 
 export function ApplicationDialog({
-  dateRange,
+  dateRanges,
   selected,
   yearsOfExperience,
   onSubmit,
@@ -27,11 +27,15 @@ export function ApplicationDialog({
   const selectedCompetences = Object.entries(selected).filter(
     ([, isSelected]) => isSelected,
   );
+
   const COMPETENCE_LABELS: Record<string, string> = {
     lotteries: "Lotteries",
     "roller-coaster": "Roller Coaster Operations",
     "ticket-sales": "Ticket Sales",
   };
+
+  const validRanges = dateRanges?.filter((d) => d && d.from && d.to) ?? [];
+
   return (
     <Dialog>
       <form>
@@ -39,7 +43,7 @@ export function ApplicationDialog({
           <Button
             variant="outline"
             className="w-full bg-blue-300 hover:bg-blue-200"
-            disabled={!dateRange?.from || !dateRange.to}
+            disabled={!validRanges || validRanges.length === 0}
           >
             Review application
           </Button>
@@ -75,15 +79,21 @@ export function ApplicationDialog({
 
             <div className="border-t pt-4">
               <h4 className="font-semibold mb-2">Availability:</h4>
-              <p className="text-sm">
-                {dateRange?.from
-                  ? dateRange.from.toLocaleDateString()
-                  : "Not selected"}
-                {" - "}
-                {dateRange?.to
-                  ? dateRange.to.toLocaleDateString()
-                  : "Not selected"}
-              </p>
+              {validRanges && validRanges.length > 0 ? (
+                <ul className="list-disc pl-5 text-sm">
+                  {validRanges.map((d, i) => (
+                    <li key={i}>
+                      {d.from ? d.from.toLocaleDateString() : "Not selected"}
+                      {" - "}
+                      {d.to ? d.to.toLocaleDateString() : "Not selected"}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No availability periods.
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>

@@ -10,6 +10,7 @@ interface LoginResponse {
   surname: string;
   email: string;
   personNumber: string;
+  person_id: number;
 }
 /*
   Communication logic for the login process:

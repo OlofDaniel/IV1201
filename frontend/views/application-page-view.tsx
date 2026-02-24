@@ -5,6 +5,7 @@ import { SkeletonCard } from "@/components/ui/custom/card-skeleton";
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { ApplicationDialog } from "@/components/ui/custom/application-dialog";
+import { Trash2 } from "lucide-react";
 
 interface ApplicationPageViewProps {
   username: string | null;
@@ -18,12 +19,14 @@ interface ApplicationPageViewProps {
   application: {
     selected: Record<string, boolean>;
     yearsOfExperience: Record<string, number>;
-    dateRange: DateRange | undefined;
+    dateRanges: DateRange[];
     actions: {
       onToggle: (id: string, checked: boolean) => void;
       onYearsChange: (id: string, years: number) => void;
       onSubmit: () => void;
-      onDateChange: (range: DateRange | undefined) => void;
+      onAddDateRange: () => void;
+      onUpdateDateRange: (index: number, range: DateRange | undefined) => void;
+      onRemoveDateRange: (index: number) => void;
     };
   };
 }
@@ -39,8 +42,15 @@ export function ApplicationPageView({
   userLoading,
   application,
 }: ApplicationPageViewProps) {
-  const { selected, yearsOfExperience, dateRange, actions } = application;
-  const { onToggle, onYearsChange, onSubmit, onDateChange } = actions;
+  const { selected, yearsOfExperience, dateRanges, actions } = application;
+  const {
+    onToggle,
+    onYearsChange,
+    onSubmit,
+    onAddDateRange,
+    onUpdateDateRange,
+    onRemoveDateRange,
+  } = actions;
   return userLoading ? (
     <div className="flex justify-center mt-20">
       <SkeletonCard />
@@ -80,14 +90,44 @@ export function ApplicationPageView({
               onYearsChange={onYearsChange}
             />
           </div>
-          <div className="mt-10 w-full flex justify-center">
-            <CalendarPicker dateRange={dateRange} onDateChange={onDateChange} />
+          <div className="mt-10 w-full flex flex-col items-center gap-4">
+            {dateRanges.length > 0 ? (
+              dateRanges.map((range, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-[1fr_auto_1fr] items-center w-full gap-4"
+                >
+                  <div className="col-start-2 flex justify-center">
+                    <CalendarPicker
+                      dateRange={range}
+                      onDateChange={(r) => onUpdateDateRange(idx, r)}
+                    />
+                  </div>
+                  <div className="col-start-3 flex justify-start">
+                    <Button
+                      variant="ghost"
+                      onClick={() => onRemoveDateRange(idx)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No availability periods added.
+              </p>
+            )}
+
+            <div className="mt-2 w-full flex justify-center">
+              <Button onClick={onAddDateRange}>Add availability period</Button>
+            </div>
           </div>
           <div className="mt-10 w-75">
             <ApplicationDialog
               selected={selected}
               yearsOfExperience={yearsOfExperience}
-              dateRange={dateRange}
+              dateRanges={dateRanges}
               onSubmit={onSubmit}
             />
           </div>

@@ -13,6 +13,7 @@ interface UserProfile {
   surname: string | null;
   email: string | null;
   person_number: string | null;
+  person_id: number | null;
 }
 
 interface userState {
@@ -60,6 +61,7 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.pnr,
+          person_id: data.person_id,
         };
       })
       .addCase(postLoginThunk.fulfilled, (state, action) => {
@@ -71,6 +73,7 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.personNumber,
+          person_id: data.person_id,
         };
       })
       .addCase(postSignupThunk.fulfilled, (state, action) => {
@@ -82,6 +85,7 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.personNumber,
+          person_id: data.person_id,
         };
       });
   },

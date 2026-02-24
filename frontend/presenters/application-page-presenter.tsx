@@ -34,6 +34,25 @@ export function ApplicationPagePresenter() {
   };
 
   const COMPETENCIES = ["ticket-sales", "lotteries", "roller-coaster"];
+  const COMPETENCY_CODES: Record<string, number> = {
+    "ticket-sales": 1,
+    lotteries: 2,
+    "roller-coaster": 3,
+  };
+
+  const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
+
+  const addDateRange = () =>
+    setDateRanges((prev) => [...prev, {} as DateRange]);
+
+  const updateDateRange = (index: number, range: DateRange | undefined) =>
+    setDateRanges((prev) =>
+      prev.map((r, i) => (i === index ? (range ?? ({} as DateRange)) : r)),
+    );
+
+  const removeDateRange = (index: number) =>
+    setDateRanges((prev) => prev.filter((_, i) => i !== index));
+
   const submit = () => {
     const competencyPayload = Object.fromEntries(
       COMPETENCIES.map((id) => [
@@ -42,15 +61,17 @@ export function ApplicationPagePresenter() {
       ]),
     );
 
+    const validRanges = dateRanges.filter((r) => r?.from && r?.to);
+
+    setDateRanges(validRanges);
+
     const payload = {
       competencies: competencyPayload,
-      availability: dateRange,
+      availability: validRanges,
     };
 
     console.log("Submit payload:", payload);
   };
-
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const application = {
     selected,
@@ -59,9 +80,11 @@ export function ApplicationPagePresenter() {
       onToggle: toggleCompetency,
       onYearsChange: setYearsFor,
       onSubmit: submit,
-      onDateChange: setDateRange,
+      onAddDateRange: addDateRange,
+      onUpdateDateRange: updateDateRange,
+      onRemoveDateRange: removeDateRange,
     },
-    dateRange,
+    dateRanges,
   };
 
   return (

@@ -293,6 +293,15 @@ def get_user_info(response: Response, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/sendapplication")
+def send_application(response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+
 if __name__ == "__main__":
     uvicorn.run(
         "presentation.presentation:app", host="0.0.0.0", port=8000, reload=False

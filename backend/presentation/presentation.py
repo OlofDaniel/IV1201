@@ -3,6 +3,7 @@ from typing import Annotated
 
 import uvicorn
 from controllers.controller import (
+    get_all_applicants_information_controller,
     get_user_information_controller,
     login_controller,
     logout_controller,
@@ -18,7 +19,7 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
-from pydantic import AfterValidator, BaseModel
+from pydantic import BaseModel, AfterValidator
 
 app = FastAPI()
 
@@ -169,6 +170,7 @@ def reset(data: PasswordResetRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
 @app.post("/updatepassword")
 def updatepassword(
     data: PasswordUpdateRequest,
@@ -286,12 +288,42 @@ def get_user_info(response: Response, request: Request):
             raise HTTPException(status_code=500, detail="Cannot get data")
 
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        if str(e) == "Bad refresh token":
+            clear_auth_cookies(response)
+        return HTTPException(status_code=401, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.get("/recruiter")
+def get_all_applicants_info(response: Response, request: Request):
+    """
+    Function that gets all applicants information from supabase with the users access token. It retrieves the user access and refresh token from cookies.
+    Sets new cookies if new tokens are returned from lower layers, which indicate that the old tokens expired.
+    Raises HTTPException if no access_token were sent.
+    """
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        all_applicants_info, new_tokens = get_all_applicants_information_controller(
+            access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return all_applicants_info
+
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(

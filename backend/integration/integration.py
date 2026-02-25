@@ -6,6 +6,13 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
+
+from dotenv import load_dotenv
+from models.customExceptions import (
+    DatabaseException,
+    InvalidTokenError,
+    ValidationError,
+)
 from postgrest.exceptions import APIError
 from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, ClientOptions, create_client
@@ -155,6 +162,7 @@ def get_user_data(access_token: str):
         response = (
             user_client.table("person_add_to_auth")
             .select("username, name, surname, email, pnr")
+            .eq("id", user_client.auth.get_user(access_token).user.id)
             .single()
             .execute()
         )
@@ -163,7 +171,10 @@ def get_user_data(access_token: str):
         return response.data
     except APIError:
         raise
-    except Exception:
+    except AuthApiError:
+        raise
+    except Exception as e:
+        print (type(e))
         raise ValueError("An error occurred while fetching user data")
 
 
@@ -225,3 +236,31 @@ def update_password(password, access_token, refresh_token):
     except PydanticValidationError as e:
         print(e)
         raise InvalidTokenError("Invalid or expired token")
+
+
+def get_applicants_data(access_token: str):
+    """
+    Function that fetches information about all applicants (role_id = 2) and returns data as a list to the frontend.
+    Throws an ValueError if no user data is found or if the user is unauthorized, or a DatabaseException if there is an error in the database.
+    """
+    try:
+        user_client = get_user_client(access_token)
+
+        response = (
+            user_client.table("person_add_to_auth")
+            .select(
+                "person_id, username, name, surname, email, pnr, application_status"
+            )
+            .eq("role_id", 2)
+            .execute()
+        )
+
+        if response.data is None:
+            return []
+        return response.data
+    except APIError:
+        raise DatabaseException()
+    except Exception as e:
+        if "Unauthorized" in str(e):
+            raise ValueError(str(e))
+        raise DatabaseException()

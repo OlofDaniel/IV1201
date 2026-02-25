@@ -266,19 +266,11 @@ def get_applicants_data(access_token: str):
         raise DatabaseException()
 
 
-def send_application(access_token: str):
+def upsert_application(
+    availabilities, competencies, access_token, refresh_token, person_id
+):
     try:
         user_client = get_user_client(access_token)
-        person_id = (
-            user_client.table("person_add_to_auth")
-            .select("person_id")
-            .single()
-            .execute()
-        )
-        if person_id.data is None:
-            raise ValueError("No data found")
-
-        response = user_client.table("competence_profile").insert("").single().execute()
 
     except APIError:
         raise

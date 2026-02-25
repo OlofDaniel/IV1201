@@ -13,6 +13,7 @@ interface UserProfile {
   surname: string | null;
   email: string | null;
   person_number: string | null;
+  role: string | null;
 }
 
 interface userState {
@@ -60,6 +61,12 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.pnr,
+          role:
+            data.role_id === 1
+              ? "recruiter"
+              : data.role_id === 2
+                ? "applicant"
+                : null,
         };
       })
       .addCase(postLoginThunk.fulfilled, (state, action) => {
@@ -71,6 +78,12 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.personNumber,
+          role:
+            data.role_id === 1
+              ? "recruiter"
+              : data.role_id === 2
+                ? "applicant"
+                : null,
         };
       })
       .addCase(postSignupThunk.fulfilled, (state, action) => {
@@ -82,6 +95,12 @@ export const userSlice = createSlice({
           surname: data.surname,
           email: data.email,
           person_number: data.personNumber,
+          role:
+            data.role_id === 1
+              ? "recruiter"
+              : data.role_id === 2
+                ? "applicant"
+                : null,
         };
       });
   },

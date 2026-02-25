@@ -4,6 +4,7 @@ import { RootState } from "@/lib/Redux/store";
 import { ApplicationPageView } from "@/views/application-page-view";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { AccessDeniedView } from "@/views/access-denied-view";
 
 export function ApplicationPagePresenter() {
   const { user, loading, isAuthenticated, errorMessage } = useSelector(
@@ -63,8 +64,12 @@ export function ApplicationPagePresenter() {
     },
     dateRange,
   };
-
-  return (
+  if (loading) {
+    return null;
+  }
+  return user?.role !== "applicant" ? (
+    <AccessDeniedView />
+  ) : (
     <ApplicationPageView
       first_name={user?.first_name ?? ""}
       username={user?.username ?? ""}

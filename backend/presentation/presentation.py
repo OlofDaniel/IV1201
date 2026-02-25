@@ -87,6 +87,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
+
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 
@@ -168,7 +169,6 @@ def reset(data: PasswordResetRequest):
         return reset_password_controller(data.email)
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @app.post("/updatepassword")
@@ -288,9 +288,7 @@ def get_user_info(response: Response, request: Request):
             raise HTTPException(status_code=500, detail="Cannot get data")
 
     except ValueError as e:
-        if str(e) == "Bad refresh token":
-            clear_auth_cookies(response)
-        return HTTPException(status_code=401, detail=str(e))
+        raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:

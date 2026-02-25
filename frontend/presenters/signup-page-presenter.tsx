@@ -6,11 +6,13 @@ import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { SignupPageView } from "@/views/signup-page-view";
 import { togglePasswordShown } from "@/models/Redux/signup-slice";
 import { postSignupThunk } from "@/communication/signup-communication";
+import { AccessDeniedView } from "@/views/access-denied-view";
 
 export function SignupPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const { passwordShown, signupLoading, errorMessage, fieldErrors } =
     useSelector((state: RootState) => state.signup);
+  const { user, loading } = useSelector((state: RootState) => state.user);
   /* 
   onEyeClick: toggles the value in passwordShown, hides password if false
   */
@@ -50,7 +52,12 @@ export function SignupPagePresenter() {
       // Error message is handled in the slice, so we don't need to do anything here
     }
   };
-  return (
+  if (loading) {
+    return null;
+  }
+  return user ? (
+    <AccessDeniedView />
+  ) : (
     <SignupPageView
       passwordShown={passwordShown}
       signupLoading={signupLoading}

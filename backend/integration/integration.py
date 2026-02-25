@@ -161,7 +161,7 @@ def get_user_data(access_token: str):
         user_client = get_user_client(access_token)
         response = (
             user_client.table("person_add_to_auth")
-            .select("username, name, surname, email, pnr")
+            .select("username, name, surname, email, pnr, role_id")
             .eq("id", user_client.auth.get_user(access_token).user.id)
             .single()
             .execute()

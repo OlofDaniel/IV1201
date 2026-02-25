@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { RecruiterPageView } from "@/views/recruiter-page-view";
+import { AccessDeniedView } from "@/views/access-denied-view";
 import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
 import {
   setNewStatus,
@@ -19,8 +20,14 @@ export function RecruiterPagePresenter() {
     selectedApplication,
   } = useSelector((state: RootState) => state.recruiter);
 
+  const { user } = useSelector((state: RootState) => state.user);
+
   useEffect(() => {
-    if (applications.length === 0 && !applicationsLoading) {
+    if (
+      applications.length === 0 &&
+      !applicationsLoading &&
+      user?.role === "recruiter"
+    ) {
       dispatch(getApplicationsThunk());
     }
   }, [dispatch, applications.length, applicationsLoading]);
@@ -38,7 +45,9 @@ export function RecruiterPagePresenter() {
 
   const onCloseRowClick = () => dispatch(setSelectedApplication(null));
 
-  return (
+  return user?.role !== "recruiter" ? (
+    <AccessDeniedView />
+  ) : (
     <RecruiterPageView
       applications={applications}
       selectedApplication={selectedApplication}

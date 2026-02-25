@@ -6,6 +6,7 @@ interface UserInfoResponse {
   surname: string;
   email: string;
   pnr: string;
+  role_id: number;
 }
 
 interface GetInfoError {

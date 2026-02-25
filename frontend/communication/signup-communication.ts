@@ -19,6 +19,7 @@ interface SignupResponse {
   surname: string;
   email: string;
   personNumber: string;
+  role_id: number;
 }
 /*
   Communication logic for the signup process:
@@ -73,6 +74,7 @@ export const postSignupThunk = createAsyncThunk<
       surname: userInfo.surname,
       email: userInfo.email,
       personNumber: userInfo.pnr,
+      role_id: userInfo.role_id,
     };
   } catch (error: any) {
     if (error.status == "409") {

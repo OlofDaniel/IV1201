@@ -10,6 +10,7 @@ interface LoginResponse {
   surname: string;
   email: string;
   personNumber: string;
+  role_id: number;
 }
 /*
   Communication logic for the login process:
@@ -60,6 +61,7 @@ export const postLoginThunk = createAsyncThunk<
       surname: userInfo.surname,
       email: userInfo.email,
       personNumber: userInfo.pnr,
+      role_id: userInfo.role_id,
     };
   } catch (error: any) {
     if (error.status === 401) {

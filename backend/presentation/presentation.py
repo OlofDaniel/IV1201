@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, List
 
 import uvicorn
 from controllers.controller import (
@@ -7,6 +7,7 @@ from controllers.controller import (
     login_controller,
     logout_controller,
     reset_password_controller,
+    send_application_controller,
     signup_controller,
     update_password_controller,
 )
@@ -18,7 +19,7 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
-from pydantic import AfterValidator, BaseModel
+from pydantic import AfterValidator, BaseModel, Field
 
 app = FastAPI()
 
@@ -107,6 +108,17 @@ class PasswordResetRequest(BaseModel):
     """Specifies types and formats expected in a password reset request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
     email: email_str
+
+
+class availabilityRange(BaseModel):
+    from_date: str
+    to_date: str
+
+
+class applicationPayload(BaseModel):
+    competencies: dict
+    availability_ranges: List[availabilityRange] = Field(min_length=1)
+    person_id: int
 
 
 @app.post("/login")
@@ -293,10 +305,19 @@ def get_user_info(response: Response, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/sendapplication")
-def send_application(response: Response, request: Request):
+@app.post("/sendapplication")
+async def send_application(
+    data: applicationPayload, response: Response, request: Request
+):
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
+
+    try:
+        send_application_controller(data, access_token, refresh_token)
+
+    except Exception as e:
+        print(data)
+        raise HTTPException(status_code=400, detail=str(e))
 
     if not access_token:
         raise HTTPException(status_code=401, detail="Not logged in")

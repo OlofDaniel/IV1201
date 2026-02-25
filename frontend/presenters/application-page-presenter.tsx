@@ -1,11 +1,13 @@
 "use client";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/Redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/lib/Redux/store";
 import { ApplicationPageView } from "@/views/application-page-view";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import { postApplicationThunk } from "@/communication/application-communication";
 
 export function ApplicationPagePresenter() {
+  const dispatch = useDispatch<AppDispatch>();
   const { user, loading, isAuthenticated, errorMessage } = useSelector(
     (state: RootState) => state.user,
   );
@@ -67,10 +69,19 @@ export function ApplicationPagePresenter() {
 
     const payload = {
       competencies: competencyPayload,
-      availability: validRanges,
+      availability: validRanges.map((r) => ({
+        from_date: r.from!.toISOString(),
+        to_date: r.to!.toISOString(),
+      })),
+      person_id: user?.person_id ?? null,
     };
 
-    console.log("Submit payload:", payload);
+    console.log(
+      "Submit payload:",
+      typeof payload.competencies,
+      typeof payload.availability,
+    );
+    dispatch(postApplicationThunk(payload));
   };
 
   const application = {

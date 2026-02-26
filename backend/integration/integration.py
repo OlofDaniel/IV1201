@@ -171,11 +171,8 @@ def get_user_data(access_token: str):
         return response.data
     except APIError:
         raise
-    except AuthApiError:
-        raise
-    except Exception as e:
-        print (type(e))
-        raise ValueError("An error occurred while fetching user data")
+    except Exception:
+        raise DatabaseException()
 
 
 def get_user_client(access_token: str):
@@ -266,13 +263,36 @@ def get_applicants_data(access_token: str):
         raise DatabaseException()
 
 
-def upsert_application(
-    availabilities, competencies, access_token, refresh_token, person_id
-):
+def get_previous_applications(access_token, person_id):
     try:
         user_client = get_user_client(access_token)
-
+        prev_availability = (
+            user_client.table("availability_duplicate")
+            .select("from_date")
+            .eq("person_id", person_id)
+            .execute()
+        )
+        return prev_availability
     except APIError:
         raise
     except Exception:
-        raise ValueError("An error occurred while fetching user data")
+        raise DatabaseException()
+
+
+def upsert_application(availability_list, competencies_list, access_token, person_id):
+    try:
+        user_client = get_user_client(access_token)
+        user_client.table("availability_duplicate").insert(availability_list).execute()
+        user_client.table("competence_profile_duplicate").delete().eq(
+            "person_id", person_id
+        ).execute()
+        user_client.table("competence_profile_duplicate").insert(
+            competencies_list
+        ).execute()
+
+    except AuthApiError:
+        raise
+    except APIError:
+        raise
+    except Exception:
+        raise DatabaseException()

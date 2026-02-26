@@ -5,6 +5,7 @@ import userReducer from "@/models/Redux/user-slice";
 import passwordResetReducer from "@/models/Redux/password-reset-slice";
 import updatePasswordReducer from "@/models/Redux/update-password-slice";
 import recruiterReducer from "@/models/Redux/recruiter-slice";
+import applicationReducer from "@/models/Redux/application-slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -15,6 +16,7 @@ export const makeStore = () => {
       passwordReset: passwordResetReducer,
       updatePassword: updatePasswordReducer,
       recruiter: recruiterReducer,
+      application: applicationReducer,
     },
   });
 };

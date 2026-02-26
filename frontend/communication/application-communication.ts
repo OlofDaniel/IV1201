@@ -42,8 +42,8 @@ export const postApplicationThunk = createAsyncThunk<
   try {
     await postApplication(payload);
   } catch (error: any) {
-    if (error.status == "409") {
-      return thunkAPI.rejectWithValue(error.detail);
+    if (error.status == "400") {
+      return thunkAPI.rejectWithValue({ message: error.detail });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",

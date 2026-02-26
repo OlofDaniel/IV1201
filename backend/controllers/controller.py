@@ -39,7 +39,7 @@ def get_user_information_controller(access_token, refresh_token):
         raise
     except DatabaseException:
         raise
-    except Exception:
+    except InvalidTokenError:
         raise
 
 

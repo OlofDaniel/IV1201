@@ -301,6 +301,8 @@ def get_user_info(response: Response, request: Request):
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -312,15 +314,28 @@ async def send_application(
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
 
-    try:
-        send_application_controller(data, access_token, refresh_token)
-
-    except Exception as e:
-        print(data)
-        raise HTTPException(status_code=400, detail=str(e))
-
     if not access_token:
         raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        message, new_tokens = send_application_controller(
+            data, access_token, refresh_token
+        )
+
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return message
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":

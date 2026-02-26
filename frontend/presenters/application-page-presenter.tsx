@@ -2,15 +2,34 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/lib/Redux/store";
 import { ApplicationPageView } from "@/views/application-page-view";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { postApplicationThunk } from "@/communication/application-communication";
+import { toast } from "sonner";
 
 export function ApplicationPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { user, loading, isAuthenticated, errorMessage } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const {
+    user,
+    loading: userLoading,
+    isAuthenticated,
+    errorMessage: userErrorMessage,
+  } = useSelector((state: RootState) => state.user);
+  const {
+    loading: applicationLoading,
+    errorMessage: applicationErrorMessage,
+    applicationSuccess,
+  } = useSelector((state: RootState) => state.application);
+
+  useEffect(() => {
+    if (applicationErrorMessage) {
+      toast.error(applicationErrorMessage, { position: "top-center" });
+    } else if (applicationSuccess) {
+      toast.success("Sucessfully submitted application", {
+        position: "top-center",
+      });
+    }
+  }, [applicationErrorMessage, applicationSuccess]);
 
   const [selected, setSelected] = useState<Record<string, boolean>>({
     "ticket-sales": false,
@@ -105,9 +124,9 @@ export function ApplicationPagePresenter() {
       surname={user?.surname ?? ""}
       email={user?.email ?? ""}
       person_number={user?.person_number ?? ""}
-      errorMessage={errorMessage}
+      errorMessage={userErrorMessage}
       isAuthenticated={isAuthenticated}
-      userLoading={loading}
+      userLoading={userLoading}
       application={application}
     />
   );

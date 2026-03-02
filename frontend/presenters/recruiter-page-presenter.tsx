@@ -4,20 +4,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { RecruiterPageView } from "@/views/recruiter-page-view";
 import { AccessDeniedView } from "@/views/access-denied-view";
-import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
+import {
+  getApplicationsThunk,
+  postApplicationUpdateThunk,
+} from "@/communication/recruiter-applications-communication";
 import {
   setNewStatus,
   setSelectedApplication,
+  cancelStatusChanges,
   Application,
 } from "@/models/Redux/recruiter-slice";
+import { toast } from "sonner";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const {
     applications,
+    updatedApplications,
     applicationsLoading,
+    saveChangesLoading,
     errorMessage,
     selectedApplication,
+    saveSuccess,
   } = useSelector((state: RootState) => state.recruiter);
 
   const { user } = useSelector((state: RootState) => state.user);
@@ -30,7 +38,7 @@ export function RecruiterPagePresenter() {
     ) {
       dispatch(getApplicationsThunk());
     }
-  }, [dispatch, applications.length, applicationsLoading]);
+  }, [dispatch, applications.length, applicationsLoading, user?.role]);
 
   const onStatusChange = (id: string, newStatus: Application["status"]) =>
     dispatch(setNewStatus({ id, newStatus }));
@@ -45,6 +53,24 @@ export function RecruiterPagePresenter() {
 
   const onCloseRowClick = () => dispatch(setSelectedApplication(null));
 
+  const hasPendingChanges = updatedApplications.length > 0;
+
+  const onSaveChangesClick = () => {
+    dispatch(postApplicationUpdateThunk(updatedApplications));
+  };
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage, { position: "top-center" });
+    } else if (saveSuccess) {
+      toast.success("Successfully saved changes", { position: "top-center" });
+    }
+  }, [errorMessage, saveSuccess]);
+
+  const onCancelChangesClick = () => {
+    dispatch(cancelStatusChanges());
+  };
+
   return user?.role !== "recruiter" ? (
     <AccessDeniedView />
   ) : (
@@ -52,10 +78,14 @@ export function RecruiterPagePresenter() {
       applications={applications}
       selectedApplication={selectedApplication}
       applicationsLoading={applicationsLoading}
+      saveChangesLoading={saveChangesLoading}
       errorMessage={errorMessage}
+      hasPendingChanges={hasPendingChanges}
       onStatusChange={onStatusChange}
       onRowClick={onRowClick}
       onCloseRowClick={onCloseRowClick}
+      onSaveChangesClick={onSaveChangesClick}
+      onCancelChangesClick={onCancelChangesClick}
     ></RecruiterPageView>
   );
 }

@@ -16,21 +16,30 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onRowClick: (row: TData) => void;
+  saveChangesLoading: boolean;
   selectedRowId?: string | null;
+  hasPendingChanges: boolean;
+  onRowClick: (row: TData) => void;
   expandedRow: (data: TData) => React.ReactNode;
+  onSaveChangesClick: () => void;
+  onCancelChangesClick: () => void;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
-  onRowClick,
   selectedRowId,
+  saveChangesLoading,
+  hasPendingChanges,
+  onRowClick,
   expandedRow,
+  onSaveChangesClick,
+  onCancelChangesClick,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -117,28 +126,52 @@ export function DataTable<TData extends { id: string }, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-2">
-        <span className="text-sm">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </span>
+      <div className="flex items-center justify-between py-2">
+        <div className="flex space-x-2">
+          <Button
+            variant="default"
+            onClick={onSaveChangesClick}
+            disabled={!hasPendingChanges || saveChangesLoading}
+          >
+            {saveChangesLoading ? (
+              <>
+                <Spinner data-icon="inline-start" /> Saving...
+              </>
+            ) : (
+              "Save"
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onCancelChangesClick}
+            disabled={!hasPendingChanges || saveChangesLoading}
+          >
+            Cancel
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </span>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

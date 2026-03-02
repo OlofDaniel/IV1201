@@ -1,13 +1,16 @@
+from models.applicationModel import send_application
 from models.customExceptions import (
     DatabaseException,
     InvalidTokenError,
     ValidationError,
 )
 from models.loginModel import login
-from models.passwordResetModel import change_password, request_password_email
-from models.recruiterModel import get_all_applicants_information
-from models.applicationModel import send_application
 from models.logoutModel import logout
+from models.passwordResetModel import change_password, request_password_email
+from models.recruiterModel import (
+    get_all_applicants_information,
+    update_application_status,
+)
 from models.signupModel import signup
 from models.userModel import get_user_information
 
@@ -44,7 +47,6 @@ def get_user_information_controller(access_token, refresh_token):
         raise
 
 
-
 def reset_password_controller(user_email):
     """Controller function for resetting password, just calls model to attempt reset and catches possible errors, raising them to the caller"""
     try:
@@ -75,7 +77,6 @@ def logout_controller(access_token, refresh_token):
         raise
 
 
-
 def get_all_applicants_information_controller(access_token, refresh_token):
     """Controller function for getting all applicants information. Calls model function get_all_applicants_information with users tokens."""
     try:
@@ -95,4 +96,14 @@ def send_application_controller(application_data, access_token, refresh_token):
     except DatabaseException:
         raise
     except ValueError:
+        raise
+
+
+def update_application_controller(status_updates, access_token, refresh_token):
+    """Controller function for updating application status. Calls model function update_application_status with the status updates and users tokens."""
+    try:
+        return update_application_status(status_updates, access_token, refresh_token)
+    except ValueError:
+        raise
+    except DatabaseException:
         raise

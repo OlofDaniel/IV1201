@@ -6,13 +6,6 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
-
-from dotenv import load_dotenv
-from models.customExceptions import (
-    DatabaseException,
-    InvalidTokenError,
-    ValidationError,
-)
 from postgrest.exceptions import APIError
 from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, ClientOptions, create_client
@@ -256,7 +249,7 @@ def get_applicants_data(access_token: str):
             return []
         return response.data
     except APIError:
-        raise DatabaseException()
+        raise
     except Exception as e:
         if "Unauthorized" in str(e):
             raise ValueError(str(e))
@@ -296,3 +289,24 @@ def upsert_application(availability_list, competencies_list, access_token, perso
         raise
     except Exception:
         raise DatabaseException()
+
+
+def upsert_application_status_updates(status_updates, access_token):
+    """
+    Function that upserts application status updates to the database. Takes a list of status updates and the users access token.
+    Returns the response from supabase if successful, raises ValueError if the user is unauthorized and
+    DatabaseException if there is an error with the database.
+    """
+    try:
+        user_client = get_user_client(access_token)
+
+        response = (
+            user_client.table("person_add_to_auth")
+            .upsert(status_updates, on_conflict="person_id")
+            .execute()
+        )
+        return response
+    except (APIError, AuthApiError):
+        raise
+    except Exception:
+        raise ValueError("An error occurred while updating application status")

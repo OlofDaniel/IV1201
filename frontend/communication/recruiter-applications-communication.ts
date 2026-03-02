@@ -15,12 +15,26 @@ interface GetApplicationsError {
   errors?: { [key: string]: string };
 }
 
+interface UpdatedApplication {
+  id: string;
+  status: "Accepted" | "Rejected" | "Unhandled";
+}
+
+interface UpdatedApplicationPayload {
+  person_id: string;
+  application_status: "Accepted" | "Rejected" | "Unhandled";
+}
+
+interface ApplicationUpdateError {
+  message: string;
+  errors?: { [key: string]: string };
+}
+
 /*
   Communication logic for fetching applications for the recruiter page:
   getApplications: handles the communication from the frontend to the backend for fetching applications
   response: saves the response from the fetch call to the applications endpoint after the HTTP GET request
 */
-
 const getApplications = async () => {
   const response = await fetch("http://localhost:8000/recruiter", {
     method: "GET",
@@ -29,7 +43,9 @@ const getApplications = async () => {
       "Content-Type": "application/json",
     },
   });
+
   const data = await response.json();
+
   if (!response.ok) {
     throw {
       status: response.status,
@@ -46,7 +62,6 @@ const getApplications = async () => {
   await getApplications: executes the API call to fetch applications and waits for a response
   rejectWithValue: returns the correct error message if an error occurs
 */
-
 export const getApplicationsThunk = createAsyncThunk<
   ApplicationsResponse[],
   void,
@@ -56,6 +71,66 @@ export const getApplicationsThunk = createAsyncThunk<
     return await getApplications();
   } catch (error: any) {
     if (error.status == "401" || error.status == "500") {
+      return thunkAPI.rejectWithValue(error.detail);
+    }
+    return thunkAPI.rejectWithValue({
+      message: "Something went wrong, try again later",
+    });
+  }
+});
+
+/*
+  Communication logic for posting application updates for the recruiter page:
+  postApplicationUpdate: handles the communication from the frontend to the backend with the status updates
+  data: saves the response from the fetch call to the updateapplication endpoint after the HTTP POST request
+  JSON.stringify: formats the application updates as a JSON payload for the API call
+*/
+const postApplicationUpdate = async (payload: UpdatedApplicationPayload[]) => {
+  const response = await fetch("http://localhost:8000/updateapplication", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw {
+      status: response.status,
+      detail: data.detail,
+    };
+  }
+  return data;
+};
+
+/*
+  Asynchronous thunk for posting application updates:
+  postApplicationUpdateThunk: dispatches status updates (pending, fulfilled, rejected) of the application update state
+  await postApplicationUpdate: executes the API call with the update payload and waits for a response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
+export const postApplicationUpdateThunk = createAsyncThunk<
+  void,
+  UpdatedApplication[],
+  { rejectValue: ApplicationUpdateError }
+>("applications/postApplicationUpdateThunk", async (payload, thunkAPI) => {
+  try {
+    const formattedPayload: UpdatedApplicationPayload[] = payload.map(
+      (app) => ({
+        person_id: app.id,
+        application_status: app.status,
+      }),
+    );
+    await postApplicationUpdate(formattedPayload);
+  } catch (error: any) {
+    if (
+      error.status == "401" ||
+      error.status == "400" ||
+      error.status == "500"
+    ) {
       return thunkAPI.rejectWithValue(error.detail);
     }
     return thunkAPI.rejectWithValue({

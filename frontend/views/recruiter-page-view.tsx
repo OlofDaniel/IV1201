@@ -7,10 +7,14 @@ interface RecruiterPageViewProps {
   applications: Application[];
   selectedApplication: Application | null;
   applicationsLoading: boolean;
+  saveChangesLoading: boolean;
   errorMessage: string | null;
+  hasPendingChanges: boolean;
   onStatusChange: (id: string, newStatus: Application["status"]) => void;
   onRowClick: (app: Application) => void;
   onCloseRowClick: () => void;
+  onSaveChangesClick: () => void;
+  onCancelChangesClick: () => void;
 }
 
 export function RecruiterPageView({

@@ -14,15 +14,23 @@ import { Application } from "@/models/Redux/recruiter-slice";
 interface RecruiterApplicationTableProps {
   applications: Application[];
   selectedApplication: Application | null;
+  saveChangesLoading: boolean;
+  hasPendingChanges: boolean;
   onStatusChange: (id: string, newStatus: Application["status"]) => void;
   onRowClick: (app: Application) => void;
+  onSaveChangesClick: () => void;
+  onCancelChangesClick: () => void;
 }
 
 export function RecruiterApplicationTable({
-  applications,
-  selectedApplication,
   onStatusChange,
+  applications,
   onRowClick,
+  onCancelChangesClick,
+  onSaveChangesClick,
+  selectedApplication,
+  saveChangesLoading,
+  hasPendingChanges,
 }: RecruiterApplicationTableProps) {
   const columns: ColumnDef<Application>[] = [
     {
@@ -78,15 +86,21 @@ export function RecruiterApplicationTable({
 
   const expandedRow = (app: Application) => (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <h4 className="font-bold text-slate-500">Extended User Details</h4>
           <p>Username: {app.username}</p>
           <p>Email: {app.email}</p>
-          <p>Age: {app.personNumber}</p>
+          <p>Personal ID: {app.personNumber}</p>
         </div>
         <div>
-          <h4 className="font-bold text-slate-500">Application Details</h4>
+          <h4 className="font-bold text-slate-500">Competence</h4>
+          <p>Years of Experience: 1 year </p>
+          <p>Competence in: Ticket sales</p>
+          <p>Availability: 26-06-02 - 26-08-13</p>
+        </div>
+        <div>
+          <h4 className="font-bold text-slate-500">Availability</h4>
           <p>Years of Experience: 1 year </p>
           <p>Competence in: Ticket sales</p>
           <p>Availability: 26-06-02 - 26-08-13</p>
@@ -100,9 +114,13 @@ export function RecruiterApplicationTable({
       <DataTable<Application, unknown>
         columns={columns}
         data={applications}
-        onRowClick={onRowClick}
         selectedRowId={selectedApplication?.id}
+        saveChangesLoading={saveChangesLoading}
+        hasPendingChanges={hasPendingChanges}
+        onRowClick={onRowClick}
         expandedRow={expandedRow}
+        onSaveChangesClick={onSaveChangesClick}
+        onCancelChangesClick={onCancelChangesClick}
       />
     </div>
   );

@@ -1,7 +1,8 @@
-from integration.integration import get_user_data, refresh_session
+from integration.integration import get_user_data
 from postgrest.exceptions import APIError
-from supabase_auth.errors import AuthApiError
-from .customExceptions import DatabaseException
+from utils.utils import handle_jwt_expired
+
+from .customExceptions import DatabaseException, InvalidTokenError
 
 
 def get_user_information(access_token, refresh_token):
@@ -16,19 +17,14 @@ def get_user_information(access_token, refresh_token):
         msg = str(e)
 
         if "JWT" in msg or "expired" in msg:
-            try:
-                new_session = refresh_session(refresh_token)
-                new_tokens = {
-                    "access_token": new_session.session.access_token,
-                    "refresh_token": new_session.session.refresh_token,
-                }
-                data = get_user_data(new_tokens["access_token"])
-                return data, new_tokens
-            except AuthApiError:
-                raise ValueError("Bad refresh token")
+            new_tokens = handle_jwt_expired(refresh_token)
+            data = get_user_data(new_tokens["access_token"])
+            return data, new_tokens
         else:
             raise DatabaseException()
     except ValueError:
+        raise
+    except InvalidTokenError:
         raise
     except Exception as e:
         raise DatabaseException() from e

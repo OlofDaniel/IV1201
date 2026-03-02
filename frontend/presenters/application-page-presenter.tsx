@@ -1,15 +1,36 @@
 "use client";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/Redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/lib/Redux/store";
 import { ApplicationPageView } from "@/views/application-page-view";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { AccessDeniedView } from "@/views/access-denied-view";
+import { postApplicationThunk } from "@/communication/application-communication";
+import { toast } from "sonner";
 
 export function ApplicationPagePresenter() {
-  const { user, loading, isAuthenticated, errorMessage } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    user,
+    loading: userLoading,
+    isAuthenticated,
+    errorMessage: userErrorMessage,
+  } = useSelector((state: RootState) => state.user);
+  const {
+    loading: applicationLoading,
+    errorMessage: applicationErrorMessage,
+    applicationSuccess,
+  } = useSelector((state: RootState) => state.application);
+
+  useEffect(() => {
+    if (applicationErrorMessage) {
+      toast.error(applicationErrorMessage, { position: "top-center" });
+    } else if (applicationSuccess) {
+      toast.success("Sucessfully submitted application", {
+        position: "top-center",
+      });
+    }
+  }, [applicationErrorMessage, applicationSuccess]);
 
   const [selected, setSelected] = useState<Record<string, boolean>>({
     "ticket-sales": false,
@@ -35,6 +56,25 @@ export function ApplicationPagePresenter() {
   };
 
   const COMPETENCIES = ["ticket-sales", "lotteries", "roller-coaster"];
+  const COMPETENCY_CODES: Record<string, number> = {
+    "ticket-sales": 1,
+    lotteries: 2,
+    "roller-coaster": 3,
+  };
+
+  const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
+
+  const addDateRange = () =>
+    setDateRanges((prev) => [...prev, {} as DateRange]);
+
+  const updateDateRange = (index: number, range: DateRange | undefined) =>
+    setDateRanges((prev) =>
+      prev.map((r, i) => (i === index ? (range ?? ({} as DateRange)) : r)),
+    );
+
+  const removeDateRange = (index: number) =>
+    setDateRanges((prev) => prev.filter((_, i) => i !== index));
+
   const submit = () => {
     const competencyPayload = Object.fromEntries(
       COMPETENCIES.map((id) => [
@@ -43,15 +83,26 @@ export function ApplicationPagePresenter() {
       ]),
     );
 
+    const validRanges = dateRanges.filter((r) => r?.from && r?.to);
+
+    setDateRanges(validRanges);
+
     const payload = {
       competencies: competencyPayload,
-      availability: dateRange,
+      availability: validRanges.map((r) => ({
+        from_date: r.from!.toISOString(),
+        to_date: r.to!.toISOString(),
+      })),
+      person_id: user?.person_id ?? null,
     };
 
-    console.log("Submit payload:", payload);
+    console.log(
+      "Submit payload:",
+      typeof payload.competencies,
+      typeof payload.availability,
+    );
+    dispatch(postApplicationThunk(payload));
   };
-
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const application = {
     selected,
@@ -60,11 +111,13 @@ export function ApplicationPagePresenter() {
       onToggle: toggleCompetency,
       onYearsChange: setYearsFor,
       onSubmit: submit,
-      onDateChange: setDateRange,
+      onAddDateRange: addDateRange,
+      onUpdateDateRange: updateDateRange,
+      onRemoveDateRange: removeDateRange,
     },
-    dateRange,
+    dateRanges,
   };
-  if (loading) {
+  if (userLoading) {
     return null;
   }
   return user?.role !== "applicant" ? (
@@ -76,9 +129,9 @@ export function ApplicationPagePresenter() {
       surname={user?.surname ?? ""}
       email={user?.email ?? ""}
       person_number={user?.person_number ?? ""}
-      errorMessage={errorMessage}
+      errorMessage={userErrorMessage}
       isAuthenticated={isAuthenticated}
-      userLoading={loading}
+      userLoading={userLoading}
       application={application}
     />
   );

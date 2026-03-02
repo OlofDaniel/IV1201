@@ -161,7 +161,7 @@ def get_user_data(access_token: str):
         user_client = get_user_client(access_token)
         response = (
             user_client.table("person_add_to_auth")
-            .select("username, name, surname, email, pnr, role_id")
+            .select("person_id, username, name, surname, email, pnr, role_id")
             .eq("id", user_client.auth.get_user(access_token).user.id)
             .single()
             .execute()
@@ -171,11 +171,8 @@ def get_user_data(access_token: str):
         return response.data
     except APIError:
         raise
-    except AuthApiError:
-        raise
-    except Exception as e:
-        print (type(e))
-        raise ValueError("An error occurred while fetching user data")
+    except Exception:
+        raise DatabaseException()
 
 
 def get_user_client(access_token: str):
@@ -263,4 +260,39 @@ def get_applicants_data(access_token: str):
     except Exception as e:
         if "Unauthorized" in str(e):
             raise ValueError(str(e))
+        raise DatabaseException()
+
+
+def get_previous_applications(access_token, person_id):
+    try:
+        user_client = get_user_client(access_token)
+        prev_availability = (
+            user_client.table("availability_duplicate")
+            .select("from_date")
+            .eq("person_id", person_id)
+            .execute()
+        )
+        return prev_availability
+    except APIError:
+        raise
+    except Exception:
+        raise DatabaseException()
+
+
+def upsert_application(availability_list, competencies_list, access_token, person_id):
+    try:
+        user_client = get_user_client(access_token)
+        user_client.table("availability_duplicate").insert(availability_list).execute()
+        user_client.table("competence_profile_duplicate").delete().eq(
+            "person_id", person_id
+        ).execute()
+        user_client.table("competence_profile_duplicate").insert(
+            competencies_list
+        ).execute()
+
+    except AuthApiError:
+        raise
+    except APIError:
+        raise
+    except Exception:
         raise DatabaseException()

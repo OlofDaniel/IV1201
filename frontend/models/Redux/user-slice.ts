@@ -14,6 +14,7 @@ interface UserProfile {
   email: string | null;
   person_number: string | null;
   role: string | null;
+  person_id: number | null;
 }
 
 interface userState {
@@ -67,6 +68,7 @@ export const userSlice = createSlice({
               : data.role_id === 2
                 ? "applicant"
                 : null,
+          person_id: data.person_id,
         };
       })
       .addCase(postLoginThunk.fulfilled, (state, action) => {
@@ -84,6 +86,7 @@ export const userSlice = createSlice({
               : data.role_id === 2
                 ? "applicant"
                 : null,
+          person_id: data.person_id,
         };
       })
       .addCase(postSignupThunk.fulfilled, (state, action) => {
@@ -101,6 +104,7 @@ export const userSlice = createSlice({
               : data.role_id === 2
                 ? "applicant"
                 : null,
+          person_id: data.person_id,
         };
       });
   },

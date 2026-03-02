@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, List
 
 import uvicorn
 from controllers.controller import (
@@ -8,6 +8,7 @@ from controllers.controller import (
     login_controller,
     logout_controller,
     reset_password_controller,
+    send_application_controller,
     signup_controller,
     update_password_controller,
 )
@@ -19,7 +20,7 @@ from models.customExceptions import (
     InvalidTokenError,
     ValidationError,
 )
-from pydantic import BaseModel, AfterValidator
+from pydantic import AfterValidator, BaseModel, Field
 
 app = FastAPI()
 
@@ -109,6 +110,17 @@ class PasswordResetRequest(BaseModel):
     """Specifies types and formats expected in a password reset request, using them with pydantic BaseModel automates HTTP Error 422 responses"""
 
     email: email_str
+
+
+class availabilityRange(BaseModel):
+    from_date: str
+    to_date: str
+
+
+class applicationPayload(BaseModel):
+    competencies: dict
+    availability_ranges: List[availabilityRange] = Field(min_length=1)
+    person_id: int
 
 
 @app.post("/login")
@@ -291,8 +303,41 @@ def get_user_info(response: Response, request: Request):
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/sendapplication")
+async def send_application(
+    data: applicationPayload, response: Response, request: Request
+):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        message, new_tokens = send_application_controller(
+            data, access_token, refresh_token
+        )
+
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return message
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/recruiter")

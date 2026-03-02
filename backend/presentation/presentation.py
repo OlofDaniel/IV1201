@@ -4,6 +4,7 @@ from typing import Annotated, List
 import uvicorn
 from controllers.controller import (
     get_all_applicants_information_controller,
+    get_application_controller,
     get_user_information_controller,
     login_controller,
     logout_controller,
@@ -115,6 +116,9 @@ class PasswordResetRequest(BaseModel):
 class availabilityRange(BaseModel):
     from_date: str
     to_date: str
+
+class getApplicationPayload(BaseModel):
+    person_id: int
 
 
 class applicationPayload(BaseModel):
@@ -367,6 +371,34 @@ def get_all_applicants_info(response: Response, request: Request):
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/application")
+def get_application(data: getApplicationPayload, response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        application_info, new_tokens = get_application_controller(
+            data.person_id, access_token, refresh_token
+        )
+
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return application_info
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(

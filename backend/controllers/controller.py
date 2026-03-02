@@ -1,3 +1,4 @@
+
 from models.customExceptions import (
     DatabaseException,
     InvalidTokenError,
@@ -6,7 +7,7 @@ from models.customExceptions import (
 from models.loginModel import login
 from models.passwordResetModel import change_password, request_password_email
 from models.recruiterModel import get_all_applicants_information
-from models.applicationModel import send_application
+from models.applicationModel import send_application, get_latest_application
 from models.logoutModel import logout
 from models.signupModel import signup
 from models.userModel import get_user_information
@@ -90,6 +91,17 @@ def send_application_controller(application_data, access_token, refresh_token):
     """Controller function for sending application, just calls model to attempt sending application and catches possible errors, raising them to the caller"""
     try:
         return send_application(application_data, access_token, refresh_token)
+    except InvalidTokenError:
+        raise
+    except DatabaseException:
+        raise
+    except ValueError:
+        raise
+
+def get_application_controller(person_id, access_token, refresh_token):
+    """Controller function for getting application, just calls model to attempt getting application and catches possible errors, raising them to the caller"""
+    try:
+        return get_latest_application(person_id, access_token, refresh_token)
     except InvalidTokenError:
         raise
     except DatabaseException:

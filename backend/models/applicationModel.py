@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from integration.integration import (
     get_previous_applications,
     upsert_application,
+    get_application
 )
 from postgrest.exceptions import APIError
 from utils.utils import handle_jwt_expired
@@ -100,3 +101,47 @@ def format_availability_ranges(application_data):
         range.to_date = datetime.strptime(range.to_date, "%Y-%m-%d")
         range.from_date = range.from_date + timedelta(days=1)
         range.to_date = range.to_date + timedelta(days=1)
+
+def get_latest_application(person_id, access_token, refresh_token):
+    try:
+        application = get_application(access_token, person_id)
+        application["availability"] = extract_future_availability(application["availability"])
+        application["competencies"] = format_competencies(application["competencies"])
+        return application, None
+    except APIError as e:
+        msg = str(e)
+
+        if "JWT" in msg or "expired" in msg:
+            new_tokens = handle_jwt_expired(refresh_token)
+            application = get_application(new_tokens["access_token"], person_id)
+            application["availability"] = extract_future_availability(application["availability"])
+            application["competencies"] = format_competencies(application["competencies"])
+            return application, new_tokens
+
+        else:
+            raise DatabaseException()
+
+    except InvalidTokenError:
+        raise
+    except DatabaseException:
+        raise
+
+def format_competencies(competencies):
+    user_competencies = {}
+    reverse_competency_map = {v: k for k, v in competency_id_map.items()}
+    for competency in competencies:
+        user_competencies[reverse_competency_map[competency["competence_id"]]] = competency["years_of_experience"]
+    return user_competencies
+
+def extract_future_availability(availabilities):
+    future_availability = []
+    current_date = datetime.now().date()
+
+    for availability in availabilities:
+        to_date = datetime.strptime(availability["to_date"], "%Y-%m-%d").date()
+
+        if to_date >= current_date:
+            future_availability.append(availability)
+
+    return future_availability
+        

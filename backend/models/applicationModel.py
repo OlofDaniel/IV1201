@@ -106,6 +106,9 @@ def get_latest_application(person_id, access_token, refresh_token):
     try:
         application = get_application(access_token, person_id)
         application["availability"] = extract_future_availability(application["availability"])
+        if(len(application["availability"]) == 0):
+            raise ValueError("No future availability found for user")
+           
         application["competencies"] = format_competencies(application["competencies"])
         return application, None
     except APIError as e:
@@ -115,6 +118,8 @@ def get_latest_application(person_id, access_token, refresh_token):
             new_tokens = handle_jwt_expired(refresh_token)
             application = get_application(new_tokens["access_token"], person_id)
             application["availability"] = extract_future_availability(application["availability"])
+            if(len(application["availability"]) == 0):
+                raise ValueError("No future availability found for user")
             application["competencies"] = format_competencies(application["competencies"])
             return application, new_tokens
 

@@ -117,7 +117,7 @@ export function ApplicationPagePresenter() {
     },
     dateRanges,
   };
-  if (loading) {
+  if (userLoading) {
     return null;
   }
   return user?.role !== "applicant" ? (

@@ -19,7 +19,7 @@ interface getApplicationPayload {
 interface applicationResponse {
   competencies: Record<string, number | null>;
   availability: Array<{ from_date: string; to_date: string }>;
-  status: string;
+  status: { application_status: string };
 }
 const postApplication = async (payload: applicationPayload) => {
   const response = await fetch("http://localhost:8000/sendapplication", {

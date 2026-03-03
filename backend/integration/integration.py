@@ -260,7 +260,7 @@ def get_previous_applications(access_token, person_id):
     try:
         user_client = get_user_client(access_token)
         prev_availability = (
-            user_client.table("availability_duplicate")
+            user_client.table("availability")
             .select("from_date")
             .eq("person_id", person_id)
             .execute()
@@ -275,11 +275,11 @@ def get_previous_applications(access_token, person_id):
 def upsert_application(availability_list, competencies_list, access_token, person_id):
     try:
         user_client = get_user_client(access_token)
-        user_client.table("availability_duplicate").insert(availability_list).execute()
-        user_client.table("competence_profile_duplicate").delete().eq(
+        user_client.table("availability").insert(availability_list).execute()
+        user_client.table("competence_profile").delete().eq(
             "person_id", person_id
         ).execute()
-        user_client.table("competence_profile_duplicate").insert(
+        user_client.table("competence_profile").insert(
             competencies_list
         ).execute()
 
@@ -315,13 +315,13 @@ def get_application(access_token, person_id):
     try:
         user_client = get_user_client(access_token)
         availability_response = (
-            user_client.table("availability_duplicate")
+            user_client.table("availability")
             .select("from_date, to_date")
             .eq("person_id", person_id)
             .execute()
         )
         competencies_response = (
-            user_client.table("competence_profile_duplicate")
+            user_client.table("competence_profile")
             .select("competence_id, years_of_experience")
             .eq("person_id", person_id)
             .execute()

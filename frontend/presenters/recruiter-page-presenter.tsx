@@ -15,6 +15,7 @@ import {
   Application,
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
+import { getApplicationThunk } from "@/communication/application-communication";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,6 +27,8 @@ export function RecruiterPagePresenter() {
     errorMessage,
     selectedApplication,
     saveSuccess,
+    getApplicationLoading,
+    applicationDetails,
   } = useSelector((state: RootState) => state.recruiter);
 
   const { user } = useSelector((state: RootState) => state.user);
@@ -47,6 +50,7 @@ export function RecruiterPagePresenter() {
     if (selectedApplication?.id === app.id) {
       dispatch(setSelectedApplication(null));
     } else {
+      dispatch(getApplicationThunk({ person_id: parseInt(app.id) }));
       dispatch(setSelectedApplication(app));
     }
   };
@@ -86,6 +90,8 @@ export function RecruiterPagePresenter() {
       onCloseRowClick={onCloseRowClick}
       onSaveChangesClick={onSaveChangesClick}
       onCancelChangesClick={onCancelChangesClick}
+      getApplicationLoading={getApplicationLoading}
+      applicationDetails={applicationDetails}
     ></RecruiterPageView>
   );
 }

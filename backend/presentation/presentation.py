@@ -1,6 +1,7 @@
 import re
 from typing import Annotated, List
 
+import jwt
 import uvicorn
 from controllers.controller import (
     get_all_applicants_information_controller,
@@ -13,6 +14,7 @@ from controllers.controller import (
     signup_controller,
     update_application_controller,
     update_password_controller,
+    get_recruiter_application_controller
 )
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -388,9 +390,15 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
         raise HTTPException(status_code=401, detail="Not logged in")
 
     try:
-        application_info, new_tokens = get_application_controller(
+        decoded_jwt = jwt.decode(access_token, options={"verify_signature": False})
+        if decoded_jwt["user_metadata"]["role_id"] == 1:
+            application_info, new_tokens = get_recruiter_application_controller(
             data.person_id, access_token, refresh_token
         )
+        else:
+            application_info, new_tokens = get_application_controller(
+                data.person_id, access_token, refresh_token
+            )
 
         if new_tokens:
             set_cookies(
@@ -401,10 +409,12 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except ValueError as e:
+        print(str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
+        print(str(e))    
         raise HTTPException(status_code=400, detail=str(e))
 
 

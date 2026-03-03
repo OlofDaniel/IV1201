@@ -7,6 +7,12 @@ interface RecruiterPageViewProps {
   applications: Application[];
   selectedApplication: Application | null;
   applicationsLoading: boolean;
+  getApplicationLoading: boolean;
+  applicationDetails: {
+    competencies: Record<string, number | null>;
+    availability: Array<{ from_date: string; to_date: string }>;
+    status: { application_status: string };
+  } | null;
   saveChangesLoading: boolean;
   errorMessage: string | null;
   hasPendingChanges: boolean;

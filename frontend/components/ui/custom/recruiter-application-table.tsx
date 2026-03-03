@@ -10,8 +10,15 @@ import {
 import { Dot } from "lucide-react";
 
 import { Application } from "@/models/Redux/recruiter-slice";
+import { Spinner } from "../spinner";
 
 interface RecruiterApplicationTableProps {
+  getApplicationLoading: boolean;
+  applicationDetails: {
+    competencies: Record<string, number | null>;
+    availability: Array<{ from_date: string; to_date: string }>;
+    status: { application_status: string };
+  } | null;
   applications: Application[];
   selectedApplication: Application | null;
   saveChangesLoading: boolean;
@@ -31,6 +38,8 @@ export function RecruiterApplicationTable({
   selectedApplication,
   saveChangesLoading,
   hasPendingChanges,
+  applicationDetails,
+  getApplicationLoading,
 }: RecruiterApplicationTableProps) {
   const columns: ColumnDef<Application>[] = [
     {
@@ -95,15 +104,32 @@ export function RecruiterApplicationTable({
         </div>
         <div>
           <h4 className="font-bold text-slate-500">Competence</h4>
-          <p>Years of Experience: 1 year </p>
-          <p>Competence in: Ticket sales</p>
-          <p>Availability: 26-06-02 - 26-08-13</p>
+          {getApplicationLoading ? (
+            <Spinner />
+          ) : Object.entries(applicationDetails?.competencies || {}).length ===
+            0 ? (
+            <p>No prior experience</p>
+          ) : (
+            Object.entries(applicationDetails?.competencies || {}).map(
+              ([key, value]) => (
+                <p key={key}>
+                  {key}: {value} years
+                </p>
+              ),
+            )
+          )}
         </div>
         <div>
           <h4 className="font-bold text-slate-500">Availability</h4>
-          <p>Years of Experience: 1 year </p>
-          <p>Competence in: Ticket sales</p>
-          <p>Availability: 26-06-02 - 26-08-13</p>
+          {getApplicationLoading ? (
+            <Spinner />
+          ) : (
+            applicationDetails?.availability.map((range, idx) => (
+              <p key={idx}>
+                {range.from_date} to {range.to_date}
+              </p>
+            ))
+          )}
         </div>
       </div>
     </div>

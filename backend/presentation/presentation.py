@@ -408,8 +408,8 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
             )
 
         return application_info
-    except DatabaseException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="Something went wrong when retrieving the application details")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except InvalidTokenError as e:
@@ -439,8 +439,8 @@ def update_application(
 
         return status_update_result
 
-    except DatabaseException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="Something went wrong when trying to update application status")
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
 

@@ -38,13 +38,23 @@ interface recruiterState {
   applicationsLoading: boolean;
   saveChangesLoading: boolean;
   saveSuccess: boolean;
-  errorMessage: string | null;
+  errorMessages: {
+    getApplicationsError: string | null;
+    saveChangesError: string | null;
+    getApplicationDetailsError: string | null;
+  };
   applicationDetails: {
     competencies: Record<string, number | null>;
     availability: Array<{ from_date: string; to_date: string }>;
     status: { application_status: string };
   } | null;
 }
+
+const defaultErrorMessages = {
+  getApplicationsError: null,
+  saveChangesError: null,
+  getApplicationDetailsError: null,
+};
 
 const initialState: recruiterState = {
   getApplicationLoading: false,
@@ -54,7 +64,7 @@ const initialState: recruiterState = {
   applicationsLoading: false,
   saveChangesLoading: false,
   saveSuccess: false,
-  errorMessage: null,
+  errorMessages: defaultErrorMessages,
   applicationDetails: null,
 };
 
@@ -121,7 +131,7 @@ export const recruiterSlice = createSlice({
       })
       .addCase(getApplicationsThunk.fulfilled, (state, action) => {
         state.applicationsLoading = false;
-        state.errorMessage = null;
+        state.errorMessages = defaultErrorMessages;
 
         const data = action.payload;
 
@@ -140,8 +150,7 @@ export const recruiterSlice = createSlice({
         state.applicationsLoading = false;
 
         const payload = action.payload;
-
-        state.errorMessage =
+        state.errorMessages.getApplicationsError =
           payload?.message ??
           "Unknown error occurred when attempting to get applications";
       })
@@ -151,7 +160,7 @@ export const recruiterSlice = createSlice({
       })
       .addCase(postApplicationUpdateThunk.fulfilled, (state) => {
         state.saveChangesLoading = false;
-        state.errorMessage = null;
+        state.errorMessages = defaultErrorMessages;
         state.saveSuccess = true;
 
         state.applications.forEach((app) => {
@@ -164,27 +173,29 @@ export const recruiterSlice = createSlice({
         state.saveChangesLoading = false;
         state.saveSuccess = false;
 
-        state.errorMessage =
+        state.errorMessages.saveChangesError =
           action.payload?.message ??
           "Unknown error occurred when attempting to save";
       })
       .addCase(getApplicationThunk.pending, (state) => {
         state.getApplicationLoading = true;
-        state.errorMessage = null;
+        state.errorMessages = defaultErrorMessages;
         state.applicationDetails = null;
       })
       .addCase(getApplicationThunk.fulfilled, (state, action) => {
         state.getApplicationLoading = false;
-        state.errorMessage = null;
+        state.errorMessages = defaultErrorMessages;
         state.applicationDetails = action.payload;
       })
       .addCase(getApplicationThunk.rejected, (state, action) => {
         state.getApplicationLoading = false;
-        state.errorMessage = action.payload?.message
-          ? action.payload.message
-          : "Unknown error occurred when attempting to retrieve application";
-        state.errorMessage = null;
-        state.applicationDetails = null;
+        if (action.payload?.status !== 400) {
+          state.errorMessages.getApplicationDetailsError = action.payload
+            ?.message
+            ? action.payload.message
+            : "Unknown error occurred when attempting to retrieve application";
+          state.applicationDetails = null;
+        }
       });
   },
 });

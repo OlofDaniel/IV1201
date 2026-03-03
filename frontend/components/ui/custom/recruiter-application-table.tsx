@@ -13,6 +13,7 @@ import { Application } from "@/models/Redux/recruiter-slice";
 import { Spinner } from "../spinner";
 
 interface RecruiterApplicationTableProps {
+  errorMessage: string | null;
   getApplicationLoading: boolean;
   applicationDetails: {
     competencies: Record<string, number | null>;
@@ -40,6 +41,7 @@ export function RecruiterApplicationTable({
   hasPendingChanges,
   applicationDetails,
   getApplicationLoading,
+  errorMessage,
 }: RecruiterApplicationTableProps) {
   const columns: ColumnDef<Application>[] = [
     {
@@ -118,6 +120,9 @@ export function RecruiterApplicationTable({
               ),
             )
           )}
+          {errorMessage && (
+            <p className="text-red-500 mt-2">{errorMessage}</p>
+          )}
         </div>
         <div>
           <h4 className="font-bold text-slate-500">Availability</h4>
@@ -129,6 +134,9 @@ export function RecruiterApplicationTable({
                 {range.from_date} to {range.to_date}
               </p>
             ))
+          )}
+          {errorMessage && (
+            <p className="text-red-500 mt-2">{errorMessage}</p>
           )}
         </div>
       </div>

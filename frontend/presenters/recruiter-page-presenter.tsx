@@ -16,6 +16,7 @@ import {
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
 import { getApplicationThunk } from "@/communication/application-communication";
+import { error } from "console";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +25,7 @@ export function RecruiterPagePresenter() {
     updatedApplications,
     applicationsLoading,
     saveChangesLoading,
-    errorMessage,
+    errorMessages,
     selectedApplication,
     saveSuccess,
     getApplicationLoading,
@@ -37,11 +38,18 @@ export function RecruiterPagePresenter() {
     if (
       applications.length === 0 &&
       !applicationsLoading &&
-      user?.role === "recruiter"
+      user?.role === "recruiter" &&
+      errorMessages.getApplicationsError === null
     ) {
       dispatch(getApplicationsThunk());
     }
-  }, [dispatch, applications.length, applicationsLoading, user?.role]);
+  }, [
+    dispatch,
+    applications.length,
+    applicationsLoading,
+    user?.role,
+    errorMessages.getApplicationsError,
+  ]);
 
   const onStatusChange = (id: string, newStatus: Application["status"]) =>
     dispatch(setNewStatus({ id, newStatus }));
@@ -64,12 +72,12 @@ export function RecruiterPagePresenter() {
   };
 
   useEffect(() => {
-    if (errorMessage) {
-      toast.error(errorMessage, { position: "top-center" });
+    if (errorMessages.saveChangesError) {
+      toast.error(errorMessages.saveChangesError, { position: "top-center" });
     } else if (saveSuccess) {
       toast.success("Successfully saved changes", { position: "top-center" });
     }
-  }, [errorMessage, saveSuccess]);
+  }, [errorMessages.saveChangesError, saveSuccess]);
 
   const onCancelChangesClick = () => {
     dispatch(cancelStatusChanges());
@@ -83,7 +91,7 @@ export function RecruiterPagePresenter() {
       selectedApplication={selectedApplication}
       applicationsLoading={applicationsLoading}
       saveChangesLoading={saveChangesLoading}
-      errorMessage={errorMessage}
+      errorMessages={errorMessages}
       hasPendingChanges={hasPendingChanges}
       onStatusChange={onStatusChange}
       onRowClick={onRowClick}

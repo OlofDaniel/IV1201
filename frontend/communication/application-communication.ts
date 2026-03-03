@@ -9,6 +9,7 @@ interface applicationPayload {
 
 interface ApplicationError {
   message: string;
+  status?: number;
   errors?: { [key: string]: string };
 }
 
@@ -91,10 +92,14 @@ export const getApplicationThunk = createAsyncThunk<
     return data;
   } catch (error: any) {
     if (error.status == "400") {
-      return thunkAPI.rejectWithValue({ message: error.detail });
+      return thunkAPI.rejectWithValue({
+        message: error.detail,
+        status: error.status,
+      });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",
+      status: 500,
     });
   }
 });

@@ -10,6 +10,7 @@ from controllers.controller import (
     reset_password_controller,
     send_application_controller,
     signup_controller,
+    update_application_controller,
     update_password_controller,
 )
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
@@ -88,7 +89,6 @@ class LoginRequest(BaseModel):
     password: str
 
 
-
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 
@@ -121,6 +121,13 @@ class applicationPayload(BaseModel):
     competencies: dict
     availability_ranges: List[availabilityRange] = Field(min_length=1)
     person_id: int
+
+
+class StatusUpdateRequest(BaseModel):
+    """Specifies types and formats expected in an application status update request"""
+
+    person_id: int
+    application_status: str
 
 
 @app.post("/login")
@@ -367,6 +374,36 @@ def get_all_applicants_info(response: Response, request: Request):
         raise HTTPException(status_code=409, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/updateapplication")
+def update_application(
+    data: List[StatusUpdateRequest], response: Response, request: Request
+):
+
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    updates_dict = [item.model_dump() for item in data]
+
+    try:
+        status_update_result, new_tokens = update_application_controller(
+            updates_dict, access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return status_update_result
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run(

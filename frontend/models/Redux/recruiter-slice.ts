@@ -1,5 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
+import {
+  getApplicationsThunk,
+  postApplicationUpdateThunk,
+} from "@/communication/recruiter-applications-communication";
 
 /*
   State handling for the recruiter page:
@@ -18,13 +21,21 @@ export interface Application {
   personNumber: string;
   username: string;
   status: "Accepted" | "Rejected" | "Unhandled";
+  initialStatus: "Accepted" | "Rejected" | "Unhandled";
+}
+
+export interface UpdatedApplication {
+  id: string;
+  status: Application["status"];
 }
 
 interface recruiterState {
   applications: Application[];
-  updatedApplications: Application[];
+  updatedApplications: UpdatedApplication[];
   selectedApplication: Application | null;
   applicationsLoading: boolean;
+  saveChangesLoading: boolean;
+  saveSuccess: boolean;
   errorMessage: string | null;
 }
 
@@ -33,6 +44,8 @@ const initialState: recruiterState = {
   updatedApplications: [],
   selectedApplication: null,
   applicationsLoading: false,
+  saveChangesLoading: false,
+  saveSuccess: false,
   errorMessage: null,
 };
 
@@ -62,16 +75,28 @@ export const recruiterSlice = createSlice({
       if (application) {
         application.status = newStatus;
 
-        const updatedApplication = state.updatedApplications.find(
-          (app) => app.id === id,
-        );
-
-        if (updatedApplication) {
-          updatedApplication.status = newStatus;
+        if (newStatus === application.initialStatus) {
+          state.updatedApplications = state.updatedApplications.filter(
+            (upd) => upd.id !== id,
+          );
         } else {
-          state.updatedApplications.push(application);
+          const existingUpdate = state.updatedApplications.find(
+            (upd) => upd.id === id,
+          );
+
+          if (existingUpdate) {
+            existingUpdate.status = newStatus;
+          } else {
+            state.updatedApplications.push({ id, status: newStatus });
+          }
         }
       }
+    },
+    cancelStatusChanges: (state) => {
+      state.applications.forEach((app) => {
+        app.status = app.initialStatus;
+      });
+      state.updatedApplications = [];
     },
     setSelectedApplication: (
       state,
@@ -99,6 +124,7 @@ export const recruiterSlice = createSlice({
           personNumber: app.pnr,
           username: app.username,
           status: app.application_status,
+          initialStatus: app.application_status,
         }));
       })
       .addCase(getApplicationsThunk.rejected, (state, action) => {
@@ -109,9 +135,33 @@ export const recruiterSlice = createSlice({
         state.errorMessage =
           payload?.message ??
           "Unknown error occurred when attempting to get applications";
+      })
+      .addCase(postApplicationUpdateThunk.pending, (state) => {
+        state.saveChangesLoading = true;
+        state.saveSuccess = false;
+      })
+      .addCase(postApplicationUpdateThunk.fulfilled, (state) => {
+        state.saveChangesLoading = false;
+        state.errorMessage = null;
+        state.saveSuccess = true;
+
+        state.applications.forEach((app) => {
+          app.initialStatus = app.status;
+        });
+
+        state.updatedApplications = [];
+      })
+      .addCase(postApplicationUpdateThunk.rejected, (state, action) => {
+        state.saveChangesLoading = false;
+        state.saveSuccess = false;
+
+        state.errorMessage =
+          action.payload?.message ??
+          "Unknown error occurred when attempting to save";
       });
   },
 });
 
 export default recruiterSlice.reducer;
-export const { setNewStatus, setSelectedApplication } = recruiterSlice.actions;
+export const { setNewStatus, cancelStatusChanges, setSelectedApplication } =
+  recruiterSlice.actions;

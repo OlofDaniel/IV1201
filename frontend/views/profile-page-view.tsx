@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface ProfilePageViewProps {
+  role: string;
   username: string | null;
   first_name: string | null;
   surname: string | null;
@@ -38,6 +39,7 @@ export function ProfilePageView({
   errorMessage,
   isAuthenticated,
   userLoading,
+  role,
 }: ProfilePageViewProps) {
   return userLoading ? (
     <div className="flex justify-center mt-20">
@@ -76,10 +78,14 @@ export function ProfilePageView({
             </CardContent>
             <CardFooter>
               <Link
-                href="/application"
+                href={role === "recruiter" ? "/recruiter" : "/application"}
                 className="text-blue-500 hover:underline"
               >
-                <Button variant="default">Go to application</Button>
+                <Button variant="default">
+                  {role === "recruiter"
+                    ? "Handle applications"
+                    : "Go to application"}
+                </Button>
               </Link>
             </CardFooter>
           </Card>

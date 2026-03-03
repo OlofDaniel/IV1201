@@ -310,3 +310,32 @@ def upsert_application_status_updates(status_updates, access_token):
         raise
     except Exception:
         raise ValueError("An error occurred while updating application status")
+
+def get_application(access_token, person_id):
+    try:
+        user_client = get_user_client(access_token)
+        availability_response = (
+            user_client.table("availability_duplicate")
+            .select("from_date, to_date")
+            .eq("person_id", person_id)
+            .execute()
+        )
+        competencies_response = (
+            user_client.table("competence_profile_duplicate")
+            .select("competence_id, years_of_experience")
+            .eq("person_id", person_id)
+            .execute()
+        )
+        status_response = user_client.table("person_add_to_auth").select("application_status").eq("person_id", person_id).single().execute()
+
+        return {   
+            "availability": availability_response.data,
+            "competencies": competencies_response.data,
+            "status": status_response.data
+        }  
+    except AuthApiError:
+        raise 
+    except APIError:
+        raise
+    except Exception:
+        raise DatabaseException()

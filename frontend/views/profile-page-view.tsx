@@ -10,6 +10,8 @@ import {
 
 import Image from "next/image";
 import { SkeletonCard } from "@/components/ui/custom/card-skeleton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface ProfilePageViewProps {
   username: string | null;
@@ -73,17 +75,13 @@ export function ProfilePageView({
               </div>
             </CardContent>
             <CardFooter>
-              <p>Card Footer</p>
+              <Link
+                href="/application"
+                className="text-blue-500 hover:underline"
+              >
+                <Button variant="default">Go to application</Button>
+              </Link>
             </CardFooter>
-          </Card>
-        </div>
-
-        <div className="flex justify-center mt-20 w-full">
-          <Card className="bg-neutral-200 w-full max-w-5xl">
-            <CardHeader className="flex justify-center">
-              <CardTitle>Application</CardTitle>
-            </CardHeader>
-            <CardContent></CardContent>
           </Card>
         </div>
       </div>

@@ -11,3 +11,8 @@ dependencies = [
     "supabase>=2.27.2",
     "uvicorn>=0.40.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]

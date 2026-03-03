@@ -14,6 +14,7 @@ from controllers.controller import (
     signup_controller,
     update_application_controller,
     update_password_controller,
+    add_username_controller,
     get_recruiter_application_controller
 )
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
@@ -119,8 +120,14 @@ class availabilityRange(BaseModel):
     from_date: str
     to_date: str
 
+
 class getApplicationPayload(BaseModel):
     person_id: int
+
+
+class updateUsernamePayload(BaseModel):
+    person_id: int
+    new_username: str
 
 
 class applicationPayload(BaseModel):
@@ -382,7 +389,7 @@ def get_all_applicants_info(response: Response, request: Request):
         raise HTTPException(status_code=500, detail=str(e))
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
-    
+
 @app.post("/application")
 def get_application(data: getApplicationPayload, response: Response, request: Request):
     access_token = request.cookies.get("access_token")
@@ -446,6 +453,33 @@ def update_application(
         raise HTTPException(status_code=500, detail="Something went wrong when trying to update application status")
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+
+@app.post("/updateusername")
+def update_username(data: updateUsernamePayload, response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        username_update, new_tokens = add_username_controller(
+            data.new_username, data.person_id, access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return username_update
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":

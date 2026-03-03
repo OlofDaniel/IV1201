@@ -7,7 +7,7 @@ import { DateRange } from "react-day-picker";
 import { AccessDeniedView } from "@/views/access-denied-view";
 import { postApplicationThunk } from "@/communication/application-communication";
 import { toast } from "sonner";
-import { ApplicationCard } from "@/components/ui/custom/application_card";
+import { ApplicationCard } from "@/components/ui/custom/application-card";
 
 export function ApplicationPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();

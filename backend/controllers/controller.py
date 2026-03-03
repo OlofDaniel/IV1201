@@ -1,13 +1,13 @@
 
-from models.applicationModel import send_application, get_latest_application
 from models.customExceptions import (
     DatabaseException,
     InvalidTokenError,
     ValidationError,
 )
 from models.loginModel import login
-from models.logoutModel import logout
 from models.passwordResetModel import change_password, request_password_email
+from models.applicationModel import send_application, get_latest_application
+from models.logoutModel import logout
 from models.recruiterModel import (
     get_all_applicants_information,
     update_application_status,
@@ -119,3 +119,4 @@ def update_application_controller(status_updates, access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+

@@ -377,9 +377,11 @@ def get_all_applicants_info(response: Response, request: Request):
         return all_applicants_info
 
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
     
 @app.post("/application")
 def get_application(data: getApplicationPayload, response: Response, request: Request):
@@ -409,13 +411,9 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except ValueError as e:
-        print(str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
-    except Exception as e:
-        print(str(e))    
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/updateapplication")
@@ -441,10 +439,10 @@ def update_application(
 
         return status_update_result
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -309,7 +309,7 @@ def upsert_application_status_updates(status_updates, access_token):
     except (APIError, AuthApiError):
         raise
     except Exception:
-        raise ValueError("An error occurred while updating application status")
+        raise DatabaseException()   
 
 def get_application(access_token, person_id):
     try:

@@ -71,7 +71,7 @@ export const getApplicationsThunk = createAsyncThunk<
     return await getApplications();
   } catch (error: any) {
     if (error.status == "401" || error.status == "500") {
-      return thunkAPI.rejectWithValue(error.detail);
+      return thunkAPI.rejectWithValue({ message: error.detail });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",
@@ -126,12 +126,13 @@ export const postApplicationUpdateThunk = createAsyncThunk<
     );
     await postApplicationUpdate(formattedPayload);
   } catch (error: any) {
+    console.log("error caught", error);
     if (
       error.status == "401" ||
       error.status == "400" ||
       error.status == "500"
     ) {
-      return thunkAPI.rejectWithValue(error.detail);
+      return thunkAPI.rejectWithValue({ message: error.detail });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",

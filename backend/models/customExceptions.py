@@ -1,8 +1,9 @@
 class DatabaseException(Exception):
     """Custom exception used when a database access fails, raised either when cause is unknown or irrelevant to higher layers"""
 
-    def init(self):
-        self.msg = "Error occured when accessing the database"
+    def __init__(self):
+        self.msg = "An error occured when accessing the database"
+        super().__init__(self.msg)
 
 
 class ValidationError(ValueError):

@@ -8,6 +8,7 @@ import { AccessDeniedView } from "@/views/access-denied-view";
 import { postApplicationThunk } from "@/communication/application-communication";
 import { toast } from "sonner";
 import { ApplicationCard } from "@/components/ui/custom/application-card";
+import { LoaderView } from "@/views/loading-view";
 
 export function ApplicationPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -121,7 +122,7 @@ export function ApplicationPagePresenter() {
     dateRanges,
   };
   if (userLoading || getApplicationLoading) {
-    return null;
+    return <LoaderView />;
   }
   if (currentApplication) {
     return (

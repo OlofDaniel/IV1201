@@ -10,6 +10,7 @@ export function ProfileViewPresenter() {
 
   return (
     <ProfilePageView
+      role={user?.role ?? ""}
       first_name={user?.first_name ?? ""}
       username={user?.username ?? ""}
       surname={user?.surname ?? ""}

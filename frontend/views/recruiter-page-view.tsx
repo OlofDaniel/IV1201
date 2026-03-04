@@ -7,8 +7,18 @@ interface RecruiterPageViewProps {
   applications: Application[];
   selectedApplication: Application | null;
   applicationsLoading: boolean;
+  getApplicationLoading: boolean;
+  applicationDetails: {
+    competencies: Record<string, number | null>;
+    availability: Array<{ from_date: string; to_date: string }>;
+    status: { application_status: string };
+  } | null;
   saveChangesLoading: boolean;
-  errorMessage: string | null;
+  errorMessages: {
+    getApplicationsError: string | null;
+    saveChangesError: string | null;
+    getApplicationDetailsError: string | null;
+  };
   hasPendingChanges: boolean;
   onStatusChange: (id: string, newStatus: Application["status"]) => void;
   onRowClick: (app: Application) => void;
@@ -19,7 +29,7 @@ interface RecruiterPageViewProps {
 
 export function RecruiterPageView({
   applicationsLoading,
-  errorMessage,
+  errorMessages,
   ...RecruiterProps
 }: RecruiterPageViewProps) {
   return (
@@ -32,19 +42,21 @@ export function RecruiterPageView({
       />
 
       <div className="absolute inset-x-0 top-0 mx-auto flex-col flex justify-center items-center w-full h-full max-w-5xl">
-        <h1 className=" text-white text-6xl text-center">
-          Welcome to the recruiter page
-        </h1>
-        <p className=" text-white text-center my-5 text-xl">
-          List and review all applications and manage their statuses below
-        </p>
         <div className="w-full">
           {applicationsLoading ? (
             <SkeletonTable />
-          ) : errorMessage ? (
-            errorMessage
+          ) : errorMessages.getApplicationsError ? (
+            <div className="bg-red-50 border rounded-lg p-6 text-700">
+              <p className="font-semibold">
+                Error occured when getting applications:
+              </p>
+              <p>{errorMessages.getApplicationsError}</p>
+            </div>
           ) : (
-            <RecruiterApplicationTable {...RecruiterProps} />
+            <RecruiterApplicationTable
+              {...RecruiterProps}
+              errorMessage={errorMessages.getApplicationDetailsError}
+            />
           )}
         </div>
       </div>

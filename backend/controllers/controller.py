@@ -11,6 +11,7 @@ from models.logoutModel import logout
 from models.recruiterModel import (
     get_all_applicants_information,
     update_application_status,
+    get_recruiter_application,
 )
 from models.signupModel import signup
 from models.userModel import get_user_information
@@ -120,3 +121,13 @@ def update_application_controller(status_updates, access_token, refresh_token):
     except DatabaseException:
         raise
 
+def get_recruiter_application_controller(person_id, access_token, refresh_token):
+    """Controller function for getting application for recruiter view, just calls model to attempt getting application and catches possible errors, raising them to the caller"""
+    try:
+        return get_recruiter_application(person_id, access_token, refresh_token)
+    except InvalidTokenError:
+        raise
+    except DatabaseException:
+        raise
+    except ValueError:
+        raise

@@ -15,6 +15,8 @@ import {
   Application,
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
+import { getApplicationThunk } from "@/communication/application-communication";
+import { LoaderView } from "@/views/loading-view";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,22 +25,33 @@ export function RecruiterPagePresenter() {
     updatedApplications,
     applicationsLoading,
     saveChangesLoading,
-    errorMessage,
+    errorMessages,
     selectedApplication,
     saveSuccess,
+    getApplicationLoading,
+    applicationDetails,
   } = useSelector((state: RootState) => state.recruiter);
 
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   useEffect(() => {
     if (
       applications.length === 0 &&
       !applicationsLoading &&
-      user?.role === "recruiter"
+      user?.role === "recruiter" &&
+      errorMessages.getApplicationsError === null
     ) {
       dispatch(getApplicationsThunk());
     }
-  }, [dispatch, applications.length, applicationsLoading, user?.role]);
+  }, [
+    dispatch,
+    applications.length,
+    applicationsLoading,
+    user?.role,
+    errorMessages.getApplicationsError,
+  ]);
 
   const onStatusChange = (id: string, newStatus: Application["status"]) =>
     dispatch(setNewStatus({ id, newStatus }));
@@ -47,6 +60,7 @@ export function RecruiterPagePresenter() {
     if (selectedApplication?.id === app.id) {
       dispatch(setSelectedApplication(null));
     } else {
+      dispatch(getApplicationThunk({ person_id: parseInt(app.id) }));
       dispatch(setSelectedApplication(app));
     }
   };
@@ -60,32 +74,33 @@ export function RecruiterPagePresenter() {
   };
 
   useEffect(() => {
-    if (errorMessage) {
-      toast.error(errorMessage, { position: "top-center" });
+    if (errorMessages.saveChangesError) {
+      toast.error(errorMessages.saveChangesError, { position: "top-center" });
     } else if (saveSuccess) {
       toast.success("Successfully saved changes", { position: "top-center" });
     }
-  }, [errorMessage, saveSuccess]);
+  }, [errorMessages.saveChangesError, saveSuccess]);
 
   const onCancelChangesClick = () => {
     dispatch(cancelStatusChanges());
   };
-
-  return user?.role !== "recruiter" ? (
+  return user?.role !== "recruiter" && !userLoading ? (
     <AccessDeniedView />
   ) : (
     <RecruiterPageView
       applications={applications}
       selectedApplication={selectedApplication}
-      applicationsLoading={applicationsLoading}
+      applicationsLoading={applicationsLoading || userLoading}
       saveChangesLoading={saveChangesLoading}
-      errorMessage={errorMessage}
+      errorMessages={errorMessages}
       hasPendingChanges={hasPendingChanges}
       onStatusChange={onStatusChange}
       onRowClick={onRowClick}
       onCloseRowClick={onCloseRowClick}
       onSaveChangesClick={onSaveChangesClick}
       onCancelChangesClick={onCancelChangesClick}
+      getApplicationLoading={getApplicationLoading}
+      applicationDetails={applicationDetails}
     ></RecruiterPageView>
   );
 }

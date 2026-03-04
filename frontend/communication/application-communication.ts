@@ -9,6 +9,7 @@ interface applicationPayload {
 
 interface ApplicationError {
   message: string;
+  status?: number;
   errors?: { [key: string]: string };
 }
 
@@ -19,7 +20,7 @@ interface getApplicationPayload {
 interface applicationResponse {
   competencies: Record<string, number | null>;
   availability: Array<{ from_date: string; to_date: string }>;
-  status: string;
+  status: { application_status: string };
 }
 const postApplication = async (payload: applicationPayload) => {
   const response = await fetch("http://localhost:8000/sendapplication", {
@@ -91,10 +92,14 @@ export const getApplicationThunk = createAsyncThunk<
     return data;
   } catch (error: any) {
     if (error.status == "400") {
-      return thunkAPI.rejectWithValue({ message: error.detail });
+      return thunkAPI.rejectWithValue({
+        message: error.detail,
+        status: error.status,
+      });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",
+      status: 500,
     });
   }
 });

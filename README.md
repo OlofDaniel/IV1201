@@ -1,1 +1,11 @@
 # IV1201
+## För deployment och utveckling:
+### Backend
+Backend behöver manuellt deployas med nya pushes till main. På dashboarden för render-projektet klickas då bara "deploy latest commit" vilket hämtar senaste commiten från detta repo och bygger. Om testning ska ske på egen maskin kan man starta backenden efter att ha intallerat och syncat uv ( ```pip install uv && uv sync ```) genom ```uv run python -m presentation.presentation``` om man sedan i webbläsaren går till /docs på den givna sidan kan endpoints testas. För att kunna testa lokalt bör också en .env fil med supabase url och nyckel finnas i backend foldern. Denna inkluderas i .gitignore. Backend använder pydantic för validering av fälten som kommer på HTTP requests, för att kunna ta emot en rquest bör dess typer (och möjligen andra valideringar) hanteras med en pydantic BaseModel.
+
+### Frontend
+Frontend deployas på nytt automatiskt via vercel när nya ändringar publiceras på main. För att kunna köra frontenden lokalt behövs bara ```npm install``` och ```npm run dev``` i terminalen. För att testa med backend kommer dock communication-filerna behöva ändra sina URLer, till localhost med rätt port men med samma endpoint. Frontend använder shadcn för komponenter och lucide-react för ikoner, så för att ge ett fortsatt enhetligt intryck bör dessa användas framåt. För att hitta nya komponeneter gå till: https://ui.shadcn.com/docs/components där även instuktioner för installation finns. Nya ikoner och installationsguide finns på: https://lucide.dev/icons/
+
+## Arkitekturen
+Frontend använder MVP-mönster och modellen hanteras med Redux toolkit i slices, presenters dispatchar begäran till backend och den passande slicen för begäran lyssnar på svaret genom extraReducers och uppdaterar därifrån tillståndet. De installerade och skapade komponenterna finns samlade i en egen mapp "components", där ska nya visuella element som bygger sidor sparas. I utils mappen finns stödfunktioner som hämtar nödvändig information vid sid-uppdatering, t.ex användarinfo. Dessa renderas i page.tsx i  för sidan de berör.
+Backend använder en lager-struktur med integration, controller, model och presentation. Modeller ska finnas i separate filer per ändamål, dvs all business logic som angår att byta lösenord ska finnas i samma "passwordResetModel" till exempel.

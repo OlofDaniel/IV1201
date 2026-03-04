@@ -31,7 +31,7 @@ from pydantic import AfterValidator, BaseModel, Field
 app = FastAPI()
 
 origins = [
-    "https://iv-1201-orcin.vercel.app/"
+    "https://iv-1201-orcin.vercel.app"
 ]
 
 

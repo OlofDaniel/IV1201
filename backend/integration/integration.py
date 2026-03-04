@@ -273,16 +273,14 @@ def get_previous_applications(access_token, person_id):
 
 
 def upsert_application(availability_list, competencies_list, access_token, person_id):
+    application_payload = {
+        "p_person_id": person_id,
+        "p_availability_data": availability_list,
+        "p_competence_data": competencies_list
+    }
     try:
         user_client = get_user_client(access_token)
-        user_client.table("availability").insert(availability_list).execute()
-        user_client.table("competence_profile").delete().eq(
-            "person_id", person_id
-        ).execute()
-        user_client.table("competence_profile").insert(
-            competencies_list
-        ).execute()
-
+        user_client.rpc("create_application", application_payload).execute()
     except AuthApiError:
         raise
     except APIError:

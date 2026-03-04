@@ -63,6 +63,7 @@ export const postLoginThunk = createAsyncThunk<
       email: userInfo.email,
       personNumber: userInfo.pnr,
       role_id: userInfo.role_id,
+      person_id: userInfo.person_id,
     };
   } catch (error: any) {
     if (error.status === 401) {

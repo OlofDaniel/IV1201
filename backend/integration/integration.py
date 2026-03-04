@@ -306,10 +306,11 @@ def upsert_application_status_updates(status_updates, access_token):
             .execute()
         )
         return response
-    except (APIError, AuthApiError):
+    except APIError, AuthApiError:
         raise
     except Exception:
         raise DatabaseException()   
+
 
 def get_application(access_token, person_id):
     try:
@@ -326,16 +327,42 @@ def get_application(access_token, person_id):
             .eq("person_id", person_id)
             .execute()
         )
-        status_response = user_client.table("person_add_to_auth").select("application_status").eq("person_id", person_id).single().execute()
+        status_response = (
+            user_client.table("person_add_to_auth")
+            .select("application_status")
+            .eq("person_id", person_id)
+            .single()
+            .execute()
+        )
 
-        return {   
+        return {
             "availability": availability_response.data,
             "competencies": competencies_response.data,
-            "status": status_response.data
-        }  
+            "status": status_response.data,
+        }
     except AuthApiError:
-        raise 
+        raise
     except APIError:
         raise
     except Exception:
+        raise DatabaseException()
+
+
+def add_username(access_token, new_username, person_id):
+    try:
+        user_client = get_user_client(access_token)
+        response = (
+            user_client.table("person_add_to_auth")
+            .update({"username": new_username})
+            .eq("person_id", person_id)
+            .is_("username", None)
+            .execute()
+        )
+
+        return response
+    except AuthApiError as e:
+        raise
+    except APIError as e:
+        raise
+    except Exception as e:
         raise DatabaseException()

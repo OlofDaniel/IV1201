@@ -1,4 +1,3 @@
-
 from models.customExceptions import (
     DatabaseException,
     InvalidTokenError,
@@ -14,7 +13,7 @@ from models.recruiterModel import (
     get_recruiter_application,
 )
 from models.signupModel import signup
-from models.userModel import get_user_information
+from models.userModel import get_user_information, update_user_username
 
 
 def signup_controller(person_information):
@@ -100,6 +99,7 @@ def send_application_controller(application_data, access_token, refresh_token):
     except ValueError:
         raise
 
+
 def get_application_controller(person_id, access_token, refresh_token):
     """Controller function for getting application, just calls model to attempt getting application and catches possible errors, raising them to the caller"""
     try:
@@ -125,6 +125,18 @@ def get_recruiter_application_controller(person_id, access_token, refresh_token)
     """Controller function for getting application for recruiter view, just calls model to attempt getting application and catches possible errors, raising them to the caller"""
     try:
         return get_recruiter_application(person_id, access_token, refresh_token)
+    except InvalidTokenError:
+        raise
+    except DatabaseException:
+        raise
+    except ValueError:
+        raise
+
+def add_username_controller(new_username, person_id, access_token, refresh_token):
+    try:
+        return update_user_username(
+            new_username, person_id, access_token, refresh_token
+        )
     except InvalidTokenError:
         raise
     except DatabaseException:

@@ -8,7 +8,6 @@ from .customExceptions import DatabaseException, InvalidTokenError
 
 
 def call_with_token_refresh(func, access_token, refresh_token, *args):
-    print("Hej från call with token")
     try:
         data = func(access_token, *args)
         return data, None

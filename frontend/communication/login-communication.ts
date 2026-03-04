@@ -27,6 +27,7 @@ const postLogin = async (payload: loginPayload) => {
     },
     body: JSON.stringify(payload),
     credentials: "include",
+    redirect: "manual",
   });
 
   const data = await response.json();

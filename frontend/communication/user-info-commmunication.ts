@@ -26,7 +26,7 @@ interface GetInfoError {
   response: saves the response from the fetch call to the getUserInfo endpoint after the HTTP POST request
 */
 const getUserInfo = async () => {
-  const response = await fetch("http://localhost:8000/getinfo", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getinfo`, {
     method: "GET",
     credentials: "include",
   });
@@ -37,7 +37,7 @@ const getUserInfo = async () => {
       detail: data.detail,
     };
   }
-
+  8000;
   return data;
 };
 /*
@@ -65,17 +65,20 @@ export const getUserInfoThunk = createAsyncThunk<
 });
 
 const postUsername = async (payload: UsernamePayload) => {
-  const response = await fetch("http://localhost:8000/updateusername", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/updateusername`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        person_id: payload.person_id,
+        new_username: payload.new_username,
+      }),
+      credentials: "include",
     },
-    body: JSON.stringify({
-      person_id: payload.person_id,
-      new_username: payload.new_username,
-    }),
-    credentials: "include",
-  });
+  );
   const data = await response.json();
   if (!response.ok) {
     throw {
@@ -87,13 +90,12 @@ const postUsername = async (payload: UsernamePayload) => {
 };
 
 export const postUsernameThunk = createAsyncThunk<
-    UserInfoResponse,
-    UsernamePayload,
-    { rejectValue: GetInfoError }
+  UserInfoResponse,
+  UsernamePayload,
+  { rejectValue: GetInfoError }
 >("user/postUsername", async (payload, thunkAPI) => {
   try {
     return await postUsername(payload);
-
   } catch (error: any) {
     if (error.status == "409") {
       return thunkAPI.rejectWithValue(error.detail);

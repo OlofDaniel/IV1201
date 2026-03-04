@@ -36,7 +36,7 @@ interface ApplicationUpdateError {
   response: saves the response from the fetch call to the applications endpoint after the HTTP GET request
 */
 const getApplications = async () => {
-  const response = await fetch("http://localhost:8000/recruiter", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recruiter`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -86,14 +86,17 @@ export const getApplicationsThunk = createAsyncThunk<
   JSON.stringify: formats the application updates as a JSON payload for the API call
 */
 const postApplicationUpdate = async (payload: UpdatedApplicationPayload[]) => {
-  const response = await fetch("http://localhost:8000/updateapplication", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/updateapplication`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   const data = await response.json();
 

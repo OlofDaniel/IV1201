@@ -196,8 +196,8 @@ def password_reset_request(email):
         response = supabase.auth.reset_password_email(
             email,
             {
-                "redirect_to": "http://localhost:3000/updatepassword"
-            },  # TODO: Change redirect url when frontend is deployed
+                "redirect_to": "https://iv-1201-orcin.vercel.app/updatepassword"
+            },
         )
         return response
     except AuthApiError:
@@ -360,9 +360,9 @@ def add_username(access_token, new_username, person_id):
         )
 
         return response
-    except AuthApiError as e:
+    except AuthApiError:
         raise
-    except APIError as e:
+    except APIError:
         raise
-    except Exception as e:
+    except Exception:
         raise DatabaseException()

@@ -21,7 +21,7 @@ interface ResetError {
   JSON.stringify: formats the users credentials as a JSON payload for authentication
 */
 const postReset = async (payload: passwordresetPayload) => {
-  const response = await fetch("http://localhost:8000/reset", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reset`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -75,17 +75,20 @@ export const postResetThunk = createAsyncThunk<
 */
 
 const postPasswordUpdate = async (payload: passwordupdatePayload) => {
-  const response = await fetch("http://localhost:8000/updatepassword", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${payload.accessToken}`,
-      refresh_token: payload.refreshToken,
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/updatepassword`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${payload.accessToken}`,
+        refresh_token: payload.refreshToken,
+      },
+      body: JSON.stringify({
+        password: payload.password,
+      }),
     },
-    body: JSON.stringify({
-      password: payload.password,
-    }),
-  });
+  );
 
   const data = await response.json();
 

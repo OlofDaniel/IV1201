@@ -23,18 +23,21 @@ interface applicationResponse {
   status: { application_status: string };
 }
 const postApplication = async (payload: applicationPayload) => {
-  const response = await fetch("http://localhost:8000/sendapplication", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/sendapplication`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        availability_ranges: payload.availability,
+        competencies: payload.competencies,
+        person_id: payload.person_id,
+      }),
+      credentials: "include",
     },
-    body: JSON.stringify({
-      availability_ranges: payload.availability,
-      competencies: payload.competencies,
-      person_id: payload.person_id,
-    }),
-    credentials: "include",
-  });
+  );
   const data = await response.json();
   if (!response.ok) {
     throw {
@@ -62,16 +65,19 @@ export const postApplicationThunk = createAsyncThunk<
 });
 
 const getApplication = async (payload: getApplicationPayload) => {
-  const response = await fetch("http://localhost:8000/application", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/application`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        person_id: payload.person_id,
+      }),
+      credentials: "include",
     },
-    body: JSON.stringify({
-      person_id: payload.person_id,
-    }),
-    credentials: "include",
-  });
+  );
   const data = await response.json();
   if (!response.ok) {
     throw {

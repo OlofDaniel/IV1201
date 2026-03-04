@@ -65,20 +65,17 @@ export const getUserInfoThunk = createAsyncThunk<
 });
 
 const postUsername = async (payload: UsernamePayload) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/updateusername`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        person_id: payload.person_id,
-        new_username: payload.new_username,
-      }),
-      credentials: "include",
+  const response = await fetch(`/api/updateusername`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      person_id: payload.person_id,
+      new_username: payload.new_username,
+    }),
+    credentials: "include",
+  });
   const data = await response.json();
   if (!response.ok) {
     throw {

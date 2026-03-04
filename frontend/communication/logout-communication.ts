@@ -7,7 +7,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 */
 
 const postLogout = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+  const response = await fetch(`/api/logout`, {
     method: "POST",
     credentials: "include",
   });

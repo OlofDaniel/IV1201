@@ -29,7 +29,7 @@ interface SignupResponse {
   JSON.stringify: converts the frontend naming conventions to match the backends expected format
 */
 const postSignup = async (payload: signupPayload) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
+  const response = await fetch(`/api/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

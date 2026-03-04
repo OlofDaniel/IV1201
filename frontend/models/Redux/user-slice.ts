@@ -3,6 +3,7 @@
   Holds the state of the user information such as username, first_name and more. 
 */
 import { getUserInfoThunk } from "@/communication/user-info-commmunication";
+import { postUsernameThunk} from "@/communication/user-info-commmunication";
 import { createSlice } from "@reduxjs/toolkit";
 import { postLoginThunk } from "@/communication/login-communication";
 import { postSignupThunk } from "@/communication/signup-communication";
@@ -104,6 +105,24 @@ export const userSlice = createSlice({
               : data.role_id === 2
                 ? "applicant"
                 : null,
+          person_id: data.person_id,
+        };
+      })
+      .addCase(postUsernameThunk.fulfilled, (state, action) => {
+        const data = action.payload;
+
+        state.user = {
+          username: data.username,
+          first_name: data.name,
+          surname: data.surname,
+          email: data.email,
+          person_number: data.pnr,
+          role:
+              data.role_id === 1
+                  ? "recruiter"
+                  : data.role_id === 2
+                      ? "applicant"
+                      : null,
           person_id: data.person_id,
         };
       });

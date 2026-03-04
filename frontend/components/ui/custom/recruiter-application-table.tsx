@@ -10,19 +10,38 @@ import {
 import { Dot } from "lucide-react";
 
 import { Application } from "@/models/Redux/recruiter-slice";
+import { Spinner } from "../spinner";
 
 interface RecruiterApplicationTableProps {
+  errorMessage: string | null;
+  getApplicationLoading: boolean;
+  applicationDetails: {
+    competencies: Record<string, number | null>;
+    availability: Array<{ from_date: string; to_date: string }>;
+    status: { application_status: string };
+  } | null;
   applications: Application[];
   selectedApplication: Application | null;
+  saveChangesLoading: boolean;
+  hasPendingChanges: boolean;
   onStatusChange: (id: string, newStatus: Application["status"]) => void;
   onRowClick: (app: Application) => void;
+  onSaveChangesClick: () => void;
+  onCancelChangesClick: () => void;
 }
 
 export function RecruiterApplicationTable({
-  applications,
-  selectedApplication,
   onStatusChange,
+  applications,
   onRowClick,
+  onCancelChangesClick,
+  onSaveChangesClick,
+  selectedApplication,
+  saveChangesLoading,
+  hasPendingChanges,
+  applicationDetails,
+  getApplicationLoading,
+  errorMessage,
 }: RecruiterApplicationTableProps) {
   const columns: ColumnDef<Application>[] = [
     {
@@ -40,7 +59,10 @@ export function RecruiterApplicationTable({
         return (
           <div
             className="relative flex items-center"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRowClick(application);
+            }}
           >
             <div className="absolute -left-9">
               <Dot
@@ -78,18 +100,43 @@ export function RecruiterApplicationTable({
 
   const expandedRow = (app: Application) => (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <h4 className="font-bold text-slate-500">Extended User Details</h4>
           <p>Username: {app.username}</p>
           <p>Email: {app.email}</p>
-          <p>Age: {app.personNumber}</p>
+          <p>Personal ID: {app.personNumber}</p>
         </div>
         <div>
-          <h4 className="font-bold text-slate-500">Application Details</h4>
-          <p>Years of Experience: 1 year </p>
-          <p>Competence in: Ticket sales</p>
-          <p>Availability: 26-06-02 - 26-08-13</p>
+          <h4 className="font-bold text-slate-500">Competence</h4>
+          {getApplicationLoading ? (
+            <Spinner />
+          ) : Object.entries(applicationDetails?.competencies || {}).length ===
+              0 && !errorMessage ? (
+            <p>No prior experience</p>
+          ) : (
+            Object.entries(applicationDetails?.competencies || {}).map(
+              ([key, value]) => (
+                <p key={key}>
+                  {key}: {value} years
+                </p>
+              ),
+            )
+          )}
+          {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+        </div>
+        <div>
+          <h4 className="font-bold text-slate-500">Availability</h4>
+          {getApplicationLoading ? (
+            <Spinner />
+          ) : (
+            applicationDetails?.availability.map((range, idx) => (
+              <p key={idx}>
+                {range.from_date} to {range.to_date}
+              </p>
+            ))
+          )}
+          {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
         </div>
       </div>
     </div>
@@ -100,9 +147,13 @@ export function RecruiterApplicationTable({
       <DataTable<Application, unknown>
         columns={columns}
         data={applications}
-        onRowClick={onRowClick}
         selectedRowId={selectedApplication?.id}
+        saveChangesLoading={saveChangesLoading}
+        hasPendingChanges={hasPendingChanges}
+        onRowClick={onRowClick}
         expandedRow={expandedRow}
+        onSaveChangesClick={onSaveChangesClick}
+        onCancelChangesClick={onCancelChangesClick}
       />
     </div>
   );

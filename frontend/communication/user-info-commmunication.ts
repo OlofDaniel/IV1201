@@ -1,5 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+interface UsernamePayload {
+  person_id: number | null;
+  new_username: string;
+}
+
 interface UserInfoResponse {
   username: string;
   name: string;
@@ -49,6 +54,46 @@ export const getUserInfoThunk = createAsyncThunk<
   try {
     const data = await getUserInfo();
     return data;
+  } catch (error: any) {
+    if (error.status == "409") {
+      return thunkAPI.rejectWithValue(error.detail);
+    }
+    return thunkAPI.rejectWithValue({
+      message: "Something went wrong, try again later",
+    });
+  }
+});
+
+const postUsername = async (payload: UsernamePayload) => {
+  const response = await fetch("http://localhost:8000/updateusername", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      person_id: payload.person_id,
+      new_username: payload.new_username,
+    }),
+    credentials: "include",
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw {
+      status: response.status,
+      detail: data.detail,
+    };
+  }
+  return data;
+};
+
+export const postUsernameThunk = createAsyncThunk<
+    UserInfoResponse,
+    UsernamePayload,
+    { rejectValue: GetInfoError }
+>("user/postUsername", async (payload, thunkAPI) => {
+  try {
+    return await postUsername(payload);
+
   } catch (error: any) {
     if (error.status == "409") {
       return thunkAPI.rejectWithValue(error.detail);

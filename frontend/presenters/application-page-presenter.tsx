@@ -7,6 +7,8 @@ import { DateRange } from "react-day-picker";
 import { AccessDeniedView } from "@/views/access-denied-view";
 import { postApplicationThunk } from "@/communication/application-communication";
 import { toast } from "sonner";
+import { ApplicationCard } from "@/components/ui/custom/application-card";
+import { LoaderView } from "@/views/loading-view";
 
 export function ApplicationPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,20 +19,22 @@ export function ApplicationPagePresenter() {
     errorMessage: userErrorMessage,
   } = useSelector((state: RootState) => state.user);
   const {
-    loading: applicationLoading,
+    loading: postApplicationLoading,
+    getApplicationLoading,
     errorMessage: applicationErrorMessage,
-    applicationSuccess,
+    applicationSentSuccess,
+    currentApplication,
   } = useSelector((state: RootState) => state.application);
 
   useEffect(() => {
     if (applicationErrorMessage) {
       toast.error(applicationErrorMessage, { position: "top-center" });
-    } else if (applicationSuccess) {
+    } else if (applicationSentSuccess) {
       toast.success("Sucessfully submitted application", {
         position: "top-center",
       });
     }
-  }, [applicationErrorMessage, applicationSuccess]);
+  }, [applicationErrorMessage, applicationSentSuccess]);
 
   const [selected, setSelected] = useState<Record<string, boolean>>({
     "ticket-sales": false,
@@ -117,8 +121,17 @@ export function ApplicationPagePresenter() {
     },
     dateRanges,
   };
-  if (userLoading) {
-    return null;
+  if (userLoading || getApplicationLoading) {
+    return <LoaderView />;
+  }
+  if (currentApplication) {
+    return (
+      <ApplicationCard
+        competencies={currentApplication.competencies}
+        availability={currentApplication.availability}
+        status={currentApplication.status.application_status}
+      />
+    );
   }
   return user?.role !== "applicant" ? (
     <AccessDeniedView />

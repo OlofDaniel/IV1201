@@ -9,9 +9,19 @@ interface applicationPayload {
 
 interface ApplicationError {
   message: string;
+  status?: number;
   errors?: { [key: string]: string };
 }
 
+interface getApplicationPayload {
+  person_id: number | null;
+}
+
+interface applicationResponse {
+  competencies: Record<string, number | null>;
+  availability: Array<{ from_date: string; to_date: string }>;
+  status: { application_status: string };
+}
 const postApplication = async (payload: applicationPayload) => {
   const response = await fetch("http://localhost:8000/sendapplication", {
     method: "POST",
@@ -47,6 +57,49 @@ export const postApplicationThunk = createAsyncThunk<
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",
+    });
+  }
+});
+
+const getApplication = async (payload: getApplicationPayload) => {
+  const response = await fetch("http://localhost:8000/application", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      person_id: payload.person_id,
+    }),
+    credentials: "include",
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw {
+      status: response.status,
+      detail: data.detail,
+    };
+  }
+  return data;
+};
+
+export const getApplicationThunk = createAsyncThunk<
+  applicationResponse,
+  getApplicationPayload,
+  { rejectValue: ApplicationError }
+>("application/getApplicationThunk", async (payload, thunkAPI) => {
+  try {
+    const data = await getApplication(payload);
+    return data;
+  } catch (error: any) {
+    if (error.status == "400") {
+      return thunkAPI.rejectWithValue({
+        message: error.detail,
+        status: error.status,
+      });
+    }
+    return thunkAPI.rejectWithValue({
+      message: "Something went wrong, try again later",
+      status: 500,
     });
   }
 });

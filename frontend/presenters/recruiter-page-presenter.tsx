@@ -4,33 +4,54 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { RecruiterPageView } from "@/views/recruiter-page-view";
 import { AccessDeniedView } from "@/views/access-denied-view";
-import { getApplicationsThunk } from "@/communication/recruiter-applications-communication";
+import {
+  getApplicationsThunk,
+  postApplicationUpdateThunk,
+} from "@/communication/recruiter-applications-communication";
 import {
   setNewStatus,
   setSelectedApplication,
+  cancelStatusChanges,
   Application,
 } from "@/models/Redux/recruiter-slice";
+import { toast } from "sonner";
+import { getApplicationThunk } from "@/communication/application-communication";
+import { LoaderView } from "@/views/loading-view";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
   const {
     applications,
+    updatedApplications,
     applicationsLoading,
-    errorMessage,
+    saveChangesLoading,
+    errorMessages,
     selectedApplication,
+    saveSuccess,
+    getApplicationLoading,
+    applicationDetails,
   } = useSelector((state: RootState) => state.recruiter);
 
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   useEffect(() => {
     if (
       applications.length === 0 &&
       !applicationsLoading &&
-      user?.role === "recruiter"
+      user?.role === "recruiter" &&
+      errorMessages.getApplicationsError === null
     ) {
       dispatch(getApplicationsThunk());
     }
-  }, [dispatch, applications.length, applicationsLoading]);
+  }, [
+    dispatch,
+    applications.length,
+    applicationsLoading,
+    user?.role,
+    errorMessages.getApplicationsError,
+  ]);
 
   const onStatusChange = (id: string, newStatus: Application["status"]) =>
     dispatch(setNewStatus({ id, newStatus }));
@@ -39,23 +60,47 @@ export function RecruiterPagePresenter() {
     if (selectedApplication?.id === app.id) {
       dispatch(setSelectedApplication(null));
     } else {
+      dispatch(getApplicationThunk({ person_id: parseInt(app.id) }));
       dispatch(setSelectedApplication(app));
     }
   };
 
   const onCloseRowClick = () => dispatch(setSelectedApplication(null));
 
-  return user?.role !== "recruiter" ? (
+  const hasPendingChanges = updatedApplications.length > 0;
+
+  const onSaveChangesClick = () => {
+    dispatch(postApplicationUpdateThunk(updatedApplications));
+  };
+
+  useEffect(() => {
+    if (errorMessages.saveChangesError) {
+      toast.error(errorMessages.saveChangesError, { position: "top-center" });
+    } else if (saveSuccess) {
+      toast.success("Successfully saved changes", { position: "top-center" });
+    }
+  }, [errorMessages.saveChangesError, saveSuccess]);
+
+  const onCancelChangesClick = () => {
+    dispatch(cancelStatusChanges());
+  };
+  return user?.role !== "recruiter" && !userLoading ? (
     <AccessDeniedView />
   ) : (
     <RecruiterPageView
       applications={applications}
       selectedApplication={selectedApplication}
-      applicationsLoading={applicationsLoading}
-      errorMessage={errorMessage}
+      applicationsLoading={applicationsLoading || userLoading}
+      saveChangesLoading={saveChangesLoading}
+      errorMessages={errorMessages}
+      hasPendingChanges={hasPendingChanges}
       onStatusChange={onStatusChange}
       onRowClick={onRowClick}
       onCloseRowClick={onCloseRowClick}
+      onSaveChangesClick={onSaveChangesClick}
+      onCancelChangesClick={onCancelChangesClick}
+      getApplicationLoading={getApplicationLoading}
+      applicationDetails={applicationDetails}
     ></RecruiterPageView>
   );
 }

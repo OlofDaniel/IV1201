@@ -2,16 +2,21 @@ import re
 import os
 from typing import Annotated, List
 
+import jwt
 import uvicorn
 from controllers.controller import (
     get_all_applicants_information_controller,
+    get_application_controller,
     get_user_information_controller,
     login_controller,
     logout_controller,
     reset_password_controller,
     send_application_controller,
     signup_controller,
+    update_application_controller,
     update_password_controller,
+    add_username_controller,
+    get_recruiter_application_controller
 )
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,7 +94,6 @@ class LoginRequest(BaseModel):
     password: str
 
 
-
 class PasswordUpdateRequest(BaseModel):
     """Specifies types expected in a password update request"""
 
@@ -118,10 +122,26 @@ class availabilityRange(BaseModel):
     to_date: str
 
 
+class getApplicationPayload(BaseModel):
+    person_id: int
+
+
+class updateUsernamePayload(BaseModel):
+    person_id: int
+    new_username: str
+
+
 class applicationPayload(BaseModel):
     competencies: dict
     availability_ranges: List[availabilityRange] = Field(min_length=1)
     person_id: int
+
+
+class StatusUpdateRequest(BaseModel):
+    """Specifies types and formats expected in an application status update request"""
+
+    person_id: int
+    application_status: str
 
 
 @app.post("/login")
@@ -365,9 +385,103 @@ def get_all_applicants_info(response: Response, request: Request):
         return all_applicants_info
 
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        raise HTTPException(status_code=403, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+@app.post("/application")
+def get_application(data: getApplicationPayload, response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        decoded_jwt = jwt.decode(access_token, options={"verify_signature": False})
+        if decoded_jwt["user_metadata"]["role_id"] == 1:
+            application_info, new_tokens = get_recruiter_application_controller(
+            data.person_id, access_token, refresh_token
+        )
+        else:
+            application_info, new_tokens = get_application_controller(
+                data.person_id, access_token, refresh_token
+            )
+
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return application_info
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="Something went wrong when retrieving the application details")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+
+@app.post("/updateapplication")
+def update_application(
+    data: List[StatusUpdateRequest], response: Response, request: Request
+):
+
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    updates_dict = [item.model_dump() for item in data]
+
+    try:
+        decoded_jwt = jwt.decode(access_token, options={"verify_signature": False})
+        if decoded_jwt["user_metadata"]["role_id"] == 2:
+            raise HTTPException(status_code=403, detail="Only recruiters can update application status")
+        status_update_result, new_tokens = update_application_controller(
+            updates_dict, access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return status_update_result
+
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail="Something went wrong when trying to update application status")
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+
+@app.post("/updateusername")
+def update_username(data: updateUsernamePayload, response: Response, request: Request):
+    access_token = request.cookies.get("access_token")
+    refresh_token = request.cookies.get("refresh_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    try:
+        username_update, new_tokens = add_username_controller(
+            data.new_username, data.person_id, access_token, refresh_token
+        )
+        if new_tokens:
+            set_cookies(
+                response, new_tokens["access_token"], new_tokens["refresh_token"]
+            )
+
+        return username_update
+    except DatabaseException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run(

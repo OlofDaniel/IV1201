@@ -10,8 +10,13 @@ import {
 
 import Image from "next/image";
 import { SkeletonCard } from "@/components/ui/custom/card-skeleton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+import { NewUsernameDialog} from "@/components/ui/custom/new-username-dialog";
 
 interface ProfilePageViewProps {
+  role: string;
   username: string | null;
   first_name: string | null;
   surname: string | null;
@@ -20,6 +25,7 @@ interface ProfilePageViewProps {
   errorMessage: string | null;
   isAuthenticated: boolean;
   userLoading: boolean;
+  onAddNewUsername: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
 /*
@@ -35,7 +41,8 @@ export function ProfilePageView({
   person_number,
   errorMessage,
   isAuthenticated,
-  userLoading,
+  role,
+  userLoading, onAddNewUsername,
 }: ProfilePageViewProps) {
   return userLoading ? (
     <div className="flex justify-center mt-20">
@@ -62,7 +69,9 @@ export function ProfilePageView({
             <CardContent>
               <div className="grid grid-cols-2 gap-y-2 border-t pt-4">
                 <span className="font-bold">Username:</span>{" "}
-                <span>{username}</span>
+                { username ? <span>{username}</span> :
+                    <NewUsernameDialog onAddNewUsername={onAddNewUsername}/>
+                }
                 <span className="font-bold">First name:</span>{" "}
                 <span>{first_name}</span>
                 <span className="font-bold">Surname:</span>{" "}
@@ -73,17 +82,17 @@ export function ProfilePageView({
               </div>
             </CardContent>
             <CardFooter>
-              <p>Card Footer</p>
+              <Link
+                href={role === "recruiter" ? "/recruiter" : "/application"}
+                className="text-blue-500 hover:underline"
+              >
+                <Button variant="default">
+                  {role === "recruiter"
+                    ? "Handle applications"
+                    : "Go to application"}
+                </Button>
+              </Link>
             </CardFooter>
-          </Card>
-        </div>
-
-        <div className="flex justify-center mt-20 w-full">
-          <Card className="bg-neutral-200 w-full max-w-5xl">
-            <CardHeader className="flex justify-center">
-              <CardTitle>Application</CardTitle>
-            </CardHeader>
-            <CardContent></CardContent>
           </Card>
         </div>
       </div>

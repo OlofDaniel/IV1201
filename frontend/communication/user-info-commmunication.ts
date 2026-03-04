@@ -26,7 +26,7 @@ interface GetInfoError {
   response: saves the response from the fetch call to the getUserInfo endpoint after the HTTP POST request
 */
 const getUserInfo = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getinfo`, {
+  const response = await fetch(`/api/getinfo`, {
     method: "GET",
     credentials: "include",
   });

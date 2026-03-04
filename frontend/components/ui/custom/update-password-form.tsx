@@ -10,8 +10,8 @@ interface UpdatePasswordFormProps {
   passwordShown: boolean;
   onSubmit: (
     password: string,
-    accessToken: string | null,
-    refreshToken: string | null,
+    accessToken: string,
+    refreshToken: string,
   ) => void;
   onEyeClick: () => void;
 }
@@ -49,8 +49,8 @@ export function UpdatePasswordForm({
     }
     const params = new URLSearchParams(window.location.hash.slice(1));
 
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
+    const accessToken = params.get("access_token")?? "";
+    const refreshToken = params.get("refresh_token")?? "";
     const formData = new FormData(event.currentTarget);
     const password = formData.get("fieldgroup-password") as string;
 

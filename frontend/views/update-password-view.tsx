@@ -10,8 +10,8 @@ interface UpdatePasswordViewProps {
   onEyeClick: () => void;
   onSubmit: (
     password: string,
-    accessToken: string | null,
-    refreshToken: string | null,
+    accessToken: string,
+    refreshToken: string,
   ) => void;
 }
 

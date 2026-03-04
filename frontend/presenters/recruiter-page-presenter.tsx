@@ -16,7 +16,7 @@ import {
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
 import { getApplicationThunk } from "@/communication/application-communication";
-import { error } from "console";
+import { LoaderView } from "@/views/loading-view";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,7 +32,9 @@ export function RecruiterPagePresenter() {
     applicationDetails,
   } = useSelector((state: RootState) => state.recruiter);
 
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, loading: userLoading } = useSelector(
+    (state: RootState) => state.user,
+  );
 
   useEffect(() => {
     if (
@@ -82,14 +84,13 @@ export function RecruiterPagePresenter() {
   const onCancelChangesClick = () => {
     dispatch(cancelStatusChanges());
   };
-
-  return user?.role !== "recruiter" ? (
+  return user?.role !== "recruiter" && !userLoading ? (
     <AccessDeniedView />
   ) : (
     <RecruiterPageView
       applications={applications}
       selectedApplication={selectedApplication}
-      applicationsLoading={applicationsLoading}
+      applicationsLoading={applicationsLoading || userLoading}
       saveChangesLoading={saveChangesLoading}
       errorMessages={errorMessages}
       hasPendingChanges={hasPendingChanges}

@@ -59,7 +59,10 @@ export function RecruiterApplicationTable({
         return (
           <div
             className="relative flex items-center"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRowClick(application);
+            }}
           >
             <div className="absolute -left-9">
               <Dot
@@ -109,7 +112,7 @@ export function RecruiterApplicationTable({
           {getApplicationLoading ? (
             <Spinner />
           ) : Object.entries(applicationDetails?.competencies || {}).length ===
-            0 ? (
+              0 && !errorMessage ? (
             <p>No prior experience</p>
           ) : (
             Object.entries(applicationDetails?.competencies || {}).map(
@@ -120,9 +123,7 @@ export function RecruiterApplicationTable({
               ),
             )
           )}
-          {errorMessage && (
-            <p className="text-red-500 mt-2">{errorMessage}</p>
-          )}
+          {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
         </div>
         <div>
           <h4 className="font-bold text-slate-500">Availability</h4>
@@ -135,9 +136,7 @@ export function RecruiterApplicationTable({
               </p>
             ))
           )}
-          {errorMessage && (
-            <p className="text-red-500 mt-2">{errorMessage}</p>
-          )}
+          {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
         </div>
       </div>
     </div>

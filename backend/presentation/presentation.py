@@ -429,6 +429,9 @@ def update_application(
     updates_dict = [item.model_dump() for item in data]
 
     try:
+        decoded_jwt = jwt.decode(access_token, options={"verify_signature": False})
+        if decoded_jwt["user_metadata"]["role_id"] == 2:
+            raise HTTPException(status_code=403, detail="Only recruiters can update application status")
         status_update_result, new_tokens = update_application_controller(
             updates_dict, access_token, refresh_token
         )

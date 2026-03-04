@@ -1,4 +1,5 @@
 import re
+import os
 from typing import Annotated, List
 
 import uvicorn
@@ -370,5 +371,5 @@ def get_all_applicants_info(response: Response, request: Request):
 
 if __name__ == "__main__":
     uvicorn.run(
-        "presentation.presentation:app", host="0.0.0.0", port=8000, reload=False
+        "presentation.presentation:app", host="0.0.0.0", port=os.environ.get("PORT", 8000), reload=False
     )

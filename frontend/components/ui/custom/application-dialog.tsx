@@ -34,6 +34,9 @@ export function ApplicationDialog({
     "ticket-sales": "Ticket Sales",
   };
 
+  /*
+    validRanges: filters the dates to only keep correct dates with start and end date
+  */
   const validRanges = dateRanges?.filter((d) => d && d.from && d.to) ?? [];
 
   return (

@@ -16,6 +16,12 @@ interface UpdatePasswordFormProps {
   onEyeClick: () => void;
 }
 
+/*
+  handleConfirmPassword: checks that both passwords entered are the same.
+  handleFormSubmit: handles the data entered in the form. Extracts the needed data and passes it in the onSubmit call.
+  const params (in handleFormSubmit): Workaround since supabase expects the call to be made from this URL, not the backend. Reads the URL of the form page when submitted to get the relevant tokens.
+*/
+
 export function UpdatePasswordForm({
   loading,
   passwordShown,
@@ -40,8 +46,6 @@ export function UpdatePasswordForm({
     return true;
   }
 
-  /*Workaround since supabase expects the call to be made from this URL, not the backend. 
-  Reads the URL of the form page when submitted to get the relevant tokens.*/
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!handleConfirmPassword()) {

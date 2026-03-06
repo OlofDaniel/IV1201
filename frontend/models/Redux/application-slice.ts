@@ -24,6 +24,14 @@ const initialState: applicationState = {
   currentApplication: null,
 };
 
+/*
+Application slice
+extraReducers:
+  postApplicationThunk: updates the state of loading, errormessage and applicationSendSuccess in the different states .pending, .fulfilled and .rejected.
+  getApplicationThunk: updates the state of getApplicationLoading, errormessage and currentApplication in the different states .pending, .fulfilled and .rejected.
+*/
+
+
 export const applicationSlice = createSlice({
   name: "application",
   initialState,

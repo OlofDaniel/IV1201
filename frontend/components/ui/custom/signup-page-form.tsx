@@ -25,6 +25,11 @@ interface SignupPageFormProps {
   ) => void;
 }
 
+/*
+  handleConfirmPassword: checks that both passwords entered are the same.
+  handleFormSubmit: handles the data entered in the form, extracts the data needed and passes it in the onSignupClick call.
+*/
+
 export function SignupPageForm({
   passwordShown,
   signupLoading,

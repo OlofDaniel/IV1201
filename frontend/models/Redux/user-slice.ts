@@ -32,6 +32,15 @@ const initialState: userState = {
   errorMessage: null,
 };
 
+/*
+User slice
+extraReducers:
+  getUserInfoThunk: updates the state of loading, errorMessage, isAuthenticated and user state in the different states: .pending, .fulfilled and rejected.
+  postLoginThunk: changes the user state with the metadata returned from supabase.
+  postSignupThunk: changes the user state with the metadata returned from supabase.
+  postUsernameThunk: changes the user state with the metadata returned from supabase.
+*/
+
 export const userSlice = createSlice({
   name: "user",
   initialState,

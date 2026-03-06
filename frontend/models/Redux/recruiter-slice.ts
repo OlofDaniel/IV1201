@@ -73,6 +73,7 @@ recruiter slice
 reducers:
   setNewStatus: updates the status of an application in the applications list and adds it to the updatedApplications list if it's not already there
   setSelectedApplication: sets the selected application to the one passed in the action payload
+  cancelStatusChanges: clears the changes made in recruiter page
 extraReducers:
   sets the loading state to true when pending, and false when not pending
   maps database response to the application model and stores it in the state upon success

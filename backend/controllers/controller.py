@@ -24,6 +24,8 @@ def signup_controller(person_information):
         raise
     except DatabaseException:
         raise
+    except ValueError:
+        raise
 
 
 def login_controller(user_credentials):
@@ -54,6 +56,8 @@ def reset_password_controller(user_email):
         return request_password_email(user_email)
     except DatabaseException:
         raise
+    except ValueError:
+        raise
 
 
 def update_password_controller(password, access_token, refresh_token):
@@ -75,6 +79,8 @@ def logout_controller(access_token, refresh_token):
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValueError:
         raise
 
 

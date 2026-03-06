@@ -1,5 +1,8 @@
 class DatabaseException(Exception):
-    """Custom exception used when a database access fails, raised either when cause is unknown or irrelevant to higher layers"""
+    """
+    Custom exception used when a database access fails, 
+    raised either when cause is unknown or irrelevant to higher layers
+    """
 
     def __init__(self):
         self.msg = "An error occured when accessing the database"
@@ -8,7 +11,8 @@ class DatabaseException(Exception):
 
 class ValidationError(ValueError):
     """
-    Custom exception used when something goes wrong when validation a user, for example if a user wants to signup with a username/email/person number that already exist.
+    Custom exception used when something goes wrong when validation a user, 
+    for example if a user wants to signup with a username/email/person number that already exist.
     """
 
     def __init__(self, message, details: dict):

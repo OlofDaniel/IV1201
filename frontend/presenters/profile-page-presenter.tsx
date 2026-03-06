@@ -1,15 +1,21 @@
 "use client";
 import { ProfilePageView } from "@/views/profile-page-view";
-import { useSelector, useDispatch} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/lib/Redux/store";
-import { postUsernameThunk} from "@/communication/user-info-commmunication";
-
+import { postUsernameThunk } from "@/communication/user-info-commmunication";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 export function ProfileViewPresenter() {
   const dispatch = useDispatch<AppDispatch>();
-  const { user, loading, isAuthenticated, errorMessage } = useSelector(
-    (state: RootState) => state.user,
-  );
+  const { user, loading, isAuthenticated, errorMessage, usernameError } =
+    useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    if (usernameError) {
+      toast.error(usernameError, { position: "top-center" });
+    }
+  }, [usernameError]);
 
   const onAddNewUsername = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,13 +36,16 @@ export function ProfileViewPresenter() {
 
     try {
       await dispatch(
-          postUsernameThunk({ person_id: user.person_id, new_username: username })
+        postUsernameThunk({
+          person_id: user.person_id,
+          new_username: username,
+        }),
       ).unwrap();
+      window.location.href = "/profile";
       console.log("Username updated:", username);
     } catch (error) {
       console.error("Failed to update username:", error);
     }
-    window.location.href = "/profile";
   };
 
   return (

@@ -3,7 +3,7 @@
   Holds the state of the user information such as username, first_name and more. 
 */
 import { getUserInfoThunk } from "@/communication/user-info-commmunication";
-import { postUsernameThunk} from "@/communication/user-info-commmunication";
+import { postUsernameThunk } from "@/communication/user-info-commmunication";
 import { createSlice } from "@reduxjs/toolkit";
 import { postLoginThunk } from "@/communication/login-communication";
 import { postSignupThunk } from "@/communication/signup-communication";
@@ -23,6 +23,7 @@ interface userState {
   isAuthenticated: boolean;
   user: UserProfile | null;
   errorMessage: string | null;
+  usernameError: string | null;
 }
 
 const initialState: userState = {
@@ -30,6 +31,7 @@ const initialState: userState = {
   isAuthenticated: false,
   user: null,
   errorMessage: null,
+  usernameError: null,
 };
 
 export const userSlice = createSlice({
@@ -118,13 +120,22 @@ export const userSlice = createSlice({
           email: data.email,
           person_number: data.pnr,
           role:
-              data.role_id === 1
-                  ? "recruiter"
-                  : data.role_id === 2
-                      ? "applicant"
-                      : null,
+            data.role_id === 1
+              ? "recruiter"
+              : data.role_id === 2
+                ? "applicant"
+                : null,
           person_id: data.person_id,
         };
+      })
+      .addCase(postUsernameThunk.rejected, (state, action) => {
+        state.loading = false;
+
+        const payload = action.payload;
+
+        state.usernameError =
+          payload?.message ??
+          "Unknown error occurred when attempting to change username";
       });
   },
 });

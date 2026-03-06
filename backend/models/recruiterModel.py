@@ -38,8 +38,6 @@ def get_all_applicants_information(access_token, refresh_token):
         raise
     except DatabaseException:
         raise
-    except ValueError:
-        raise
 
 
 def update_application_status(status_updates, access_token, refresh_token):
@@ -65,6 +63,8 @@ def update_application_status(status_updates, access_token, refresh_token):
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValueError:
         raise
 
 
@@ -102,6 +102,8 @@ def get_recruiter_application(person_id, access_token, refresh_token):
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValueError:
         raise
 
 

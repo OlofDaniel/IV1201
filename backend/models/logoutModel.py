@@ -10,3 +10,5 @@ def logout(access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+    except ValueError:
+        raise

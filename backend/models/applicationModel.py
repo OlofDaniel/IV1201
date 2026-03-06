@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from supabase_auth.errors import AuthApiError
+
 from integration.integration import (
     get_previous_applications,
     upsert_application,
@@ -58,6 +60,8 @@ def send_application(application_data, access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+    except ValueError:
+        raise
 
 
 def add_application(application_data, access_token):
@@ -93,12 +97,19 @@ def add_application(application_data, access_token):
             }
         )
 
-    upsert_application(
-        availability_list,
-        competencies_list,
-        access_token,
-        application_data.person_id,
-    )
+    try:
+        upsert_application(
+            availability_list,
+            competencies_list,
+            access_token,
+            application_data.person_id,
+        )
+    except AuthApiError, APIError:
+        raise
+    except DatabaseException:
+        raise
+    except ValueError:
+        raise
 
 
 def format_availability_ranges(application_data):
@@ -143,6 +154,8 @@ def get_latest_application(person_id, access_token, refresh_token):
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValueError:
         raise
 
 def format_competencies(competencies):

@@ -188,6 +188,8 @@ def logout(request: Request, response: Response):
         raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/reset")
@@ -201,6 +203,8 @@ def reset(data: PasswordResetRequest):
         return reset_password_controller(data.email)
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/updatepassword")
@@ -260,6 +264,8 @@ def signup(data: SignupRequest, response: Response):
         )
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def set_cookies(response: Response, access_token: str, refresh_token: str):
@@ -474,6 +480,8 @@ def update_application(
         raise HTTPException(status_code=500, detail="Something went wrong when trying to update application status")
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/updateusername")

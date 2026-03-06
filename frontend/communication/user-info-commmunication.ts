@@ -21,8 +21,8 @@ interface GetInfoError {
 }
 
 /*
-  Communication logic for the user informatio:
-  getUserInfo: Retrieves the user info from supabase. Such as username and person number and more.
+  Communication logic for the user information:
+  getUserInfo: Retrieves the user info from Supabase. Such as username and person number and more.
   response: saves the response from the fetch call to the getUserInfo endpoint after the HTTP POST request
 */
 const getUserInfo = async () => {
@@ -37,7 +37,6 @@ const getUserInfo = async () => {
       detail: data.detail,
     };
   }
-  8000;
   return data;
 };
 /*
@@ -64,6 +63,12 @@ export const getUserInfoThunk = createAsyncThunk<
   }
 });
 
+/*
+  Communication logic for post new username:
+  postUsername: sends new username for user to supabase, with the corresponding person_id.
+  response: returns user metadata from supabase.
+*/
+
 const postUsername = async (payload: UsernamePayload) => {
   const response = await fetch(`/api/updateusername`, {
     method: "POST",
@@ -85,6 +90,13 @@ const postUsername = async (payload: UsernamePayload) => {
   }
   return data;
 };
+
+/*
+  Asynchronous thunk for post username:
+  postUsernameThunk: dispatches status updates (pending, fulfilled, rejected) of the user state
+  await postUsername: executes the API call and waits for a response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
 
 export const postUsernameThunk = createAsyncThunk<
   UserInfoResponse,

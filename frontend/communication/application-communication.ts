@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { DateRange } from "react-day-picker";
 
 interface applicationPayload {
   competencies: Record<string, number | null>;
@@ -22,6 +21,13 @@ interface applicationResponse {
   availability: Array<{ from_date: string; to_date: string }>;
   status: { application_status: string };
 }
+
+/*
+  Communication logic for the sending the application:
+  postApplication: Sends the application info to Supabase. Such as availability dates and competencies.
+  response: checks whether the response is ok, if not it throws an exception
+*/
+
 const postApplication = async (payload: applicationPayload) => {
   const response = await fetch(`/api/sendapplication`, {
     method: "POST",
@@ -44,6 +50,13 @@ const postApplication = async (payload: applicationPayload) => {
   }
 };
 
+/*
+  Asynchronous thunk for adding an application to the database:
+  postApplicationThunk: sends the application and dispatches status updates (pending, fulfilled, rejected) of the application state
+  await postApplication: executes the API call to send the application
+  rejectWithValue: returns the correct error message if an error occurs
+*/
+
 export const postApplicationThunk = createAsyncThunk<
   void,
   applicationPayload,
@@ -60,6 +73,12 @@ export const postApplicationThunk = createAsyncThunk<
     });
   }
 });
+
+/*
+  Communication logic for the application information:
+  getApplication: Retrieves the application info from Supabase. Such as availability dates and competencies.
+  response: saves the response from the fetch call to the application endpoint after the HTTP POST request
+*/
 
 const getApplication = async (payload: getApplicationPayload) => {
   const response = await fetch(`/api/application`, {
@@ -81,6 +100,14 @@ const getApplication = async (payload: getApplicationPayload) => {
   }
   return data;
 };
+
+
+/*
+  Asynchronous thunk for getting an application from database:
+  getUserInfoThunk: gets the application and dispatches status updates (pending, fulfilled, rejected) of the application state
+  await getApplication: executes the API call and waits for the response
+  rejectWithValue: returns the correct error message if an error occurs
+*/
 
 export const getApplicationThunk = createAsyncThunk<
   applicationResponse,

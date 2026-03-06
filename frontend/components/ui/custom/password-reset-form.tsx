@@ -10,6 +10,10 @@ interface PasswordResetFormProps {
   onSubmit: (email: string) => void;
 }
 
+/*
+  PasswordResetForm: handles the data entered in the form and extract the needed data and passes it in the onSubmit call.
+*/
+
 export function PasswordResetForm({
   loading,
   errorMessage,

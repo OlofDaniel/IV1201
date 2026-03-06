@@ -36,6 +36,9 @@ export function LoginDialog({
   onLoginClick,
   onOpenChange,
 }: LoginDialogProps) {
+  /*
+    handleFormSubmit: handles the data entered in the form and extracts the data needed and passes it in the onLoginClick call.
+  */
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 

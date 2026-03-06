@@ -8,20 +8,21 @@ import {
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
 
-/* Genom att skicka in router hit kan vi styra navigeringen, 
-samtidigt som det är enkelt att mocka routern i framtida tester. 
-*/
 export function createLoginPresenterHandlers(dispatch: AppDispatch) {
+  /* Creates handlers for login dialog, was used for login logic testing, 
+  but since testing was abandoned it's not necessary anymore */
   return {
+    /* Dispatches the togglePasswordShown action*/
     onEyeClick: () => dispatch(togglePasswordShown()),
 
+    /*Dispatches the postLoginThunk, if successful the user is mobved to their profile page*/
     onLoginClick: async (identifier: string, password: string) => {
       try {
         await dispatch(postLoginThunk({ identifier, password })).unwrap();
         dispatch(setDialogIsOpen(false));
         window.location.href = "/profile";
       } catch (error) {
-        // Error message is handled in the slice, so we don't need to do anything here
+        // Error message is handled in the slice
       }
     },
 
@@ -30,6 +31,7 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
 }
 
 export function LoginDialogPresenter() {
+  /* Presenter for the login dialog */
   const dispatch = useDispatch<AppDispatch>();
 
   const { loginLoading, passwordShown, dialogIsOpen, errorMessage } =

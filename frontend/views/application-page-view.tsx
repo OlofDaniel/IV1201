@@ -31,6 +31,11 @@ interface ApplicationPageViewProps {
   };
 }
 
+/*
+  View layout for the application page view:
+  Conditionally renders the application form or the current application 
+  based on if the user has already made an application.
+*/
 export function ApplicationPageView({
   username,
   first_name,

@@ -16,7 +16,6 @@ import {
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
 import { getApplicationThunk } from "@/communication/application-communication";
-import { LoaderView } from "@/views/loading-view";
 
 export function RecruiterPagePresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,6 +35,7 @@ export function RecruiterPagePresenter() {
     (state: RootState) => state.user,
   );
 
+  /*Triggers attempt to load applications on reload*/
   useEffect(() => {
     if (
       applications.length === 0 &&
@@ -53,9 +53,12 @@ export function RecruiterPagePresenter() {
     errorMessages.getApplicationsError,
   ]);
 
+  /* Dispatches the setNewStatus action when a status is changed,
+   adds to a list of user_ids and their new statuses */
   const onStatusChange = (id: string, newStatus: Application["status"]) =>
     dispatch(setNewStatus({ id, newStatus }));
 
+  /* When a row is clicked the application for that applicant is fetched */
   const onRowClick = (app: Application) => {
     if (selectedApplication?.id === app.id) {
       dispatch(setSelectedApplication(null));
@@ -65,14 +68,17 @@ export function RecruiterPagePresenter() {
     }
   };
 
+  /* Closes the detailed view of an application*/
   const onCloseRowClick = () => dispatch(setSelectedApplication(null));
 
   const hasPendingChanges = updatedApplications.length > 0;
 
+  /* Dispatches the postApplicationUpdateThunk with the new statuses when save changes is clicked */
   const onSaveChangesClick = () => {
     dispatch(postApplicationUpdateThunk(updatedApplications));
   };
 
+  /* Provides toast notifications of saved status changes */
   useEffect(() => {
     if (errorMessages.saveChangesError) {
       toast.error(errorMessages.saveChangesError, { position: "top-center" });
@@ -81,6 +87,7 @@ export function RecruiterPagePresenter() {
     }
   }, [errorMessages.saveChangesError, saveSuccess]);
 
+  /* Empties the list of changed statuses */
   const onCancelChangesClick = () => {
     dispatch(cancelStatusChanges());
   };

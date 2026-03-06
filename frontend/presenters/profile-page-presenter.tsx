@@ -11,12 +11,15 @@ export function ProfileViewPresenter() {
   const { user, loading, isAuthenticated, errorMessage, usernameError } =
     useSelector((state: RootState) => state.user);
 
+  /* If the username exits this error is shown as a toast notification */
   useEffect(() => {
     if (usernameError) {
       toast.error(usernameError, { position: "top-center" });
     }
   }, [usernameError]);
 
+  /*Dispatches the postUsernameThunk when a new username is submitted, 
+  if successful page is reloaded to show the change*/
   const onAddNewUsername = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

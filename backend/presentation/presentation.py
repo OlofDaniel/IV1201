@@ -333,6 +333,11 @@ def get_user_info(response: Response, request: Request):
 async def send_application(
     data: applicationPayload, response: Response, request: Request
 ):
+    """
+    Function that takes application data, calling controller function after converting the request to a dict
+    If new tokens are reurned session cookies are updated with the new tokens.
+    Raises HTTPException if no access_token were sent, or if the tokens are invalid/expired
+    """
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
 
@@ -392,6 +397,15 @@ def get_all_applicants_info(response: Response, request: Request):
 
 @app.post("/application")
 def get_application(data: getApplicationPayload, response: Response, request: Request):
+    """
+    Function that gets application information for a user, calling controller function
+    depending on the users role shown in their JWT token.
+    If the rquesting user is a recruiter the get_recruiter_application_controller is called which returns
+    the latest application, even if it is in the past. If the user is an applicant it'll only return future applications
+    If new tokens are reurned session cookies are updated with the new tokens.
+    Raises HTTPException 401 if no access_token were sent, or if the tokens are invalid/expired
+    400 if appropriate availabilities don't exist for the user.
+    """
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
 
@@ -427,6 +441,13 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
 def update_application(
     data: List[StatusUpdateRequest], response: Response, request: Request
 ):
+    """
+    Function that updates the status of one or more applications, calling the controller function.
+    Raises HTTPException if no access_token were sent, or if the tokens are invalid/expired. If a 
+    non-recruiter tries to update application status, HTTPException with status code 403 is raised. 
+    DatabaseException is caught if there is a problem with the database connection.
+    InvalidTokenError is caught if the tokens are invalid/expired.
+    """
 
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
@@ -457,6 +478,12 @@ def update_application(
 
 @app.post("/updateusername")
 def update_username(data: updateUsernamePayload, response: Response, request: Request):
+    """Function that updates the username of a user, calling the controller function.
+    Raises HTTPException if no access_token were sent, or if the tokens are invalid/expired. 
+    DatabaseException is caught if there is a problem with the database connection.
+    ValueError is caught if the new username is already taken.
+    InvalidTokenError is caught if the tokens are invalid/expired.
+    """
     access_token = request.cookies.get("access_token")
     refresh_token = request.cookies.get("refresh_token")
     if not access_token:
@@ -475,7 +502,7 @@ def update_username(data: updateUsernamePayload, response: Response, request: Re
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=409, detail=str(e))
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:

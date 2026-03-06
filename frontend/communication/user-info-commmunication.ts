@@ -95,7 +95,7 @@ export const postUsernameThunk = createAsyncThunk<
     return await postUsername(payload);
   } catch (error: any) {
     if (error.status == "409") {
-      return thunkAPI.rejectWithValue(error.detail);
+      return thunkAPI.rejectWithValue({ message: error.detail });
     }
     return thunkAPI.rejectWithValue({
       message: "Something went wrong, try again later",

@@ -6,6 +6,7 @@ import { PasswordResetView } from "@/views/password-reset-view";
 import { postResetThunk } from "@/communication/password-reset-communication";
 
 export function PasswordResetPagePresenter() {
+  /* Presenter for the password reset page, very simple since the view is a form with one field.*/
   const dispatch = useDispatch<AppDispatch>();
 
   const { loading, emailSent, errorMessage } = useSelector(

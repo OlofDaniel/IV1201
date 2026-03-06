@@ -15,6 +15,11 @@ interface UpdatePasswordViewProps {
   ) => void;
 }
 
+/*
+  View layout for the update password page view:
+  UpdatePasswordForm: renders the form for updating the user's password
+  Conditionally renders alert message if the link is expired or corrupt.
+*/
 export function UpdatePasswordView({
   updatePasswordLoading,
   passwordShown,

@@ -40,9 +40,11 @@ def login_user(user_credentials):
 
 
 def logout_user(access_token, refresh_token):
-    """Function that logs out user, given the users access and refresh tokens.
+    """
+    Function that logs out user, given the users access and refresh tokens.
     Returns response from supabase if successful, raises invalid token error if the access
-    token is invalid and database exception if there is a problem with the connection"""
+    token is invalid and database exception if there is a problem with the connection
+    """
     try:
         supabase.auth.set_session(access_token, refresh_token)
         response = supabase.auth.sign_out()
@@ -148,7 +150,8 @@ def get_email_from_username(identifier):
 def get_user_data(access_token: str):
     """
     Function that fetches user information from supabase and returns it to frontend.
-    Throws an ValueError if no user data is found.
+    Throws an ValueError if no user data is found, raises APIError if there is an error with the database request
+    and DatabaseException if there is an error with the database connection.
     """
     try:
         user_client = get_user_client(access_token)
@@ -181,7 +184,7 @@ def get_user_client(access_token: str):
 
 def refresh_session(refresh_token: str):
     """
-    Function that starta a new session with refresh token and returns it.
+    Function that starts a new session with refresh token and returns it.
     """
     try:
         return supabase.auth.refresh_session(refresh_token)
@@ -195,9 +198,7 @@ def password_reset_request(email):
     try:
         response = supabase.auth.reset_password_email(
             email,
-            {
-                "redirect_to": "https://iv-1201-orcin.vercel.app/updatepassword"
-            },
+            {"redirect_to": "https://iv-1201-orcin.vercel.app/updatepassword"},
         )
         return response
     except AuthApiError:
@@ -205,11 +206,12 @@ def password_reset_request(email):
 
 
 def update_password(password, access_token, refresh_token):
-    """Function to update a user's password, given the new password and valid
-    access and refresh tokens. Returns the response from supabase if successful,
-    raises invalid token error if the access token is invalid, database exception
-    if there is a problem with the connection and value error if the new password
-    is the same as the previous password"""
+    """
+    Function to update a user's password, given the new password and valid access and refresh tokens.
+    Returns the response from supabase if successful.
+    Raises invalid token error if the access token is invalid, database exception if there is a problem with the connection and
+    value error if the new password is the same as the previous password.
+    """
     try:
         supabase.auth.set_session(access_token, refresh_token)
 
@@ -230,8 +232,10 @@ def update_password(password, access_token, refresh_token):
 
 def get_applicants_data(access_token: str):
     """
-    Function that fetches information about all applicants (role_id = 2) and returns data as a list to the frontend.
-    Throws an ValueError if no user data is found or if the user is unauthorized, or a DatabaseException if there is an error in the database.
+    Function that fetches information about all applicants (role_id = 2) and returns data as a list if successful or
+    an empty list if no data is found.
+    Raises APIError if there is an error with the database request, ValueError if the user is unauthorized
+    and DatabaseException if there is an error with the database connection.
     """
     try:
         user_client = get_user_client(access_token)
@@ -257,6 +261,12 @@ def get_applicants_data(access_token: str):
 
 
 def get_previous_applications(access_token, person_id):
+    """
+    Function that fetches the from_date for all previous availability periods for a specific user. This is used to check if the user has an
+    active application before allowing them to create a new one. Returns a list of all previous availability periods.
+    Takes the users access token and person id as parameters.
+    Raises APIError if there is an error with the database request and DatabaseException if there is an error with the database connection.
+    """
     try:
         user_client = get_user_client(access_token)
         prev_availability = (
@@ -273,10 +283,18 @@ def get_previous_applications(access_token, person_id):
 
 
 def upsert_application(availability_list, competencies_list, access_token, person_id):
+    """
+    Function that executes a function in the database that registers an application with the given availability and competence data.
+    If there is existing competence data, it will be overridden with the new data. Also ensures that both availability and competence data is
+    stored in the same transaction to avoid inconsistencies in the database.
+    Takes the availability and competence data as lists, the users access token and person id as parameters.
+    Raises AuthApiError if there is an authentication error, APIError if the database rpc fails and
+    DatabaseException if there is an error with the database connection.
+    """
     application_payload = {
         "p_person_id": person_id,
         "p_availability_data": availability_list,
-        "p_competence_data": competencies_list
+        "p_competence_data": competencies_list,
     }
     try:
         user_client = get_user_client(access_token)
@@ -307,10 +325,16 @@ def upsert_application_status_updates(status_updates, access_token):
     except APIError, AuthApiError:
         raise
     except Exception:
-        raise DatabaseException()   
+        raise DatabaseException()
 
 
 def get_application(access_token, person_id):
+    """
+    Function that fetches application information for a user given the users access token and person id.
+    Returns a dict with availability, competencies and application status.
+    Raises AuthApiError if there is an authentication error, ApiError if there is an error with the database request and
+    DatabaseException if there is an error with the database connection.
+    """
     try:
         user_client = get_user_client(access_token)
         availability_response = (
@@ -347,6 +371,12 @@ def get_application(access_token, person_id):
 
 
 def add_username(access_token, new_username, person_id):
+    """
+    Function that adds a username to a user (for users that dont have one as a result of database migration). Only adds the username if the user
+    does not already have one. Takes the users access token, the new username and the users person id as parameters.
+    Returns the response from supabase if successful, raises ValueError if the user is unauthorized,
+    ValidationError if the username is not unique and DatabaseException if there is an error with the database.
+    """
     try:
         user_client = get_user_client(access_token)
         response = (

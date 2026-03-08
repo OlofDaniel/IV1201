@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://iv1201-6x6v.onrender.com/:path*"
+      "destination": "http://localhost:8000",
     }
   ]
 }

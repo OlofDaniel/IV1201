@@ -11,7 +11,7 @@ from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, ClientOptions, create_client
 from supabase_auth.errors import AuthApiError
 
-from validation import validate_tokens, validate_unique, validate_person_info, validate_application_data, validate_status_updates
+from integration.validation import validate_tokens, validate_unique, validate_person_info, validate_application_data, validate_status_updates
 
 load_dotenv()
 
@@ -36,7 +36,6 @@ def login_user(user_credentials):
     Validates the format of email and password before sent to database.
     """
     email = user_credentials["identifier"]
-    email = email.split()
     password = user_credentials["password"]
     if not isinstance(email, str) or "@" not in email:
         raise ValueError("Invalid email format")
@@ -60,7 +59,7 @@ def logout_user(access_token, refresh_token):
     """
     Function that logs out user, given the users access and refresh tokens.
     Returns response from supabase if successful, raises invalid token error if the access
-    token is invalid and database exception if there is a problem with the connection
+    token is invalid and database exception if there is a problem with the connection.
     validates the access_token and refresh_token before sending to database.
     """
     try:
@@ -75,7 +74,9 @@ def logout_user(access_token, refresh_token):
         raise InvalidTokenError("Invalid or expired token")
     except ValueError as e:
         raise ValueError(f"Token validation failed: {e}")
-    except Exception:
+    except IndexError as e:
+        raise IndexError("JWT token expired")
+    except Exception as e:
         raise DatabaseException()
 
 
@@ -179,7 +180,7 @@ def get_email_from_username(identifier):
         raise ValueError("Invalid login credentials")
 
 
-def get_user_data(access_token: str):
+def get_user_data(access_token):
     """
     Function that fetches user information from supabase and returns it to frontend.
     Throws an ValueError if no user data is found, raises APIError if there is an error with the database request
@@ -187,8 +188,11 @@ def get_user_data(access_token: str):
     Validates the format of access_token before sending to database.
     """
     try:
+        print("123")
         validate_tokens(access_token=access_token)
+        print("345")
         user_client = get_user_client(access_token)
+        print("678")
         response = (
             user_client.table("person_add_to_auth")
             .select("person_id, username, name, surname, email, pnr, role_id")
@@ -196,18 +200,22 @@ def get_user_data(access_token: str):
             .single()
             .execute()
         )
+        print("789")
         if response.data is None:
             raise ValueError("No data found")
+        print(response.data)
         return response.data
-    except APIError:
+    except APIError, AuthApiError:
         raise
     except ValueError as e:
         raise ValueError(f"Token validation failed: {e}")
-    except Exception:
+    except Exception as e:
+        print(e)
+        print(type(e))
         raise DatabaseException()
 
 
-def get_user_client(access_token: str):
+def get_user_client(access_token):
     """
     Function that creates a new user client with the users access token.
     """
@@ -218,7 +226,7 @@ def get_user_client(access_token: str):
     return user_client
 
 
-def refresh_session(refresh_token: str):
+def refresh_session(refresh_token):
     """
     Function that starts a new session with refresh token and returns it.
     Validates the format of refresh_token before sending to database.
@@ -239,7 +247,7 @@ def password_reset_request(email):
     """
 
     try:
-        if not isinstance(email, str) or not email:
+        if not isinstance(email, str) or "@" not in email or not email:
             raise ValueError("Invalid email format")
         response = supabase.auth.reset_password_email(
             email,
@@ -377,7 +385,7 @@ def upsert_application(availability_list, competencies_list, access_token, perso
         raise DatabaseException()
 
 
-def upsert_application_status_updates(status_updates, access_token):
+def upsert_application_status_updates(access_token, status_updates):
     """
     Function that upserts application status updates to the database. Takes a list of status updates and the users access token.
     Returns the response from supabase if successful, raises ValueError if the user is unauthorized and
@@ -447,6 +455,8 @@ def get_application(access_token, person_id):
         raise
     except APIError:
         raise
+    except ValueError as e:
+        raise ValueError(f"Token validation failed: {e}")
     except Exception:
         raise DatabaseException()
 

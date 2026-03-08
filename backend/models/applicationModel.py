@@ -15,6 +15,7 @@ from models.customExceptions import (
     InvalidTokenError,
 )
 
+from utils.utils import call_with_token_refresh
 competency_id_map = {
     "ticket-sales": 1,
     "lotteries": 2,
@@ -32,9 +33,7 @@ def send_application(application_data, access_token, refresh_token):
     format_availability_ranges(application_data)
 
     try:
-        prev_availability = get_previous_applications(
-            access_token, application_data.person_id
-        )
+        prev_availability, new_tokens = call_with_token_refresh(get_previous_applications, access_token, refresh_token, application_data.person_id)
 
         if len(prev_availability.data) != 0:
             sorted_dates = sorted(
@@ -44,18 +43,10 @@ def send_application(application_data, access_token, refresh_token):
             if int(sorted_dates[0]["from_date"][:4]) >= year:
                 raise ValueError("Application already exist for user")
 
+        if new_tokens:
+            access_token = new_tokens["access_token"]
         add_application(application_data, access_token)
-        return "Successfully added application", None
-    except APIError as e:
-        msg = str(e)
-
-        if "JWT" in msg or "expired" in msg:
-            new_tokens = handle_jwt_expired(refresh_token)
-            add_application(application_data, new_tokens["access_token"])
-            return "Successfully added application", new_tokens
-        else:
-            raise DatabaseException()
-
+        return "Successfully added application", new_tokens
     except InvalidTokenError:
         raise
     except DatabaseException:
@@ -129,28 +120,14 @@ def get_latest_application(person_id, access_token, refresh_token):
     Handles retry if token is expired, if any other error occurs it raises a DatabaseException
     """
     try:
-        application = get_application(access_token, person_id)
+        application, new_tokens = call_with_token_refresh(get_application, access_token, refresh_token, person_id)
+
         application["availability"] = extract_future_availability(application["availability"])
         if(len(application["availability"]) == 0):
             raise ValueError("No future availability found for user")
            
         application["competencies"] = format_competencies(application["competencies"])
-        return application, None
-    except APIError as e:
-        msg = str(e)
-
-        if "JWT" in msg or "expired" in msg:
-            new_tokens = handle_jwt_expired(refresh_token)
-            application = get_application(new_tokens["access_token"], person_id)
-            application["availability"] = extract_future_availability(application["availability"])
-            if(len(application["availability"]) == 0):
-                raise ValueError("No future availability found for user")
-            application["competencies"] = format_competencies(application["competencies"])
-            return application, new_tokens
-
-        else:
-            raise DatabaseException()
-
+        return application, new_tokens
     except InvalidTokenError:
         raise
     except DatabaseException:

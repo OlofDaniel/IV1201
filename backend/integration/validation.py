@@ -64,7 +64,7 @@ def validate_person_info(person_information):
         if not isinstance(person_information[field], str) or not person_information[field].strip():
             raise ValueError(f"Invalid or empty {field}")
 
-    email = person_information["email"].strip()
+    email = person_information["email"]
     if "@" not in email:
         raise ValueError("Invalid email format")
 

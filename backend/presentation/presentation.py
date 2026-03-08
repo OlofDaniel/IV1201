@@ -31,7 +31,9 @@ from pydantic import AfterValidator, BaseModel, Field
 app = FastAPI()
 
 origins = [
-    "https://iv-1201-orcin.vercel.app"
+    "https://iv-1201-orcin.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 
@@ -150,6 +152,7 @@ def login(data: LoginRequest, response: Response):
     Gets access and refresh tokens returned from controller and creates cookies with these tokens which are returned to frontend.
     """
     data_dict = data.model_dump()
+    print("hej från login")
     try:
         login_response = login_controller(data_dict)
 

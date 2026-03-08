@@ -30,6 +30,7 @@ def signup_controller(person_information):
 
 def login_controller(user_credentials):
     """Controller function for logging in, just calls model to attempt login and catches possible errors for example if account does not exist, raising them to the caller"""
+    print("hej från login controller")
     try:
         return login(user_credentials)
     except ValueError:

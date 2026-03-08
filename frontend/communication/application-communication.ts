@@ -29,7 +29,7 @@ interface applicationResponse {
 */
 
 const postApplication = async (payload: applicationPayload) => {
-  const response = await fetch(`/api/sendapplication`, {
+  const response = await fetch("http://localhost:8000/sendapplication", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const postApplicationThunk = createAsyncThunk<
 */
 
 const getApplication = async (payload: getApplicationPayload) => {
-  const response = await fetch(`/api/application`, {
+  const response = await fetch("http://localhost:8000/application", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

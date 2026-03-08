@@ -7,7 +7,7 @@ from integration.integration import (
 )
 from postgrest import APIError
 from supabase_auth.errors import AuthApiError
-from utils.utils import handle_jwt_expired
+from utils.utils import call_with_token_refresh
 
 # helper from applicationModel to convert competency list to a name→years map
 from .applicationModel import format_competencies
@@ -23,17 +23,9 @@ def get_all_applicants_information(access_token, refresh_token):
     if there is an error with the database connection.
     """
     try:
-        data = get_applicants_data(access_token)
-        return data, None
+        return call_with_token_refresh(get_applicants_data, access_token, refresh_token)
     except ValueError:
         raise
-    except (APIError, AuthApiError) as e:
-        if "JWT" in str(e) or "expired" in str(e):
-            new_tokens = handle_jwt_expired(refresh_token)
-            data = get_applicants_data(new_tokens["access_token"])
-            return data, new_tokens
-        else:
-            raise DatabaseException()
     except InvalidTokenError:
         raise
     except DatabaseException:
@@ -49,17 +41,7 @@ def update_application_status(status_updates, access_token, refresh_token):
     or if the update fails.
     """
     try:
-        response = upsert_application_status_updates(status_updates, access_token)
-        return response, None
-    except (APIError, AuthApiError) as e:
-        if "JWT" in str(e) or "expired" in str(e):
-            new_tokens = handle_jwt_expired(refresh_token)
-            response = upsert_application_status_updates(
-                status_updates, new_tokens["access_token"]
-            )
-            return response, new_tokens
-        else:
-            raise DatabaseException()
+        return call_with_token_refresh(upsert_application_status_updates, access_token, refresh_token, status_updates)
     except InvalidTokenError:
         raise
     except DatabaseException:
@@ -77,28 +59,12 @@ def get_recruiter_application(person_id, access_token, refresh_token):
     Raises InvalidTokenError if the access token is invalid and DatabaseException if there is an error with the database connection.
     """
     try:
-        application = get_application(access_token, person_id)
+        application, new_tokens = call_with_token_refresh(get_application, access_token, refresh_token, person_id)
         application["availability"] = extract_latest_year_availability(
             application["availability"]
         )
         application["competencies"] = format_competencies(application["competencies"])
-        return application, None
-    except APIError as e:
-        msg = str(e)
-
-        if "JWT" in msg or "expired" in msg:
-            new_tokens = handle_jwt_expired(refresh_token)
-            application = get_application(new_tokens["access_token"], person_id)
-            application["availability"] = extract_latest_year_availability(
-                application["availability"]
-            )
-            application["competencies"] = format_competencies(
-                application["competencies"]
-            )
-            return application, new_tokens
-
-        else:
-            raise DatabaseException()
+        return application, new_tokens
     except InvalidTokenError:
         raise
     except DatabaseException:

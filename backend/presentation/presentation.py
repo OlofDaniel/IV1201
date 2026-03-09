@@ -31,7 +31,7 @@ from pydantic import AfterValidator, BaseModel, Field
 app = FastAPI()
 
 origins = [
-    "https://iv-1201-orcin.vercel.app"
+    "https://iv-1201-orcin.vercel.app",
 ]
 
 
@@ -161,7 +161,8 @@ def login(data: LoginRequest, response: Response):
             "status": "success",
             "user": {"metadata": login_response["user"]},
         }
-
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException as e:
@@ -188,6 +189,8 @@ def logout(request: Request, response: Response):
         raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/reset")
@@ -201,6 +204,8 @@ def reset(data: PasswordResetRequest):
         return reset_password_controller(data.email)
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/updatepassword")
@@ -220,6 +225,8 @@ def updatepassword(
         raise HTTPException(status_code=401, detail=str(e))
     except DatabaseException:
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -245,19 +252,24 @@ def signup(data: SignupRequest, response: Response):
     except ValidationError as e:
         errors = {}
 
-        for field, is_unique in e.details.items():
-            if not is_unique:
-                if field == "email":
-                    errors["email"] = "Email is already registered"
-                elif field == "username":
-                    errors["username"] = "Username is already taken"
-                elif field == "pnr":
-                    errors["pnr"] = "Person number is already registered"
+        if e.details is not None:
 
-        raise HTTPException(
-            status_code=409,
-            detail={"message": "Some credentials are already in use", "errors": errors},
-        )
+            for field, is_unique in e.details.items():
+                if not is_unique:
+                    if field == "email":
+                        errors["email"] = "Email is already registered"
+                    elif field == "username":
+                        errors["username"] = "Username is already taken"
+                    elif field == "pnr":
+                        errors["pnr"] = "Person number is already registered"
+
+            raise HTTPException(
+                status_code=409,
+                detail={"message": "Some credentials are already in use", "errors": errors},
+            )
+        else:
+            print(e)
+            raise HTTPException(status_code=400, detail=e.message)
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -319,8 +331,10 @@ def get_user_info(response: Response, request: Request):
         else:
             raise HTTPException(status_code=500, detail="Cannot get data")
 
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except InvalidTokenError as e:
@@ -355,6 +369,8 @@ async def send_application(
             )
 
         return message
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except ValueError as e:
@@ -387,7 +403,8 @@ def get_all_applicants_info(response: Response, request: Request):
             )
 
         return all_applicants_info
-
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=403, detail=str(e))
     except DatabaseException as e:
@@ -429,10 +446,12 @@ def get_application(data: getApplicationPayload, response: Response, request: Re
             )
 
         return application_info
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except DatabaseException:
         raise HTTPException(status_code=500, detail="Something went wrong when retrieving the application details")
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -474,6 +493,8 @@ def update_application(
         raise HTTPException(status_code=500, detail="Something went wrong when trying to update application status")
     except InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=str(e))
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/updateusername")
@@ -499,6 +520,8 @@ def update_username(data: updateUsernamePayload, response: Response, request: Re
             )
 
         return username_update
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except DatabaseException as e:
         raise HTTPException(status_code=500, detail=str(e))
     except ValueError as e:

@@ -118,7 +118,7 @@ export const getApplicationThunk = createAsyncThunk<
     const data = await getApplication(payload);
     return data;
   } catch (error: any) {
-    if (error.status == "400") {
+    if (error.status == "404") {
       return thunkAPI.rejectWithValue({
         message: error.detail,
         status: error.status,

@@ -54,7 +54,7 @@ export const getUserInfoThunk = createAsyncThunk<
     const data = await getUserInfo();
     return data;
   } catch (error: any) {
-    if (error.status == "409") {
+    if (error.status == "404") {
       return thunkAPI.rejectWithValue(error.detail);
     }
     return thunkAPI.rejectWithValue({

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/Redux/store";
 import { setDialogIsOpen } from "@/models/Redux/login-slice";
 import { postLogoutThunk } from "@/communication/logout-communication";
+import {toast} from "sonner";
 
 export function HeaderPresenter() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,10 +25,10 @@ export function HeaderPresenter() {
   */
   const onLogoutClick = async () => {
     try {
-      await dispatch(postLogoutThunk());
+      await dispatch(postLogoutThunk()).unwrap();
       window.location.href = "/";
     } catch (error) {
-      console.error("Logout failed", error);
+      toast.error("Something went wrong when trying to logout");
     }
   };
 

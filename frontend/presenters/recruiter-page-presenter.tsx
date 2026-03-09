@@ -13,6 +13,7 @@ import {
   setSelectedApplication,
   cancelStatusChanges,
   Application,
+    setSaveSuccess,
 } from "@/models/Redux/recruiter-slice";
 import { toast } from "sonner";
 import { getApplicationThunk } from "@/communication/application-communication";
@@ -84,8 +85,9 @@ export function RecruiterPagePresenter() {
       toast.error(errorMessages.saveChangesError, { position: "top-center" });
     } else if (saveSuccess) {
       toast.success("Successfully saved changes", { position: "top-center" });
+      dispatch(setSaveSuccess(false))
     }
-  }, [errorMessages.saveChangesError, saveSuccess]);
+  }, [errorMessages.saveChangesError, saveSuccess, dispatch]);
 
   /* Empties the list of changed statuses */
   const onCancelChangesClick = () => {

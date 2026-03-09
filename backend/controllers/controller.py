@@ -54,6 +54,8 @@ def reset_password_controller(user_email):
         return request_password_email(user_email)
     except DatabaseException:
         raise
+    except ValidationError:
+        raise
 
 
 def update_password_controller(password, access_token, refresh_token):
@@ -63,6 +65,8 @@ def update_password_controller(password, access_token, refresh_token):
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValidationError:
         raise
     except ValueError:
         raise
@@ -76,12 +80,16 @@ def logout_controller(access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+    except ValidationError:
+        raise
 
 
 def get_all_applicants_information_controller(access_token, refresh_token):
     """Controller function for getting all applicants information. Calls model function get_all_applicants_information with users tokens."""
     try:
         return get_all_applicants_information(access_token, refresh_token)
+    except ValidationError:
+        raise
     except ValueError:
         raise
     except DatabaseException:
@@ -96,6 +104,8 @@ def send_application_controller(application_data, access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+    except ValidationError:
+        raise
     except ValueError:
         raise
 
@@ -108,6 +118,8 @@ def get_application_controller(person_id, access_token, refresh_token):
         raise
     except DatabaseException:
         raise
+    except ValidationError:
+        raise
     except ValueError:
         raise
 
@@ -116,6 +128,8 @@ def update_application_controller(status_updates, access_token, refresh_token):
     """Controller function for updating application status. Calls model function update_application_status with the status updates and users tokens."""
     try:
         return update_application_status(status_updates, access_token, refresh_token)
+    except ValidationError:
+        raise
     except ValueError:
         raise
     except DatabaseException:
@@ -130,6 +144,8 @@ def get_recruiter_application_controller(person_id, access_token, refresh_token)
         raise
     except DatabaseException:
         raise
+    except ValidationError:
+        raise
     except ValueError:
         raise
 
@@ -143,6 +159,8 @@ def add_username_controller(new_username, person_id, access_token, refresh_token
     except InvalidTokenError:
         raise
     except DatabaseException:
+        raise
+    except ValidationError:
         raise
     except ValueError:
         raise

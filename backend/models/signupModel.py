@@ -19,6 +19,7 @@ def signup(person_information):
     
     except ValidationError:
         raise
-
     except DatabaseException:
+        raise
+    except ValueError:
         raise

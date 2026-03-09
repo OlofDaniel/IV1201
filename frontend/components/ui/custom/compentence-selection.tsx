@@ -80,8 +80,19 @@ export function CompetensSelection({
                     name={`${comp.id}-years`}
                     step="0.25"
                     min="0"
-                    placeholder="0.0"
+                    placeholder="0"
                     className="w-20 h-8"
+                    onFocus={(e) => {
+                        if (e.target.value === "0") {
+                            e.target.value = "";
+                        }
+                    }}
+                    onBlur={(e) => {
+                        if (e.target.value === "") {
+                            e.target.value = "0";
+                            onYearsChange(comp.id, 0);
+                        }
+                    }}
                   />
                   <span className="text-sm text-muted-foreground">years</span>
                 </div>

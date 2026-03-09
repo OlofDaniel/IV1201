@@ -1,6 +1,7 @@
 from integration.integration import refresh_session
-from models.customExceptions import InvalidTokenError
 from supabase_auth.errors import AuthApiError
+from postgrest.exceptions import APIError
+from models.customExceptions import DatabaseException, InvalidTokenError
 
 
 def handle_jwt_expired(refresh_token):
@@ -18,3 +19,30 @@ def handle_jwt_expired(refresh_token):
         return new_tokens
     except AuthApiError:
         raise InvalidTokenError("Bad refresh token")
+
+def call_with_token_refresh(func, access_token, refresh_token, *args, **kwargs):
+    """
+    Helper function that allows several functions to be called with handling of token refreshing,
+    Calls a function that required access token and if the token is expired it handles session refreshing,
+    if both tokens are expired/corrupt InvalidTokenError is raised.
+    """
+    try:
+        data = func(access_token, *args, **kwargs)
+        return data, None
+    except (APIError, AuthApiError, IndexError) as e:
+        msg = str(e)
+
+        if "JWT" in msg or "expired" in msg:
+            new_tokens = handle_jwt_expired(refresh_token)
+            if "refresh_token" in kwargs:
+                kwargs["refresh_token"] = new_tokens["refresh_token"]
+            data = func(new_tokens["access_token"], *args, **kwargs)
+            return data, new_tokens
+        else:
+            raise DatabaseException()
+    except ValueError:
+        raise
+    except InvalidTokenError:
+        raise
+    except Exception as e:
+        raise DatabaseException() from e

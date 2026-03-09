@@ -26,15 +26,15 @@ export function ApplicationPagePresenter() {
     currentApplication,
   } = useSelector((state: RootState) => state.application);
 
-  /*useEffect: shows a toast with either an error message or a success-message after a user sends application*/
+  /*useEffect: shows a toast with an error message if there is an error after a user sends application.
+    if successful, the page reloads to show the application.
+  */
 
   useEffect(() => {
     if (applicationErrorMessage) {
       toast.error(applicationErrorMessage, { position: "top-center" });
     } else if (applicationSentSuccess) {
-      toast.success("Sucessfully submitted application", {
-        position: "top-center",
-      });
+      window.location.href = "/application";
     }
   }, [applicationErrorMessage, applicationSentSuccess]);
 

@@ -11,6 +11,10 @@ def request_password_email(email):
         return password_reset_request(email)
     except DatabaseException:
         raise
+    except ValueError:
+        raise
+
+
 def change_password(password, access_token, refresh_token):
     """
     Attempts to change password, raises invalid token error if the access token is invalid,

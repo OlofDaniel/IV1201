@@ -13,14 +13,16 @@ export function SignupPagePresenter() {
   const { passwordShown, signupLoading, errorMessage, fieldErrors } =
     useSelector((state: RootState) => state.signup);
   const { user, loading } = useSelector((state: RootState) => state.user);
-  /* 
-  onEyeClick: toggles the value in passwordShown, hides password if false
-  */
+
   useEffect(() => {
     if (errorMessage && Object.keys(fieldErrors).length === 0) {
       toast.error(errorMessage, { position: "top-center" });
     }
   }, [errorMessage, fieldErrors]);
+
+  /*
+  onEyeClick: toggles the value in passwordShown, hides password if false
+  */
   const onEyeClick = () => {
     dispatch(togglePasswordShown());
   };

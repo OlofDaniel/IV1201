@@ -7,9 +7,10 @@ import {
   togglePasswordShown,
   setDialogIsOpen,
 } from "@/models/Redux/login-slice";
+import {toast} from "sonner";
 
 export function createLoginPresenterHandlers(dispatch: AppDispatch) {
-  /* Creates handlers for login dialog, was used for login logic testing, 
+  /* Creates handlers for login dialog, was used for login logic testing,
   but since testing was abandoned it's not necessary anymore */
   return {
     /* Dispatches the togglePasswordShown action*/
@@ -22,7 +23,9 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
         dispatch(setDialogIsOpen(false));
         window.location.href = "/profile";
       } catch (error) {
-        // Error message is handled in the slice
+        // Error message is handled in the slice, so we don't need to do anything here
+        toast.error("Something went wrong when trying to login");
+
       }
     },
 

@@ -10,7 +10,6 @@ def login(user_credentials):
     Error raises if the user does not exist in the database, or if user_credentials is wrong.
     DataBaseException is raised if there was a problem when accessing the database but the cause is unknown or irrelevant to the user.
     """
-    print("hej från login model")
     try:
         identifier_is_email = is_email(user_credentials["identifier"])
         if not identifier_is_email:
@@ -26,8 +25,7 @@ def login(user_credentials):
         }
         return formatted_response
 
-    except ValueError as e:
-        print(f"Från login model valueerror: {str(e)}")
+    except ValueError:
         raise
     except Exception:
         raise DatabaseException()

@@ -5,8 +5,6 @@ from utils.utils import call_with_token_refresh
 from .customExceptions import DatabaseException, InvalidTokenError
 
 
-
-
 def get_user_information(access_token, refresh_token):
     """
     Function that gets user information from supabase and returns it.

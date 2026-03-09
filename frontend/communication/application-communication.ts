@@ -29,7 +29,7 @@ interface applicationResponse {
 */
 
 const postApplication = async (payload: applicationPayload) => {
-  const response = await fetch("http://localhost:8000/sendapplication", {
+  const response = await fetch(`/api/sendapplication`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const postApplicationThunk = createAsyncThunk<
 */
 
 const getApplication = async (payload: getApplicationPayload) => {
-  const response = await fetch("http://localhost:8000/application", {
+  const response = await fetch(`/api/application`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -118,7 +118,7 @@ export const getApplicationThunk = createAsyncThunk<
     const data = await getApplication(payload);
     return data;
   } catch (error: any) {
-    if (error.status == "400") {
+    if (error.status == "404") {
       return thunkAPI.rejectWithValue({
         message: error.detail,
         status: error.status,

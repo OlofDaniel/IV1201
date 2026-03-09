@@ -26,7 +26,7 @@ interface GetInfoError {
   response: saves the response from the fetch call to the getUserInfo endpoint after the HTTP POST request
 */
 const getUserInfo = async () => {
-  const response = await fetch("http://localhost:8000/getinfo", {
+  const response = await fetch(`/api/getinfo`, {
     method: "GET",
     credentials: "include",
   });
@@ -54,7 +54,7 @@ export const getUserInfoThunk = createAsyncThunk<
     const data = await getUserInfo();
     return data;
   } catch (error: any) {
-    if (error.status == "409") {
+    if (error.status == "404") {
       return thunkAPI.rejectWithValue(error.detail);
     }
     return thunkAPI.rejectWithValue({
@@ -70,7 +70,7 @@ export const getUserInfoThunk = createAsyncThunk<
 */
 
 const postUsername = async (payload: UsernamePayload) => {
-  const response = await fetch("http://localhost:8000/updateusername", {
+  const response = await fetch(`/api/updateusername`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

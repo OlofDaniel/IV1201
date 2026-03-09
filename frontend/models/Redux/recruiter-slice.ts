@@ -84,6 +84,9 @@ export const recruiterSlice = createSlice({
   name: "recruiter",
   initialState,
   reducers: {
+    setSaveSuccess: (state, action: PayloadAction<boolean>) => {
+      state.saveSuccess = action.payload;
+    },
     setNewStatus: (
       state,
       action: PayloadAction<{ id: string; newStatus: Application["status"] }>,
@@ -202,5 +205,5 @@ export const recruiterSlice = createSlice({
 });
 
 export default recruiterSlice.reducer;
-export const { setNewStatus, cancelStatusChanges, setSelectedApplication } =
+export const { setNewStatus, cancelStatusChanges, setSelectedApplication, setSaveSuccess } =
   recruiterSlice.actions;

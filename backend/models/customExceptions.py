@@ -15,9 +15,10 @@ class ValidationError(ValueError):
     for example if a user wants to signup with a username/email/person number that already exist.
     """
 
-    def __init__(self, message, details: dict):
+    def __init__(self, message, details: dict | str | None = None):
         super().__init__(message)
         self.details = details
+        self.message = message
 
 class InvalidTokenError(Exception):
     def __init__(self, message):

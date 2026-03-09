@@ -36,7 +36,7 @@ interface ApplicationUpdateError {
   response: saves the response from the fetch call to the applications endpoint after the HTTP GET request
 */
 const getApplications = async () => {
-  const response = await fetch("http://localhost:8000/recruiter", {
+  const response = await fetch(`/api/recruiter`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -86,7 +86,7 @@ export const getApplicationsThunk = createAsyncThunk<
   JSON.stringify: formats the application updates as a JSON payload for the API call
 */
 const postApplicationUpdate = async (payload: UpdatedApplicationPayload[]) => {
-  const response = await fetch("http://localhost:8000/updateapplication", {
+  const response = await fetch(`/api/updateapplication`, {
     method: "POST",
     credentials: "include",
     headers: {

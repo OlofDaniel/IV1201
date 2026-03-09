@@ -27,14 +27,12 @@ def call_with_token_refresh(func, access_token, refresh_token, *args, **kwargs):
     if both tokens are expired/corrupt InvalidTokenError is raised.
     """
     try:
-        print("Hej utanför jwt")
         data = func(access_token, *args, **kwargs)
         return data, None
     except (APIError, AuthApiError, IndexError) as e:
         msg = str(e)
 
         if "JWT" in msg or "expired" in msg:
-            print("hej från inne i jwt")
             new_tokens = handle_jwt_expired(refresh_token)
             if "refresh_token" in kwargs:
                 kwargs["refresh_token"] = new_tokens["refresh_token"]

@@ -11,7 +11,7 @@ from pydantic import ValidationError as PydanticValidationError
 from supabase import Client, ClientOptions, create_client
 from supabase_auth.errors import AuthApiError
 
-from integration.validation import validate_tokens, validate_unique, validate_person_info, validate_application_data, validate_status_updates
+from integration.validation import validate_tokens, validate_unique, validate_person_info, validate_application_data, validate_status_updates, validate_email
 
 load_dotenv()
 
@@ -37,10 +37,9 @@ def login_user(user_credentials):
     """
     email = user_credentials["identifier"]
     password = user_credentials["password"]
-    if not isinstance(email, str) or "@" not in email:
-        raise ValueError("Invalid email format")
+    validate_email(email)
     if not isinstance(password, str) or not password:
-        raise ValueError("Invalid password format")
+        raise ValidationError("Invalid password format")
 
     try:
         response = supabase.auth.sign_in_with_password(
@@ -53,6 +52,8 @@ def login_user(user_credentials):
 
     except AuthApiError as e:
         raise ValueError(vars(e) if hasattr(e, "dict") else str(e))
+    except ValidationError:
+        raise
 
 
 def logout_user(access_token, refresh_token):
@@ -72,9 +73,9 @@ def logout_user(access_token, refresh_token):
         raise InvalidTokenError("Invalid or expired token")
     except PydanticValidationError:
         raise InvalidTokenError("Invalid or expired token")
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
-    except IndexError as e:
+    except ValidationError:
+        raise
+    except IndexError:
         raise IndexError("JWT token expired")
     except Exception as e:
         raise DatabaseException()
@@ -99,7 +100,7 @@ def add_person(person_information):
         )
 
         if False in unique_dict.values():
-            raise ValidationError("Some credentials was not unique: ", unique_dict)
+            raise ValidationError("Some credentials was not unique: ", details=unique_dict)
 
         response = supabase.auth.sign_up(
             {
@@ -121,38 +122,9 @@ def add_person(person_information):
 
     except AuthApiError:
         raise DatabaseException()
-    except ValueError as e:
-        raise ValueError(f"Validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Validation failed: {e}", details=e.details)
 
-
-# def validate_unique(username, email, pnr):
-#     """
-#     Function that checks if username, email and person number is unique. Returns a dict with a boolean value for each of these. True indicates unique, false is not unique.
-#     """
-#     unique_status = {
-#         "email": not bool(
-#             supabase.table("person_add_to_auth")
-#             .select("id")
-#             .eq("email", email)
-#             .execute()
-#             .data
-#         ),
-#         "username": not bool(
-#             supabase.table("person_add_to_auth")
-#             .select("id")
-#             .eq("username", username)
-#             .execute()
-#             .data
-#         ),
-#         "pnr": not bool(
-#             supabase.table("person_add_to_auth")
-#             .select("id")
-#             .eq("pnr", pnr)
-#             .execute()
-#             .data
-#         ),
-#     }
-#     return unique_status
 
 
 def get_email_from_username(identifier):
@@ -163,7 +135,7 @@ def get_email_from_username(identifier):
     """
     try:
         if not isinstance(identifier, str) or not identifier:
-            raise ValueError("Invalid username format")
+            raise ValidationError("Invalid username format")
 
 
         query = (
@@ -176,7 +148,6 @@ def get_email_from_username(identifier):
         return query.data["email"]
 
     except APIError as e:
-        print(e)
         raise ValueError("Invalid login credentials")
 
 
@@ -188,11 +159,8 @@ def get_user_data(access_token):
     Validates the format of access_token before sending to database.
     """
     try:
-        print("123")
         validate_tokens(access_token=access_token)
-        print("345")
         user_client = get_user_client(access_token)
-        print("678")
         response = (
             user_client.table("person_add_to_auth")
             .select("person_id, username, name, surname, email, pnr, role_id")
@@ -200,18 +168,14 @@ def get_user_data(access_token):
             .single()
             .execute()
         )
-        print("789")
         if response.data is None:
             raise ValueError("No data found")
-        print(response.data)
         return response.data
-    except APIError, AuthApiError:
+    except (APIError, AuthApiError) as e:
         raise
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
     except Exception as e:
-        print(e)
-        print(type(e))
         raise DatabaseException()
 
 
@@ -236,8 +200,8 @@ def refresh_session(refresh_token):
         return supabase.auth.refresh_session(refresh_token)
     except AuthApiError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
 
 
 def password_reset_request(email):
@@ -247,8 +211,7 @@ def password_reset_request(email):
     """
 
     try:
-        if not isinstance(email, str) or "@" not in email or not email:
-            raise ValueError("Invalid email format")
+        validate_email(email)
         response = supabase.auth.reset_password_email(
             email,
             {"redirect_to": "https://iv-1201-orcin.vercel.app/updatepassword"},
@@ -256,6 +219,8 @@ def password_reset_request(email):
         return response
     except AuthApiError:
         raise DatabaseException()
+    except ValidationError:
+        raise
 
 
 def update_password(password, access_token, refresh_token):
@@ -268,7 +233,7 @@ def update_password(password, access_token, refresh_token):
     """
     try:
         if not isinstance(password, str) or not password:
-            raise ValueError("Invalid password format")
+            raise ValidationError("Invalid password format")
         validate_tokens(access_token=access_token, refresh_token=refresh_token)
 
         supabase.auth.set_session(access_token, refresh_token)
@@ -283,10 +248,9 @@ def update_password(password, access_token, refresh_token):
         else:
             raise InvalidTokenError("Invalid or expired token")
     except PydanticValidationError as e:
-        print(e)
         raise InvalidTokenError("Invalid or expired token")
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
 
 
 def get_applicants_data(access_token: str):
@@ -315,8 +279,8 @@ def get_applicants_data(access_token: str):
         return response.data
     except APIError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
     except Exception as e:
         if "Unauthorized" in str(e):
             raise ValueError(str(e))
@@ -333,7 +297,7 @@ def get_previous_applications(access_token, person_id):
     """
     try:
         if not isinstance(person_id, int) or not person_id:
-            raise ValueError("Invalid person_id format")
+            raise ValidationError("Invalid person_id format")
         validate_tokens(access_token=access_token)
 
         user_client = get_user_client(access_token)
@@ -346,8 +310,8 @@ def get_previous_applications(access_token, person_id):
         return prev_availability
     except APIError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
     except Exception:
         raise DatabaseException()
 
@@ -369,7 +333,7 @@ def upsert_application(availability_list, competencies_list, access_token, perso
     }
     try:
         if not isinstance(person_id, int):
-            raise ValueError("Invalid person_id format")
+            raise ValidationError("Invalid person_id format")
         validate_tokens(access_token=access_token)
         validate_application_data(availability_list, competencies_list, person_id)
 
@@ -379,8 +343,8 @@ def upsert_application(availability_list, competencies_list, access_token, perso
         raise
     except APIError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Validation failed: {e}")
     except Exception:
         raise DatabaseException()
 
@@ -406,8 +370,8 @@ def upsert_application_status_updates(access_token, status_updates):
         return response
     except APIError, AuthApiError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Validation failed: {e}")
     except Exception:
         raise DatabaseException()
 
@@ -423,7 +387,7 @@ def get_application(access_token, person_id):
     try:
         validate_tokens(access_token=access_token)
         if not isinstance(person_id, int) or not person_id:
-            raise ValueError("Invalid person_id format")
+            raise ValidationError("Invalid person_id type")
 
         user_client = get_user_client(access_token)
         availability_response = (
@@ -455,8 +419,8 @@ def get_application(access_token, person_id):
         raise
     except APIError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Token validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Token validation failed: {e}")
     except Exception:
         raise DatabaseException()
 
@@ -471,9 +435,9 @@ def add_username(access_token, new_username, person_id):
     try:
         validate_tokens(access_token=access_token)
         if not isinstance(person_id, int) or not person_id:
-            raise ValueError("Invalid person_id format")
+            raise ValidationError("Invalid person_id type")
         if not isinstance(new_username, str) or not new_username:
-            raise ValueError("Invalid username format")
+            raise ValidationError("Invalid username type")
 
 
         user_client = get_user_client(access_token)
@@ -490,7 +454,7 @@ def add_username(access_token, new_username, person_id):
         raise
     except APIError:
         raise
-    except ValueError as e:
-        raise ValueError(f"Validation failed: {e}")
+    except ValidationError as e:
+        raise ValidationError(f"Validation failed: {e}")
     except Exception:
         raise DatabaseException()

@@ -24,8 +24,6 @@ export function createLoginPresenterHandlers(dispatch: AppDispatch) {
         window.location.href = "/profile";
       } catch (error) {
         // Error message is handled in the slice, so we don't need to do anything here
-        toast.error("Something went wrong when trying to login");
-
       }
     },
 

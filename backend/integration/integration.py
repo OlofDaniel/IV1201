@@ -27,7 +27,7 @@ def validate_unique_credentials(username, email, pnr):
     """
     Validates uniqueness of username, email and person number
     """
-    validate_unique(username, email, pnr, supabase)
+    return validate_unique(username, email, pnr, supabase)
 
 def login_user(user_credentials):
     """

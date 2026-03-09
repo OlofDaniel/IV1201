@@ -78,12 +78,15 @@ def extract_latest_year_availability(availabilities):
     Helper function that takes a list of availability ranges and returns only the availability ranges that are in the latest year.
     This is used to ensure that only relevant availability data is returned to the recruiter.
     """
-    latest_year = max(
-        [datetime.strptime(a["from_date"], "%Y-%m-%d") for a in availabilities]
-    ).year
-    future_availabilities = []
-    for availability in availabilities:
-        from_date = datetime.strptime(availability["from_date"], "%Y-%m-%d")
-        if from_date.year == latest_year:
-            future_availabilities.append(availability)
-    return future_availabilities
+    try: 
+        latest_year = max(
+            [datetime.strptime(a["from_date"], "%Y-%m-%d") for a in availabilities]
+        ).year
+        future_availabilities = []
+        for availability in availabilities:
+            from_date = datetime.strptime(availability["from_date"], "%Y-%m-%d")
+            if from_date.year == latest_year:
+                future_availabilities.append(availability)
+        return future_availabilities
+    except ValueError:
+        return []
